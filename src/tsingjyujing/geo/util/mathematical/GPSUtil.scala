@@ -22,12 +22,21 @@ object GPSUtil {
         val v2 = p2.get3DPos()
         val v3 = p3.get3DPos()
         GeometryUtil.angle(
-            outerProduct(v1, v2),
-            outerProduct(v2, v3)
+            outerProduct(
+                v1,
+                v2
+            ),
+            outerProduct(
+                v2,
+                v3
+            )
         )
     }
     
-    
+    /*
+     * 近似欧氏空间求转弯角，如无特殊需求不再使用
+     */
+    @Deprecated
     def steeringAngleEuclidean[T](
                                    p1: GeometryPoint[T],
                                    p2: GeometryPoint[T],
@@ -40,16 +49,9 @@ object GPSUtil {
         )
     }
     
-    def GPSMile[T](gpsIter: Iterator[GeometryPoint[T]]): Double = {
-        var gpsMile = 0.0
-        var lastPoint = gpsIter.next()
-        while (gpsIter.hasNext) {
-            val currentPoint = gpsIter.next()
-            gpsMile += currentPoint.distance(lastPoint)
-            lastPoint = currentPoint
-        }
-        gpsMile
-    }
+    def GPSMile[T](gpsIter: Iterator[GeometryPoint[T]]): Double = gpsIter.sliding(2, 1).map {
+        case Seq(a, b) => a.distance(b)
+    }.sum
     
     def sparsifyGPS[T <: Tickable](
                                     gpsArray: IndexedSeq[GeometryPoint[T]],
@@ -102,23 +104,34 @@ object GPSUtil {
         returnList.toIndexedSeq
     }
     
+    def getMaxDistanceToLine(
+                              gpsArray: IndexedSeq[GeometryPoint[_ <: Tickable]],
+                            ): IndexedSeq[Double] = 3.to(gpsArray.size - 2).map(i => {
+        val line = new GeodesicLine(
+            gpsArray.head,
+            gpsArray(i)
+        )
+        2.until(i).map(x => line.distance(gpsArray(x))).max
+    })
+    
+    def getAverageDistanceToLine(
+                                  gpsArray: IndexedSeq[GeometryPoint[_ <: Tickable]],
+                                ): IndexedSeq[Double] = {
+        3.to(gpsArray.size).map(i => {
+            val line = new GeodesicLine(
+                gpsArray.head,
+                gpsArray(i)
+            )
+            val distance_list = 2.until(i).map(x => line.distance(gpsArray(x)))
+            distance_list.sum / distance_list.size
+        })
+    }
+    
     def cleanGPS[T <: Tickable](
                                  gpsArray: Iterable[GeometryPoint[T]],
                                  velocityLimit: Double
-                               ): immutable.IndexedSeq[GeometryPoint[T]] = {
-        val pointIter = gpsArray.iterator
-        var lastPoint = pointIter.next()
-        val returnList = new mutable.MutableList[GeometryPoint[T]]
-        returnList += lastPoint
-        while (pointIter.hasNext) {
-            val thisPoint = pointIter.next()
-            val distance = thisPoint.distance(lastPoint)
-            val velocity = distance / math.abs(thisPoint.userInfo.getTick - lastPoint.userInfo.getTick)
-            if (velocity < velocityLimit) {
-                returnList += thisPoint
-                lastPoint = thisPoint
-            }
-        }
-        returnList.toIndexedSeq
-    }
+                               ): immutable.IndexedSeq[GeometryPoint[T]] = gpsArray.iterator.sliding(2, 1).filter(data => {
+        (data.head.distance(data.last) / math.abs(data.head.userInfo.getTick - data.last.userInfo.getTick)) < velocityLimit
+    }).map(_.head).toIndexedSeq
+    
 }

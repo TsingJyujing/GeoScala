@@ -27,7 +27,7 @@ public class GeometryFrechet {
      * Initial an empty GeometryHashConnectionLayer by default parameters
      */
     public GeometryFrechet() {
-        routeComparator = new GeometryHashConnectionLayer<DirectionalPoint>();
+        routeComparator = new GeometryHashConnectionLayer<>();
     }
 
     /**
@@ -35,7 +35,7 @@ public class GeometryFrechet {
      * @param layer2 set layer 2 accuracy
      */
     public GeometryFrechet(long layer1, long layer2) {
-        routeComparator = new GeometryHashConnectionLayer<DirectionalPoint>(layer1, layer2);
+        routeComparator = new GeometryHashConnectionLayer<>(layer1, layer2);
     }
 
     /**
@@ -85,7 +85,7 @@ public class GeometryFrechet {
             d.dt = list_points.get(i).userInfo - list_points.get(i - 1).userInfo;
             d.tick = list_points.get(i).userInfo;
             d.userDefinedIndex = (long) i;
-            gen_direction_route.add(new GeometryPoint<DirectionalPoint>(
+            gen_direction_route.add(new GeometryPoint<>(
                     list_points.get(i).longitude, list_points.get(i).latitude, d));
         }
         return gen_direction_route;
@@ -103,7 +103,7 @@ public class GeometryFrechet {
             List<GeometryPoint<Double>> list_points,
             double min_distance,
             double min_sample_rate) {
-        List<GeometryPoint<Double>> return_value = new ArrayList<GeometryPoint<Double>>();
+        List<GeometryPoint<Double>> return_value = new ArrayList<>();
         return_value.add(list_points.get(0));
         int last_sample_point_index = 0;
         for (int i = 1; i < list_points.size(); ++i) {

@@ -16,13 +16,11 @@ package tsingjyujing.geo.util.file.text;
  * Have fun!
  */
 
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
+import java.util.Iterator;
 
 
-public class TextFileLineReader implements Closeable {
+public class TextFileLineReader implements Closeable, Iterable<String> {
     //public static void main(){
     //  You can write Usage in main or a new function.
     //  Such as：
@@ -67,6 +65,7 @@ public class TextFileLineReader implements Closeable {
 
     public String lineRead() {
         try {
+
             String Str = bufferReader.readLine();
             return (Str);
             //return null while end of the line
@@ -101,4 +100,45 @@ public class TextFileLineReader implements Closeable {
         super.finalize();
     }
 
+    @Override
+    public Iterator<String> iterator() {
+        try {
+            bufferReader.reset();
+        } catch (IOException e) {
+            System.err.println("Error while reset bufferReader.");
+            e.printStackTrace();
+        }
+        return new LineReaderIter();
+    }
+
+
+    class LineReaderIter implements Iterator<String> {
+
+        String currentLine;
+
+        LineReaderIter() {
+            try {
+                currentLine = bufferReader.readLine();
+            } catch (IOException e) {
+                System.err.println("Error while initializing LineReaderIter.");
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return currentLine != null;
+        }
+
+        @Override
+        public String next() {
+            String returnLine = currentLine;
+            try {
+                currentLine = bufferReader.readLine();
+            } catch (Exception ex) {
+                currentLine = null;
+            }
+            return returnLine;
+        }
+    }
 }

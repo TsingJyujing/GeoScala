@@ -13,7 +13,7 @@ import java.util.TreeMap;
  * @Telephone 182-2085-2215
  */
 public class GeometryHashConnectionLayer<T> implements java.io.Serializable {
-    //Only valid on the planet smaller than earth and ball-shape
+    // Only valid on the planet smaller than earth and ball-shape
     private static final double MAGIC_MAX_DISTANCE = 6500.00 * Math.PI;
     private TreeMap<Long, GeometryHashFinalLayer<T>> data;
     private long accuracy = 256;

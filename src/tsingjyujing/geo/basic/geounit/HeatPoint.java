@@ -1,11 +1,13 @@
 package tsingjyujing.geo.basic.geounit;
 
+import java.io.Serializable;
+
 /**
  * @author tsingjyujing
  * @Mail tsingjyujing@163.com
  * @Telephone 182-2085-2215
  */
-public class HeatPoint<T> extends GeometryPoint<T> implements java.io.Serializable {
+public class HeatPoint<T> extends GeometryPoint<T> implements Serializable {
     private long accuracy = 180;
 
     public long getAccuracy() {

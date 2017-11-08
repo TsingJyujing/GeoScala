@@ -2,6 +2,7 @@ package tsingjyujing.geo.algorithm;
 
 import tsingjyujing.geo.basic.geounit.HeatPoint;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Set;
  * @Mail tsingjyujing@163.com
  * @Telephone 182-2085-2215
  */
-public class HeatMap implements java.io.Serializable, Cloneable {
+public class HeatMap implements Serializable, Cloneable {
     private long accuracy;
 
     /**
@@ -195,15 +196,15 @@ public class HeatMap implements java.io.Serializable, Cloneable {
      * @return export heat matrix which row is [longitude,latitude,heat]
      */
     public double[][] exportMatrix() {
-        double[][] sparse_coo = new double[hMap.size()][3];
+        double[][] COOMatrix = new double[hMap.size()][3];
         Iterator<Map.Entry<HeatPoint<Integer>, Double>> iter = hMap.entrySet().iterator();
         for (int i = 0; iter.hasNext(); i++) {
             Map.Entry<HeatPoint<Integer>, Double> entry = iter.next();
-            sparse_coo[i][0] = entry.getKey().longitude;
-            sparse_coo[i][1] = entry.getKey().latitude;
-            sparse_coo[i][2] = entry.getValue();
+            COOMatrix[i][0] = entry.getKey().longitude;
+            COOMatrix[i][1] = entry.getKey().latitude;
+            COOMatrix[i][2] = entry.getValue();
         }
-        return sparse_coo;
+        return COOMatrix;
     }
 
     /**
