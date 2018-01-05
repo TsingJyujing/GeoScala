@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: scala-library.jar scala-parser-combinators_2.12-1.0.6.jar 
- scala-reflect.jar scala-swing_2.12-2.0.0.jar scala-xml_2.12-1.0.6.jar
-
