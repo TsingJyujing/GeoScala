@@ -27,8 +27,9 @@ public class GetZipMaxDistance {
             }
         }
 
-        Tools.toJava(GPSUtil.getMaxDistanceToLine(Tools.readGPSData(data))).forEach(
-                x -> textFileLineWriter.writeln(x.toString())
-        );
+        Iterable<Object> lines = Tools.toJava(GPSUtil.getMaxDistanceToLine(Tools.readGPSData(data)));
+        for (Object line : lines) {
+            textFileLineWriter.writeln(line.toString());
+        }
     }
 }

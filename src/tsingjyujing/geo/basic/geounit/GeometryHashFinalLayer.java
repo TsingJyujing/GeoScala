@@ -1,11 +1,10 @@
 package tsingjyujing.geo.basic.geounit;
 
+import com.google.common.collect.Sets;
 import tsingjyujing.geo.basic.timeseries.ATimerSeries;
 import tsingjyujing.geo.basic.timeseries.TimeUnit;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author tsingjyujing
@@ -14,12 +13,13 @@ import java.util.TreeMap;
  */
 public class GeometryHashFinalLayer<T> implements java.io.Serializable {
 
-    TreeMap<Long, List<GeometryPoint<T>>> data = new TreeMap<Long, List<GeometryPoint<T>>>();
+    Map<Long, List<GeometryPoint<T>>> data = new HashMap<Long, List<GeometryPoint<T>>>();
 
     private long accuracy = 32768;
     private int pointsCount = 0;
-    private static final double MAGIC_MAX_DISTANCE = GeometryPoint.EARTH_RADIUS * Math.PI;//此程序只有在比地球小的球星星体上有效
 
+    //此程序只有在比地球小的球星星体上有效
+    private static final double MAGIC_MAX_DISTANCE = GeometryPoint.EARTH_RADIUS * Math.PI;
     /**
      * Initialization by given parameters
      *
@@ -33,6 +33,26 @@ public class GeometryHashFinalLayer<T> implements java.io.Serializable {
      * Initialization by default parameters
      */
     public GeometryHashFinalLayer() {
+    }
+
+    public int insersectSize(GeometryHashFinalLayer layer) {
+        if (accuracy == layer.accuracy) {
+            Set<Long> numHash = Sets.newHashSet(data.keySet());
+            numHash.retainAll(layer.data.keySet());
+            return numHash.size();
+        } else {
+            throw new RuntimeException("Accuracy not equal.");
+        }
+    }
+
+    public int unionSize(GeometryHashFinalLayer layer) {
+        if (accuracy == layer.accuracy) {
+            Set<Long> denHash = Sets.newHashSet(data.keySet());
+            denHash.addAll(layer.data.keySet());
+            return denHash.size();
+        } else {
+            throw new RuntimeException("Accuracy not equal.");
+        }
     }
 
     /**

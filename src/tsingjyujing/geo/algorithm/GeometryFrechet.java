@@ -209,7 +209,7 @@ public class GeometryFrechet {
             List<GeometryPoint<DirectionalPoint>> dir_route,
             double radi
     ) {
-        double[][] return_value = new double[dir_route.size()][3];
+        double[][] return_value = new double[dir_route.size()][4];
         for (int i = 0; i < dir_route.size(); ++i) {
             GeometryPoint<DirectionalPoint> point_got;
             try {
@@ -223,10 +223,12 @@ public class GeometryFrechet {
                         )
                 );
                 return_value[i][2] = point_got.userInfo.ds;
+                return_value[i][3] = point_got.userInfo.userDefinedIndex;
             } catch (Exception e) {
                 return_value[i][0] = GeometryPoint.EARTH_RADIUS * Math.PI;
-                return_value[i][1] = Double.NaN;
-                return_value[i][2] = 0;
+                return_value[i][1] = -1;
+                return_value[i][2] = -1;
+                return_value[i][3] = -1;
             }
         }
         return return_value;

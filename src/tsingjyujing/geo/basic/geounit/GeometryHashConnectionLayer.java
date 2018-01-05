@@ -1,11 +1,10 @@
 package tsingjyujing.geo.basic.geounit;
 
+import com.google.common.collect.Sets;
 import tsingjyujing.geo.basic.timeseries.ATimerSeries;
 import tsingjyujing.geo.basic.timeseries.TimeUnit;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author tsingjyujing
@@ -15,26 +14,85 @@ import java.util.TreeMap;
 public class GeometryHashConnectionLayer<T> implements java.io.Serializable {
     // Only valid on the planet smaller than earth and ball-shape
     private static final double MAGIC_MAX_DISTANCE = 6500.00 * Math.PI;
-    private TreeMap<Long, GeometryHashFinalLayer<T>> data;
+    private Map<Long, GeometryHashFinalLayer<T>> data;
+
+    public long getAccuracy() {
+        return accuracy;
+    }
+
     private long accuracy = 256;
-    private long next_accuracy = 32768;
-    private int points_count = 0;
+
+    public long getNextAccuracy() {
+        return nextAccuracy;
+    }
+
+    private long nextAccuracy = 32768;
+    private int pointsCount = 0;
+
+
+    public int insersectSize(GeometryHashConnectionLayer<T> layer) {
+        if (accuracy == layer.getAccuracy()) {
+            Set<Long> numHash = Sets.newHashSet(data.keySet());
+            numHash.retainAll(layer.data.keySet());
+            return numHash.size();
+        } else {
+            throw new RuntimeException("Accuracy not equal.");
+        }
+    }
+
+    public int unionSize(GeometryHashConnectionLayer<T> layer) {
+        if (accuracy == layer.getAccuracy()) {
+            Set<Long> denHash = Sets.newHashSet(data.keySet());
+            denHash.addAll(layer.data.keySet());
+            return denHash.size();
+        } else {
+            throw new RuntimeException("Accuracy not equal.");
+        }
+    }
+
+
+    public double jaccardDistanceFast(GeometryHashConnectionLayer<T> layer) {
+        return insersectSize(layer) * 1.0 / unionSize(layer);
+    }
+
+    public double jaccardDistance(GeometryHashConnectionLayer<T> layer) {
+        Set<Long> numHash = Sets.newHashSet(data.keySet());
+        Set<Long> denHash = Sets.newHashSet(data.keySet());
+        denHash.addAll(layer.data.keySet());
+        numHash.retainAll(layer.data.keySet());
+        int num = 0;
+        int den = 0;
+        for (Long blockHash : denHash) {
+            if (numHash.contains(blockHash)) {
+                num += data.get(blockHash).insersectSize(layer.data.get(blockHash));
+                den += data.get(blockHash).unionSize(layer.data.get(blockHash));
+            } else {
+                if (data.containsKey(blockHash)) {
+                    den += data.get(blockHash).data.size();
+                }
+                if (layer.data.containsKey(blockHash)) {
+                    den += layer.data.get(blockHash).data.size();
+                }
+            }
+        }
+        return num * 1.0 / den;
+    }
 
     /**
      * create a default size map
      */
     public GeometryHashConnectionLayer() {
-        data = new TreeMap<Long, GeometryHashFinalLayer<T>>();
+        data = new HashMap<>();
     }
 
     /**
-     * @param accuracy_conn  connection layer map size
-     * @param accuracy_final final layer map size
+     * @param accuracyConn  connection layer map size
+     * @param accuracyFinal final layer map size
      */
-    public GeometryHashConnectionLayer(long accuracy_conn, long accuracy_final) {
-        accuracy = accuracy_conn;
-        next_accuracy = accuracy_final;
-        data = new TreeMap<Long, GeometryHashFinalLayer<T>>();
+    public GeometryHashConnectionLayer(long accuracyConn, long accuracyFinal) {
+        accuracy = accuracyConn;
+        nextAccuracy = accuracyFinal;
+        data = new HashMap<>();
     }
 
     /**
@@ -45,10 +103,10 @@ public class GeometryHashConnectionLayer<T> implements java.io.Serializable {
     public void insert(GeometryPoint<T> point) {
         long HashCode = point.geohashcode(accuracy);
         if (!data.containsKey(HashCode)) {
-            data.put(HashCode, new GeometryHashFinalLayer<T>(next_accuracy));
+            data.put(HashCode, new GeometryHashFinalLayer<T>(nextAccuracy));
         }
         data.get(HashCode).insert(point);
-        points_count++;
+        pointsCount++;
     }
 
     /**
@@ -123,7 +181,7 @@ public class GeometryHashConnectionLayer<T> implements java.io.Serializable {
             GeometryPoint<T> center_point,
             double maxDistanceTolerance
     ) throws Exception {
-        if (this.points_count <= 0) {
+        if (this.pointsCount <= 0) {
             throw new Exception("No point in the map.");
         }
 

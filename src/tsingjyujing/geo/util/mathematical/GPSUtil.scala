@@ -105,7 +105,7 @@ object GPSUtil {
     }
     
     def getMaxDistanceToLine(
-                              gpsArray: IndexedSeq[GeometryPoint[_ <: Tickable]],
+                              gpsArray: IndexedSeq[GeometryPoint[_ <: Tickable]]
                             ): IndexedSeq[Double] = 3.to(gpsArray.size - 2).map(i => {
         val line = new GeodesicLine(
             gpsArray.head,
@@ -115,7 +115,7 @@ object GPSUtil {
     })
     
     def getAverageDistanceToLine(
-                                  gpsArray: IndexedSeq[GeometryPoint[_ <: Tickable]],
+                                  gpsArray: IndexedSeq[GeometryPoint[_ <: Tickable]]
                                 ): IndexedSeq[Double] = {
         3.to(gpsArray.size).map(i => {
             val line = new GeodesicLine(

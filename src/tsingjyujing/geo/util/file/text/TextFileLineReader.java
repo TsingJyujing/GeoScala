@@ -140,5 +140,10 @@ public class TextFileLineReader implements Closeable, Iterable<String> {
             }
             return returnLine;
         }
+
+        @Override
+        public void remove() {
+            throw new RuntimeException("Unsupported operation.");
+        }
     }
 }
