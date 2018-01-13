@@ -42,10 +42,10 @@ object GPSUtil {
                                    p2: GeometryPoint[T],
                                    p3: GeometryPoint[T]
                                  ): Double = {
-        val latRatio = math.cos((p1.latitude + p2.latitude + p3.latitude) * math.Pi / 3.0 / 180.0)
+        val latRatio = math.cos((p1.getLatitude + p2.getLatitude + p3.getLatitude) * math.Pi / 3.0 / 180.0)
         GeometryUtil.angle(
-            Array((p2.longitude - p1.longitude) * latRatio, p2.latitude - p1.latitude),
-            Array((p3.longitude - p2.longitude) * latRatio, p3.latitude - p2.latitude)
+            Array((p2.getLongitude - p1.getLongitude) * latRatio, p2.getLatitude - p1.getLatitude),
+            Array((p3.getLongitude - p2.getLongitude) * latRatio, p3.getLatitude - p2.getLatitude)
         )
     }
     
@@ -131,7 +131,7 @@ object GPSUtil {
                                  gpsArray: Iterable[GeometryPoint[T]],
                                  velocityLimit: Double
                                ): immutable.IndexedSeq[GeometryPoint[T]] = gpsArray.iterator.sliding(2, 1).filter(data => {
-        (data.head.distance(data.last) / math.abs(data.head.userInfo.getTick - data.last.userInfo.getTick)) < velocityLimit
+        (data.head.distance(data.last) / math.abs(data.head.getUserInfo.getTick - data.last.getUserInfo.getTick)) < velocityLimit
     }).map(_.head).toIndexedSeq
     
 }

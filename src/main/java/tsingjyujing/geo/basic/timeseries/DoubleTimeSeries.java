@@ -22,13 +22,13 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
         List<TimeUnit<Double>> cleanedList = new ArrayList<>();
         if (removeCondition) {
             for (TimeUnit<Double> tmp : data) {
-                if (tmp.value <= value) {
+                if (tmp.getValue() <= value) {
                     cleanedList.add(tmp);
                 }
             }
         } else {
             for (TimeUnit<Double> tmp : data) {
-                if (tmp.value >= value) {
+                if (tmp.getValue() >= value) {
                     cleanedList.add(tmp);
                 }
             }
@@ -48,10 +48,10 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
         TimeUnit<Double> thisTimeUnit;
         for (int i = 1; i < data.size(); ++i) {
             thisTimeUnit = data.get(i);
-            double dv = (thisTimeUnit.value - lastTimeUnit.value);
-            double dt = (thisTimeUnit.time - lastTimeUnit.time);
+            double dv = (thisTimeUnit.getValue() - lastTimeUnit.getValue());
+            double dt = (thisTimeUnit.getTick() - lastTimeUnit.getTick());
             res.append(new TimeUnit<>(
-                    (thisTimeUnit.time + lastTimeUnit.time) / 2.0D,
+                    (thisTimeUnit.getTick() + lastTimeUnit.getTick()) / 2.0D,
                     dv / dt
             ));
             lastTimeUnit = thisTimeUnit;
@@ -71,9 +71,9 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
         TimeUnit<Double> thisTimeUnit;
         for (int i = 1; i < data.size(); ++i) {
             thisTimeUnit = data.get(i);
-            double dv = (thisTimeUnit.value - lastTimeUnit.value);
+            double dv = (thisTimeUnit.getValue() - lastTimeUnit.getValue());
             res.append(new TimeUnit<>(
-                    (thisTimeUnit.time + lastTimeUnit.time) / 2.0D,
+                    (thisTimeUnit.getTick() + lastTimeUnit.getTick()) / 2.0D,
                     dv
             ));
             lastTimeUnit = thisTimeUnit;
@@ -87,7 +87,7 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
     public double sum() {
         double rtn = 0.0D;
         for (int i = 0; i < data.size(); ++i) {
-            rtn += data.get(i).value;
+            rtn += data.get(i).getValue();
         }
         return rtn;
     }
@@ -96,14 +96,14 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
      * @return max(value)-min(value)
      */
     public double getValueRange() {
-        double minval = data.get(0).value;
-        double maxval = data.get(0).value;
+        double minval = data.get(0).getValue();
+        double maxval = data.get(0).getValue();
         for (int i = 1; i < data.size(); ++i) {
-            if (minval > data.get(i).value) {
-                minval = data.get(i).value;
+            if (minval > data.get(i).getValue()) {
+                minval = data.get(i).getValue();
             }
-            if (maxval < data.get(i).value) {
-                maxval = data.get(i).value;
+            if (maxval < data.get(i).getValue()) {
+                maxval = data.get(i).getValue();
             }
         }
         return maxval - minval;
@@ -121,8 +121,8 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
         TimeUnit<Double> this_Time_unit;
         for (int i = 1; i < data.size(); ++i) {
             this_Time_unit = data.get(i);
-            double v = (this_Time_unit.value + last_Time_unit.value) / 2.0D;
-            double dt = (this_Time_unit.time - last_Time_unit.time);
+            double v = (this_Time_unit.getValue() + last_Time_unit.getValue()) / 2.0D;
+            double dt = (this_Time_unit.getTick() - last_Time_unit.getTick());
             res += v * dt;
             last_Time_unit = this_Time_unit;
         }
@@ -135,18 +135,18 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
     public void display() {
         System.out.println("Time\t\tValue");
         for (TimeUnit<Double> tmp : data) {
-            System.out.printf("%f\t\t%f\n", tmp.time, tmp.value);
+            System.out.printf("%f\t\t%f\n", tmp.getTick(), tmp.getValue());
         }
     }
 
     /**
      * @param value
-     * @return DoubleTimeSeries which DoubleTimeSeries.value *=value
+     * @return DoubleTimeSeries which DoubleTimeSeries.getValue() *=value
      */
     public DoubleTimeSeries mul(double value) {
         DoubleTimeSeries newTimeSeries = new DoubleTimeSeries();
         for (TimeUnit<Double> tmp : data) {
-            tmp.value *= value;
+            tmp.setValue(tmp.getValue() * value);
             newTimeSeries.append(tmp);
         }
         return newTimeSeries;
@@ -154,12 +154,12 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
 
     /**
      * @param value
-     * @return DoubleTimeSeries which DoubleTimeSeries.value +=value
+     * @return DoubleTimeSeries which DoubleTimeSeries.getValue() +=value
      */
     public DoubleTimeSeries add(double value) {
         DoubleTimeSeries newTimeSeries = new DoubleTimeSeries();
         for (TimeUnit<Double> tmp : data) {
-            tmp.value += value;
+            tmp.setValue(tmp.getValue() + value);
             newTimeSeries.append(tmp);
         }
         return newTimeSeries;
@@ -167,12 +167,12 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
 
     /**
      * @param value
-     * @return DoubleTimeSeries which DoubleTimeSeries.value -=value
+     * @return DoubleTimeSeries which DoubleTimeSeries.getValue() -=value
      */
     public DoubleTimeSeries dec(double value) {
         DoubleTimeSeries newTimeSeries = new DoubleTimeSeries();
         for (TimeUnit<Double> tmp : data) {
-            tmp.value -= value;
+            tmp.setValue(tmp.getValue() - value);
             newTimeSeries.append(tmp);
         }
         return newTimeSeries;
@@ -180,12 +180,12 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
 
     /**
      * @param value
-     * @return DoubleTimeSeries which DoubleTimeSeries.value right divided by value
+     * @return DoubleTimeSeries which DoubleTimeSeries.getValue() right divided by value
      */
     public DoubleTimeSeries rdiv(double value) {
         DoubleTimeSeries newTimeSeries = new DoubleTimeSeries();
         for (TimeUnit<Double> tmp : data) {
-            tmp.value /= value;
+            tmp.setValue(tmp.getValue() / value);
             newTimeSeries.append(tmp);
         }
         return newTimeSeries;
@@ -193,31 +193,31 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
 
     /**
      * @param value
-     * @return DoubleTimeSeries which DoubleTimeSeries.value left divided by value
+     * @return DoubleTimeSeries which DoubleTimeSeries.getValue() left divided by value
      */
     public DoubleTimeSeries ldiv(double value) {
         DoubleTimeSeries newTimeSeries = new DoubleTimeSeries();
         for (TimeUnit<Double> tmp : data) {
-            tmp.value = value / tmp.value;
+            tmp.setValue(value / tmp.getValue());
             newTimeSeries.append(tmp);
         }
         return newTimeSeries;
     }
 
     /**
-     * @return DoubleTimeSeries which DoubleTimeSeries.value = sqrt(DoubleTimeSeries.value)
+     * @return DoubleTimeSeries which DoubleTimeSeries.getValue() = sqrt(DoubleTimeSeries.getValue())
      */
     public DoubleTimeSeries sqrt() {
         DoubleTimeSeries newTimeSeries = new DoubleTimeSeries();
         for (TimeUnit<Double> tmp : data) {
-            tmp.value = Math.sqrt(tmp.value);
+            tmp.setValue(Math.sqrt(tmp.getValue()));
             newTimeSeries.append(tmp);
         }
         return newTimeSeries;
     }
 
     /**
-     * @return DoubleTimeSeries which DoubleTimeSeries.value *= DoubleTimeSeries.value
+     * @return DoubleTimeSeries which DoubleTimeSeries.getValue() *= DoubleTimeSeries.getValue()
      */
     public DoubleTimeSeries pow2() {
         //user define function example
@@ -230,13 +230,13 @@ public class DoubleTimeSeries extends BaseTimeSeries<Double> {
     }
 
     /**
-     * @param func anonymous class with public double operation(double);
-     * @return DoubleTimeSeries which DoubleTimeSeries.value = func(DoubleTimeSeries.value)
+     * @param operator anonymous class with public double operation(double);
+     * @return DoubleTimeSeries which DoubleTimeSeries.getValue() = operator(DoubleTimeSeries.getValue())
      */
-    public DoubleTimeSeries userDefinedOperation(IOperator<Double> func) {
+    public DoubleTimeSeries userDefinedOperation(IOperator<Double> operator) {
         DoubleTimeSeries newTimeSeries = new DoubleTimeSeries();
         for (TimeUnit<Double> tmp : data) {
-            tmp.value = func.operation(tmp.value);
+            tmp.setValue(operator.operation(tmp.getValue()));
             newTimeSeries.append(tmp);
         }
         return newTimeSeries;

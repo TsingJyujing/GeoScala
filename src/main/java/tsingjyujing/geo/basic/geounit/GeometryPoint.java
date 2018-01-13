@@ -9,9 +9,33 @@ import java.util.List;
  * @Telephone 182-2085-2215
  */
 public class GeometryPoint<T> implements java.io.Serializable {
-    public T userInfo = null;
-    public double longitude = 0.0D;
-    public double latitude = 0.0D;
+    public T getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(T userInfo) {
+        this.userInfo = userInfo;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    protected T userInfo = null;
+    protected double longitude = 0.0D;
+    protected double latitude = 0.0D;
 
     /**
      * Radius of earth: km
@@ -37,6 +61,8 @@ public class GeometryPoint<T> implements java.io.Serializable {
      * 2^31
      */
     public static final long POW2E31 = 0x80000000L;
+
+    private static final double MAX_INNER_PRODUCT_FOR_UNIT_VECTOR = 1.0D;
 
     /**
      * @param lng longitude
@@ -64,13 +90,13 @@ public class GeometryPoint<T> implements java.io.Serializable {
     }
 
     public double[] get3DPos(double radius) {
-        double coslat = Math.cos(latitude * DEG2RAD);
-        double[] pos3D = {
-                Math.cos(longitude * DEG2RAD) * coslat * radius,
-                Math.sin(longitude * DEG2RAD) * coslat * radius,
+        double cosLatitude = Math.cos(latitude * DEG2RAD);
+        double[] euclidPosition = {
+                Math.cos(longitude * DEG2RAD) * cosLatitude * radius,
+                Math.sin(longitude * DEG2RAD) * cosLatitude * radius,
                 Math.sin(latitude * DEG2RAD) * radius
         };
-        return pos3D;
+        return euclidPosition;
     }
 
     /**
@@ -142,13 +168,13 @@ public class GeometryPoint<T> implements java.io.Serializable {
     }
 
     /**
-     * @param pointList
+     * @param points
      * @param centerPoint
      * @return
      */
-    public double minDistance(Iterable<GeometryPoint> pointList, GeometryPoint centerPoint) {
+    public double minDistance(Iterable<GeometryPoint> points, GeometryPoint centerPoint) {
         double minValue = EARTH_RADIUS * Math.PI;
-        for (GeometryPoint point : pointList) {
+        for (GeometryPoint point : points) {
             double dist = centerPoint.distance(point);
             if (minValue > dist) {
                 minValue = dist;
@@ -158,22 +184,22 @@ public class GeometryPoint<T> implements java.io.Serializable {
     }
 
     /**
-     * @param pointList
+     * @param points
      * @return
      */
-    public double minDistance(List<GeometryPoint> pointList) {
-        return minDistance(pointList, this);
+    public double minDistance(List<GeometryPoint> points) {
+        return minDistance(points, this);
     }
 
     /**
-     * @param pointList
-     * @param centerpoint
+     * @param points
+     * @param centerPoint
      * @return
      */
-    public double maxDistance(List<GeometryPoint> pointList, GeometryPoint centerpoint) {
+    public double maxDistance(List<GeometryPoint> points, GeometryPoint centerPoint) {
         double maxValue = 0.0D;
-        for (GeometryPoint point : pointList) {
-            double dist = point.distance(centerpoint);
+        for (GeometryPoint point : points) {
+            double dist = point.distance(centerPoint);
             if (maxValue < dist) {
                 maxValue = dist;
             }
@@ -182,11 +208,11 @@ public class GeometryPoint<T> implements java.io.Serializable {
     }
 
     /**
-     * @param pointList
+     * @param points
      * @return
      */
-    public double maxDistance(List<GeometryPoint> pointList) {
-        return maxDistance(pointList, this);
+    public double maxDistance(List<GeometryPoint> points) {
+        return maxDistance(points, this);
     }
 
     /**
@@ -206,11 +232,12 @@ public class GeometryPoint<T> implements java.io.Serializable {
         return geodesicDistance(point1, point2);
     }
 
+
     private static double geodesicDistance(GeometryPoint point1, GeometryPoint point2) {
         double alpha = getInnerProduct(point1, point2);
-        if (alpha >= 1.0D) {
+        if (alpha >= MAX_INNER_PRODUCT_FOR_UNIT_VECTOR) {
             return 0.0D;
-        } else if (alpha <= -1.0D) {
+        } else if (alpha <= -MAX_INNER_PRODUCT_FOR_UNIT_VECTOR) {
             return Math.PI * EARTH_RADIUS;
         } else {
             return Math.acos(alpha) * EARTH_RADIUS;
@@ -256,18 +283,18 @@ public class GeometryPoint<T> implements java.io.Serializable {
     /**
      * @param pointList
      * @param centerPoint
-     * @return get min inner productor between list and center
+     * @return get min inner product between list and center
      */
     public double minInnerProduct(List<GeometryPoint> pointList, GeometryPoint centerPoint) {
-        double minip = 1.0D;
-        double ip;
+        double minInnerProduct = 1.0D;
+        double innerProduct;
         for (GeometryPoint point : pointList) {
-            ip = point.getInnerProduct(centerPoint);
-            if (minip > ip) {
-                minip = ip;
+            innerProduct = point.getInnerProduct(centerPoint);
+            if (minInnerProduct > innerProduct) {
+                minInnerProduct = innerProduct;
             }
         }
-        return minip;
+        return minInnerProduct;
     }
 
     /**
@@ -284,14 +311,14 @@ public class GeometryPoint<T> implements java.io.Serializable {
      * @return get max inner productor between list and center
      */
     public double maxInnerProduct(List<GeometryPoint> pointList, GeometryPoint centerPoint) {
-        double maxip = 0.0D;
+        double maxInnerProduct = 0.0D;
         for (int i = 0; i < pointList.size(); ++i) {
             double ip = pointList.get(i).getInnerProduct(centerPoint);
-            if (maxip < ip) {
-                maxip = ip;
+            if (maxInnerProduct < ip) {
+                maxInnerProduct = ip;
             }
         }
-        return maxip;
+        return maxInnerProduct;
     }
 
     /**
@@ -307,50 +334,50 @@ public class GeometryPoint<T> implements java.io.Serializable {
      * @param centerPoint
      * @return find nearest point
      */
-    public GeometryPoint nearestPoint(List<GeometryPoint> pointList, GeometryPoint centerPoint) {
-        int return_value = 0;
-        double max_ip = centerPoint.getInnerProduct(pointList.get(0));
+    private GeometryPoint<T> nearestPoint(List<GeometryPoint<T>> pointList, GeometryPoint centerPoint) {
+        int returnValue = 0;
+        double maxInnerProduct = centerPoint.getInnerProduct(pointList.get(0));
         for (int i = 1; i < pointList.size(); ++i) {
-            double ip = centerPoint.getInnerProduct(pointList.get(i));
-            if (ip > max_ip) {
-                max_ip = ip;
-                return_value = i;
+            double innerProduct = centerPoint.getInnerProduct(pointList.get(i));
+            if (innerProduct > maxInnerProduct) {
+                maxInnerProduct = innerProduct;
+                returnValue = i;
             }
         }
-        return pointList.get(return_value);
+        return pointList.get(returnValue);
     }
 
     /**
-     * @param point_list
+     * @param points
      * @return find nearest point
      */
-    public GeometryPoint nearestPoint(List<GeometryPoint> point_list) {
-        return nearestPoint(point_list, this);
+    public GeometryPoint<T> nearestPoint(List<GeometryPoint<T>> points) {
+        return nearestPoint(points, this);
     }
 
     /**
-     * @param point_list
-     * @param centerpoint
+     * @param points
+     * @param centerPoint
      * @return find nearest point index
      */
-    public int nearestPointIndex(List<GeometryPoint> point_list, GeometryPoint centerpoint) {
-        int return_value = 0;
-        double max_ip = centerpoint.getInnerProduct(point_list.get(0));
-        for (int i = 1; i < point_list.size(); ++i) {
-            double ip = centerpoint.getInnerProduct(point_list.get(i));
-            if (ip > max_ip) {
-                max_ip = ip;
-                return_value = i;
+    public int nearestPointIndex(List<GeometryPoint> points, GeometryPoint centerPoint) {
+        int returnValue = 0;
+        double maxInnerProduct = centerPoint.getInnerProduct(points.get(0));
+        for (int i = 1; i < points.size(); ++i) {
+            double innerProduct = centerPoint.getInnerProduct(points.get(i));
+            if (innerProduct > maxInnerProduct) {
+                maxInnerProduct = innerProduct;
+                returnValue = i;
             }
         }
-        return return_value;
+        return returnValue;
     }
 
     /**
-     * @param point_list
+     * @param points
      * @return find nearest point index
      */
-    public int nearestPointIndex(List<GeometryPoint> point_list) {
-        return nearestPointIndex(point_list, this);
+    public int nearestPointIndex(List<GeometryPoint> points) {
+        return nearestPointIndex(points, this);
     }
 }

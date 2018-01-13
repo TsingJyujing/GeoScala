@@ -15,6 +15,8 @@ public class GeodesicLine {
     private double[][] iM;
     private double[] n;
 
+    private static final int WORLD_DIMENSION = 3;
+
     public GeodesicLine(GeometryPoint p1, GeometryPoint p2) {
         point1 = p1;
         point2 = p2;
@@ -23,14 +25,14 @@ public class GeodesicLine {
         n = VectorUtil.outerProduct(v1, v2);
         VectorUtil.norm2Vector(1.0, n);
         double[][] M = {v1, v2, n};
-        iM = MatrixUtil.invO3(M);
+        iM = MatrixUtil.inverseOrder3Matrix(M);
     }
 
     public double distance(GeometryPoint point) {
         double[] v3 = point.get3DPos();
         double[] params = {0, 0, 0};
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < WORLD_DIMENSION; i++) {
+            for (int j = 0; j < WORLD_DIMENSION; j++) {
                 params[j] += iM[i][j] * v3[j];
             }
         }

@@ -82,12 +82,12 @@ public class GeometryFrechet {
         for (int i = 1; i < points.size(); ++i) {
             DirectionalPoint d = new DirectionalPoint();
             d.writeDirection(points.get(i - 1), points.get(i));
-            d.ds = points.get(i - 1).distance(points.get(i));
-            d.dt = points.get(i).userInfo - points.get(i - 1).userInfo;
-            d.tick = points.get(i).userInfo;
-            d.userDefinedIndex = (long) i;
+            d.setDs(points.get(i - 1).distance(points.get(i)));
+            d.setDt(points.get(i).getUserInfo() - points.get(i - 1).getUserInfo());
+            d.setTick(points.get(i).getUserInfo());
+            d.setUserDefinedIndex((long) i);
             geometryPointArrayList.add(new GeometryPoint<>(
-                    points.get(i).longitude, points.get(i).latitude, d));
+                    points.get(i).getLongitude(), points.get(i).getLatitude(), d));
         }
         return geometryPointArrayList;
     }
@@ -135,16 +135,16 @@ public class GeometryFrechet {
             int pointCount
     ) {
         List<GeometryPoint<Double>> insertedPoints = new ArrayList<>();
-        double deltaLongitude = (point2.longitude - point1.longitude) / (pointCount + 1);
-        double deltaLatitude = (point2.latitude - point1.latitude) / (pointCount + 1);
-        double deltaTime = (point2.userInfo - point1.userInfo) / (pointCount + 1);
+        double deltaLongitude = (point2.getLongitude() - point1.getLongitude()) / (pointCount + 1);
+        double deltaLatitude = (point2.getLatitude() - point1.getLatitude()) / (pointCount + 1);
+        double deltaTime = (point2.getUserInfo() - point1.getUserInfo()) / (pointCount + 1);
         insertedPoints.add(point1);
         for (int i = 1; i <= pointCount; i++) {
             insertedPoints.add(
                     new GeometryPoint<>(
-                            point1.longitude + i * deltaLongitude,
-                            point1.latitude + i * deltaLatitude,
-                            point1.userInfo + i * deltaTime
+                            point1.getLongitude() + i * deltaLongitude,
+                            point1.getLatitude() + i * deltaLatitude,
+                            point1.getUserInfo() + i * deltaTime
                     )
             );
         }
@@ -180,7 +180,7 @@ public class GeometryFrechet {
             double[] time
     ) {
         assert (lng.length == lat.length && lng.length == time.length);
-        List<GeometryPoint<Double>> double2list = new ArrayList<GeometryPoint<Double>>();
+        List<GeometryPoint<Double>> double2list = new ArrayList<>();
         for (int i = 0; i < lng.length; i++) {
             double2list.add(new GeometryPoint<>(lng[i], lat[i], time[i]));
         }
@@ -212,29 +212,29 @@ public class GeometryFrechet {
             List<GeometryPoint<DirectionalPoint>> directionalRoute,
             double radius
     ) {
-        double[][] return_value = new double[directionalRoute.size()][4];
+        double[][] returnValue = new double[directionalRoute.size()][4];
         for (int i = 0; i < directionalRoute.size(); ++i) {
-            GeometryPoint<DirectionalPoint> point_got;
+            GeometryPoint<DirectionalPoint> pointQueried;
             try {
-                point_got = routeComparator.searchNearestPoint(
+                pointQueried = routeComparator.searchNearestPoint(
                         directionalRoute.get(i), radius
                 );
-                return_value[i][0] = point_got.distance(directionalRoute.get(i));
-                return_value[i][1] = Math.acos(
-                        point_got.userInfo.getInnerProduct(
-                                directionalRoute.get(i).userInfo
+                returnValue[i][0] = pointQueried.distance(directionalRoute.get(i));
+                returnValue[i][1] = Math.acos(
+                        pointQueried.getUserInfo().getInnerProduct(
+                                directionalRoute.get(i).getUserInfo()
                         )
                 );
-                return_value[i][2] = point_got.userInfo.ds;
-                return_value[i][3] = point_got.userInfo.userDefinedIndex;
+                returnValue[i][2] = pointQueried.getUserInfo().getDs();
+                returnValue[i][3] = pointQueried.getUserInfo().getUserDefinedIndex();
             } catch (Exception e) {
-                return_value[i][0] = GeometryPoint.EARTH_RADIUS * Math.PI;
-                return_value[i][1] = -1;
-                return_value[i][2] = -1;
-                return_value[i][3] = -1;
+                returnValue[i][0] = GeometryPoint.EARTH_RADIUS * Math.PI;
+                returnValue[i][1] = -1;
+                returnValue[i][2] = -1;
+                returnValue[i][3] = -1;
             }
         }
-        return return_value;
+        return returnValue;
     }
 
     public List<RouteSearchResult> frechetFetch(
@@ -264,30 +264,30 @@ public class GeometryFrechet {
 
         boolean[] isOnRoute = new boolean[directionalRoute.size()];
 
-        double[][] serarchDistance = frechetDirectionalDistance(
+        double[][] searchDistance = frechetDirectionalDistance(
                 directionalRoute,
                 radius
         );
 
         // Initial value
-        isOnRoute[0] = serarchDistance[0][0] < radius &&
-                !Double.isNaN(serarchDistance[0][1]) &&
-                serarchDistance[0][1] < thetaLimit;
+        isOnRoute[0] = searchDistance[0][0] < radius &&
+                !Double.isNaN(searchDistance[0][1]) &&
+                searchDistance[0][1] < thetaLimit;
 
         for (int i = 1; i < directionalRoute.size(); ++i) {
-            if (Double.isNaN(serarchDistance[i][1])) {
+            if (Double.isNaN(searchDistance[i][1])) {
                 isOnRoute[i] = isOnRoute[i - 1];
             } else {
-                isOnRoute[i] = serarchDistance[i][0] < radius && serarchDistance[i][1] < thetaLimit;
+                isOnRoute[i] = searchDistance[i][0] < radius && searchDistance[i][1] < thetaLimit;
             }
         }
 
         // Search the range
         DoubleTimeSeries sortedRouteIndexMapper = new DoubleTimeSeries();
-        for (int i = 0; i < route.size(); ++i) {
+        for (GeometryPoint<Double> point : route) {
             sortedRouteIndexMapper.append(
                     new TimeUnit<>(
-                            route.get(i).userInfo,
+                            point.getUserInfo(),
                             0.0D
                     )
             );
@@ -296,31 +296,31 @@ public class GeometryFrechet {
         boolean isLastValue = false;
         int t = -1;
         for (int i = 0; i < directionalRoute.size(); ++i) {
-            if (isLastValue == false && isOnRoute[i] == true) {
+            if (!isLastValue && isOnRoute[i]) {
                 resultList.add(new RouteSearchResult());
                 t = resultList.size() - 1;
-                resultList.get(t).inTime = directionalRoute.get(i).userInfo.tick;
-                resultList.get(t).inIndex =
+                resultList.get(t).enterTime = directionalRoute.get(i).getUserInfo().getTick();
+                resultList.get(t).enterIndex =
                         sortedRouteIndexMapper.searchInSorted(
-                                resultList.get(t).inTime,
+                                resultList.get(t).enterTime,
                                 false
                         );
             } else if (
                     (
-                            isLastValue == true && isOnRoute[i] == false
+                            isLastValue && !isOnRoute[i]
                     )
                             ||
                             (
-                                    isOnRoute[i] == true && i == (directionalRoute.size() - 1)
+                                    isOnRoute[i] && i == (directionalRoute.size() - 1)
                             )
                     ) {
-                resultList.get(t).outTime = directionalRoute.get(i).userInfo.tick;
-                resultList.get(t).outIndex =
+                resultList.get(t).exitTime = directionalRoute.get(i).getUserInfo().getTick();
+                resultList.get(t).exitIndex =
                         sortedRouteIndexMapper.searchInSorted(
-                                resultList.get(t).outTime,
+                                resultList.get(t).exitTime,
                                 true
                         );
-                if (resultList.get(t).outTime - resultList.get(t).inTime < minOnRouteTime) {
+                if (resultList.get(t).exitTime - resultList.get(t).enterTime < minOnRouteTime) {
                     resultList.remove(t);
                 }
             }

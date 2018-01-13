@@ -14,9 +14,9 @@ import java.util.List;
 public class GPSFileIO {
     public static List<GeometryPoint<Long>> importFileLong(String filename) {
         List<GeometryPoint<Long>> returnlist = new ArrayList<GeometryPoint<Long>>();
-        TextFileLineReader read_obj = new TextFileLineReader(filename);
+        TextFileLineReader reader = new TextFileLineReader(filename);
         while (true) {
-            String line_read = read_obj.lineRead();
+            String line_read = reader.lineRead();
             if (line_read == null) {
                 break;
             }
@@ -73,8 +73,8 @@ public class GPSFileIO {
         TextFileLineWriter fileWriter = new TextFileLineWriter(filename);
         for (GeometryPoint geoPoint : geoPoints) {
             fileWriter.writeln(String.format("%f,%f,%s",
-                    geoPoint.longitude, geoPoint.latitude,
-                    geoPoint.userInfo.toString()));
+                    geoPoint.getLongitude(), geoPoint.getLatitude(),
+                    geoPoint.getUserInfo().toString()));
         }
         fileWriter.close();
     }

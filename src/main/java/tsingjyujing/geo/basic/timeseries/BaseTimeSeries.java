@@ -84,12 +84,12 @@ public abstract class BaseTimeSeries<T> {
     public double timeRange() {
         switch (sortedStatus) {
             case 1:
-                return data.get(size() - 1).time - data.get(0).time;
+                return data.get(size() - 1).getTick() - data.get(0).getTick();
             case -1:
-                return data.get(0).time - data.get(size() - 1).time;
+                return data.get(0).getTick() - data.get(size() - 1).getTick();
             default:
                 sort(false);
-                return data.get(size() - 1).time - data.get(0).time;
+                return data.get(size() - 1).getTick() - data.get(0).getTick();
         }
     }
 
@@ -97,17 +97,17 @@ public abstract class BaseTimeSeries<T> {
      * @return time series where remove elements which tagged
      */
     public boolean remove() {
-        boolean remove_one = false;
-        List<TimeUnit<T>> ts_list_new = new ArrayList<TimeUnit<T>>();
+        boolean removedOnce = false;
+        List<TimeUnit<T>> newList = new ArrayList<TimeUnit<T>>();
         for (TimeUnit<T> tmp : data) {
-            if (!tmp.remove) {
-                ts_list_new.add(tmp);
+            if (!tmp.isRemoved()) {
+                newList.add(tmp);
             } else {
-                remove_one = true;
+                removedOnce = true;
             }
         }
-        data = ts_list_new;
-        return remove_one;
+        data = newList;
+        return removedOnce;
     }
 
     /**
@@ -115,7 +115,7 @@ public abstract class BaseTimeSeries<T> {
      */
     public void setRemove(int index) {
         TimeUnit<T> tmp = data.get(index);
-        tmp.remove = true;
+        tmp.setRemoved(true);
         this.data.set(index, tmp);
     }
 
@@ -139,8 +139,8 @@ public abstract class BaseTimeSeries<T> {
             this.sort(false);
         }
         if (
-                given_time > get(size() - 1).time ||
-                        given_time < get(0).time) {
+                given_time > get(size() - 1).getTick() ||
+                        given_time < get(0).getTick()) {
             int[] returnValue = {-1, -1};
             return returnValue;
         }
@@ -152,7 +152,7 @@ public abstract class BaseTimeSeries<T> {
 
             mid = (startIndex + endIndex) / 2;
 
-            double thist = get(mid).time;
+            double thist = get(mid).getTick();
 
             if (thist < given_time) {
                 startIndex = mid;

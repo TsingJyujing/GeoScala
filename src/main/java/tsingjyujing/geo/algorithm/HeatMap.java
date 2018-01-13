@@ -14,6 +14,12 @@ import java.util.Set;
  * @Telephone 182-2085-2215
  */
 public class HeatMap implements Serializable, Cloneable {
+
+    /**
+     * Heat map data stores
+     */
+    private HashMap<HeatPoint<Integer>, Double> heatData = new HashMap<>();
+
     private long accuracy;
 
     /**
@@ -39,16 +45,12 @@ public class HeatMap implements Serializable, Cloneable {
         append(gpsInfo);
     }
 
-    /**
-     * Heat map data stores
-     */
-    private HashMap<HeatPoint<Integer>, Double> hMap = new HashMap<>();
 
     /**
      * @return A hash-map which records heat
      */
     public HashMap<HeatPoint<Integer>, Double> getHeatMap() {
-        return hMap;
+        return heatData;
     }
 
     /**
@@ -58,10 +60,10 @@ public class HeatMap implements Serializable, Cloneable {
         for (double[] pointInfo : gpsInfo) {
             assert pointInfo.length == 3;
             HeatPoint<Integer> gp = new HeatPoint<>(pointInfo[0], pointInfo[1], 0, accuracy);
-            if (!hMap.containsKey(gp)) {
-                hMap.put(gp, pointInfo[2]);
+            if (!heatData.containsKey(gp)) {
+                heatData.put(gp, pointInfo[2]);
             } else {
-                hMap.put(gp, hMap.get(gp) + pointInfo[2]);
+                heatData.put(gp, heatData.get(gp) + pointInfo[2]);
             }
         }
     }
@@ -81,12 +83,10 @@ public class HeatMap implements Serializable, Cloneable {
      * @return search result
      */
     public double apply(HeatPoint heatPointInput) {
-        assert heatPointInput.getAccuracy() == getAccuracy();
-        if (getHeatMap().containsKey(heatPointInput)) {
-            return getHeatMap().get(heatPointInput);
-        } else {
-            return 0.0f;
+        if (heatPointInput.getAccuracy() != getAccuracy()) {
+            throw new RuntimeException("Accuracy not match, can't add to this HeatMap");
         }
+        return getHeatMap().getOrDefault(heatPointInput, 0.0D);
     }
 
 
@@ -94,16 +94,16 @@ public class HeatMap implements Serializable, Cloneable {
      * @param map Another heat-map
      * @return Points count of the intersection of two maps
      */
-    public int intersection(HeatMap map) {
-        return intersection(this, map);
+    public int intersectSize(HeatMap map) {
+        return intersectSize(this, map);
     }
 
     /**
      * @param map1 heat-map 1
      * @param map2 heat-map 2
-     * @return Points count of the intersection of two maps
+     * @return Points count of the intersect size of two maps
      */
-    public static int intersection(HeatMap map1, HeatMap map2) {
+    public static int intersectSize(HeatMap map1, HeatMap map2) {
         Set<HeatPoint<Integer>> objSet = map1.getHeatMap().keySet();
         objSet.retainAll(map2.getHeatMap().keySet());
         return objSet.size();
@@ -123,13 +123,13 @@ public class HeatMap implements Serializable, Cloneable {
      * @return Inner product of two heat-maps
      */
     public static double innerProduct(HeatMap map1, HeatMap map2) {
-        Set<HeatPoint<Integer>> objSet = map1.getHeatMap().keySet();
-        objSet.retainAll(map2.getHeatMap().keySet());
-        double sumIP = 0;
-        for (HeatPoint<Integer> gp : objSet) {
-            sumIP += map2.getHeatMap().get(gp) * map1.getHeatMap().get(gp);
+        Set<HeatPoint<Integer>> intersectSet = map1.getHeatMap().keySet();
+        intersectSet.retainAll(map2.getHeatMap().keySet());
+        double sum = 0;
+        for (HeatPoint<Integer> heatPoint : intersectSet) {
+            sum += map2.apply(heatPoint) * map1.apply(heatPoint);
         }
-        return sumIP;
+        return sum;
     }
 
     /**
@@ -137,9 +137,7 @@ public class HeatMap implements Serializable, Cloneable {
      */
     public void merge(HeatMap map) {
         assert getAccuracy() == map.getAccuracy();
-        Iterator<Map.Entry<HeatPoint<Integer>, Double>> iter = map.getHeatMap().entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<HeatPoint<Integer>, Double> entry = iter.next();
+        for (Map.Entry<HeatPoint<Integer>, Double> entry : map.getHeatMap().entrySet()) {
             getHeatMap().put(entry.getKey(), apply(entry.getKey()) + entry.getValue());
         }
     }
@@ -161,11 +159,10 @@ public class HeatMap implements Serializable, Cloneable {
      * @return Cloned Object
      * @throws CloneNotSupportedException
      */
-    @Deprecated
     @Override
     protected Object clone() throws CloneNotSupportedException {
         HeatMap ret = (HeatMap) super.clone();
-        ret.hMap = (HashMap<HeatPoint<Integer>, Double>) ret.hMap.clone();
+        ret.heatData = (HashMap<HeatPoint<Integer>, Double>) ret.heatData.clone();
         return ret;
     }
 
@@ -196,23 +193,23 @@ public class HeatMap implements Serializable, Cloneable {
      * @return export heat matrix which row is [longitude,latitude,heat]
      */
     public double[][] exportMatrix() {
-        double[][] COOMatrix = new double[hMap.size()][3];
-        Iterator<Map.Entry<HeatPoint<Integer>, Double>> iter = hMap.entrySet().iterator();
-        for (int i = 0; iter.hasNext(); i++) {
-            Map.Entry<HeatPoint<Integer>, Double> entry = iter.next();
-            COOMatrix[i][0] = entry.getKey().longitude;
-            COOMatrix[i][1] = entry.getKey().latitude;
-            COOMatrix[i][2] = entry.getValue();
+        double[][] cooMatrix = new double[heatData.size()][3];
+        Iterator<Map.Entry<HeatPoint<Integer>, Double>> iterator = heatData.entrySet().iterator();
+        for (int i = 0; iterator.hasNext(); i++) {
+            Map.Entry<HeatPoint<Integer>, Double> entry = iterator.next();
+            cooMatrix[i][0] = entry.getKey().getLongitude();
+            cooMatrix[i][1] = entry.getKey().getLatitude();
+            cooMatrix[i][2] = entry.getValue();
         }
-        return COOMatrix;
+        return cooMatrix;
     }
 
     /**
      * Print heat-map
      */
     public void display() {
-        for (HeatPoint<Integer> gp : getHeatMap().keySet()) {
-            System.out.printf("%s --> %s\n", gp.toString(), getHeatMap().get(gp).toString());
+        for (HeatPoint<Integer> heatPoint : getHeatMap().keySet()) {
+            System.out.printf("%s --> %s\n", heatPoint.toString(), getHeatMap().get(heatPoint).toString());
         }
     }
 }

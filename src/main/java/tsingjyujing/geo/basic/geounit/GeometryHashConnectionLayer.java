@@ -12,8 +12,8 @@ import java.util.*;
  * @Telephone 182-2085-2215
  */
 public class GeometryHashConnectionLayer<T> implements java.io.Serializable {
-    // Only valid on the planet smaller than earth and ball-shape
-    private static final double MAGIC_MAX_DISTANCE = 6500.00 * Math.PI;
+    // Only valid on the planet smaller than earth and 2d-sphere-shape
+    private static final double MAGIC_MAX_DISTANCE = GeometryPoint.EARTH_RADIUS * Math.PI;
     private Map<Long, GeometryHashFinalLayer<T>> data;
 
     public long getAccuracy() {
@@ -64,7 +64,7 @@ public class GeometryHashConnectionLayer<T> implements java.io.Serializable {
         int den = 0;
         for (Long blockHash : denHash) {
             if (numHash.contains(blockHash)) {
-                num += data.get(blockHash).insersectSize(layer.data.get(blockHash));
+                num += data.get(blockHash).intersectSize(layer.data.get(blockHash));
                 den += data.get(blockHash).unionSize(layer.data.get(blockHash));
             } else {
                 if (data.containsKey(blockHash)) {
@@ -218,7 +218,7 @@ public class GeometryHashConnectionLayer<T> implements java.io.Serializable {
 
         double searchRangeInnerProduct = centerPoint.minInnerProduct(
                 centerPoint.geometryHashBlockBoundary(
-                        searchRange.get(0).value,
+                        searchRange.get(0).getValue(),
                         accuracy,
                         centerPoint
                 )
@@ -226,7 +226,7 @@ public class GeometryHashConnectionLayer<T> implements java.io.Serializable {
 
         int maxIndex = searchRange.size();
         for (int i = 0; i < searchRange.size(); ++i) {
-            if (searchRange.get(i).time < searchRangeInnerProduct) {
+            if (searchRange.get(i).getTick() < searchRangeInnerProduct) {
                 maxIndex = i + 1;
                 break;
             }
@@ -236,7 +236,7 @@ public class GeometryHashConnectionLayer<T> implements java.io.Serializable {
         double maxInnerProduct = -1.0D;
         GeometryPoint<T> returnPoint = new GeometryPoint<>(0, 0);
         for (int i = 0; i < maxIndex; ++i) {
-            GeometryPoint<T> thisPoint = data.get(searchRange.get(i).value).
+            GeometryPoint<T> thisPoint = data.get(searchRange.get(i).getValue()).
                     searchNearestPoint(centerPoint, maxDistanceTolerance);
 
             double thisPointIP = thisPoint.getInnerProduct(centerPoint);

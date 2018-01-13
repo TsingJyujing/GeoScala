@@ -7,11 +7,27 @@ import javax.annotation.Nonnull;
  * @Mail tsingjyujing@163.com
  * @Telephone 182-2085-2215
  */
-public class TimeUnit<T> implements Comparable<TimeUnit> {
+public class TimeUnit<T> implements Comparable<TimeUnit>, Tickable {
 
-    public T value;
-    public double time = 0.0D;
-    public boolean remove = false;
+    public T getValue() {
+        return value;
+    }
+
+    public void setValue(T value) {
+        this.value = value;
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
+    }
+
+    private T value;
+    private double tick = 0.0D;
+    private boolean removed = false;
 
     /**
      * Initial by no parameters
@@ -24,12 +40,22 @@ public class TimeUnit<T> implements Comparable<TimeUnit> {
      * @param valueInput initial value
      */
     public TimeUnit(double timeInput, T valueInput) {
-        time = timeInput;
+        tick = timeInput;
         value = valueInput;
     }
 
     @Override
     public int compareTo(@Nonnull TimeUnit obj) {
-        return Double.compare(this.time, obj.time);
+        return Double.compare(this.tick, obj.tick);
+    }
+
+    @Override
+    public double getTick() {
+        return tick;
+    }
+
+    @Override
+    public void setTick(double tick) {
+        this.tick = tick;
     }
 }

@@ -15,23 +15,23 @@ public class HeatPoint<T> extends GeometryPoint<T> implements Serializable {
     }
 
     private void reformatGPS() {
-        longitude = reformatVariable(longitude, accuracy);
-        latitude = reformatVariable(latitude, accuracy);
+        longitude = fixPointToCenter(longitude, accuracy);
+        latitude = fixPointToCenter(latitude, accuracy);
     }
 
-    private static double reformatVariable(double variable, long accuracy) {
+    private static double fixPointToCenter(double variable, long accuracy) {
         return ((long) Math.floor(variable / 180 * accuracy) + 0.5) * 180.0 / accuracy;
     }
 
-    public HeatPoint(double longitudeIn, double latitudeIn, long acc) {
-        super(longitudeIn, latitudeIn);
-        accuracy = acc;
+    public HeatPoint(double longitude, double latitude, long accuracy) {
+        super(longitude, latitude);
+        this.accuracy = accuracy;
         reformatGPS();
     }
 
-    public HeatPoint(double longitudeIn, double latitudeIn, T value, long acc) {
-        super(longitudeIn, latitudeIn, value);
-        accuracy = acc;
+    public HeatPoint(double longitude, double latitude, T value, long accuracy) {
+        super(longitude, latitude, value);
+        this.accuracy = accuracy;
         reformatGPS();
     }
 

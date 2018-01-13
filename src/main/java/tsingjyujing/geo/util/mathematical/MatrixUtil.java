@@ -1,6 +1,8 @@
 package tsingjyujing.geo.util.mathematical;
 
 
+import java.lang.reflect.Array;
+
 /**
  * @author tsingjyujing
  * @Mail tsingjyujing@163.com
@@ -9,95 +11,120 @@ package tsingjyujing.geo.util.mathematical;
 public class MatrixUtil {
 
     /**
-     * @param Matrix
-     * @param ColIndeces
+     * Get a column by given matrix and given index
+     *
+     * @param matrix
+     * @param indices
      * @return
      */
-    public static double[][] colSlice(double[][] Matrix, int[] ColIndeces) {
-        double[][] result = new double[Matrix.length][ColIndeces.length];
-        for (int idx : ColIndeces) {
-            if (idx < 0 || idx >= Matrix[0].length) {
+    public static double[][] columnSlice(double[][] matrix, int[] indices) {
+        double[][] result = new double[matrix.length][indices.length];
+        for (int idx : indices) {
+            if (idx < 0 || idx >= matrix[0].length) {
                 throw new ArrayIndexOutOfBoundsException("Dim out of bounds");
             }
         }
         int i, j;
-        for (i = 0; i < Matrix.length; ++i) {
-            for (j = 0; j < ColIndeces.length; ++j) {
-                result[i][j] = Matrix[i][ColIndeces[j]];
+        for (i = 0; i < matrix.length; ++i) {
+            for (j = 0; j < indices.length; ++j) {
+                result[i][j] = matrix[i][indices[j]];
             }
         }
         return result;
     }
 
-    public static double[] colSlice(double[][] Matrix, int col_index) {
-        double[] result = new double[Matrix.length];
-        if (col_index < 0 || col_index >= Matrix[0].length) {
+    public static double[] columnSlice(double[][] matrix, int index) {
+        double[] result = new double[matrix.length];
+        if (index < 0 || index >= matrix[0].length) {
             throw new ArrayIndexOutOfBoundsException("Dim out of bounds");
         }
         int i, j;
-        for (i = 0; i < Matrix.length; ++i) {
-            result[i] = Matrix[i][col_index];
+        for (i = 0; i < matrix.length; ++i) {
+            result[i] = matrix[i][index];
         }
         return result;
     }
 
     /**
-     * @param arr
+     * @param data
      * @return
      */
-    public static int[] intArray(int... arr) {
-        return arr;
+    public static int[] intArray(int... data) {
+        return data;
+    }
+
+    public static <T> T[][] reshape(T[] rawData, int[] dimension, Class<T> type) throws Exception {
+        if (dimension.length != 2) {
+            throw new Exception("Error dimension parameter.");
+        }
+        for (int d : dimension) {
+            if (d <= 0) {
+                throw new ArrayIndexOutOfBoundsException("Dimension out of bounds");
+            }
+        }
+        if (dimension[0] * dimension[1] != rawData.length) {
+            throw new Exception("Error dimension parameters or data length.");
+        }
+        int rowSize = dimension[0];
+        int colSize = dimension[1];
+        T[][] returnValue = (T[][]) Array.newInstance(type, rowSize, colSize);
+        for (int i = 0; i < rowSize; ++i) {
+            for (int j = 0; j < colSize; ++j) {
+                returnValue[i][j] = rawData[i + j * rowSize];
+            }
+        }
+        return returnValue;
     }
 
     /**
-     * @param rawdata
-     * @param dim
+     * @param rawData
+     * @param dimension
      * @return
      * @throws Exception
      */
-    public static double[][] reshape(double[] rawdata, int[] dim) throws Exception {
-        if (dim.length != 2) {
-            throw new Exception("Error dim parameters.");
+    public static double[][] reshape(double[] rawData, int[] dimension) throws Exception {
+        if (dimension.length != 2) {
+            throw new Exception("Error dimension parameters.");
         }
-        for (int d : dim) {
-            if (d < 0) {
+        for (int d : dimension) {
+            if (d <= 0) {
                 throw new ArrayIndexOutOfBoundsException("Dim out of bounds");
             }
         }
-        if (dim[0] * dim[1] != rawdata.length) {
-            throw new Exception("Error dim parameters or data length.");
+        if (dimension[0] * dimension[1] != rawData.length) {
+            throw new Exception("Error dimension parameters or data length.");
         }
-        double[][] rtn = new double[dim[0]][dim[1]];
-        for (int i = 0; i < dim[0]; ++i) {
-            for (int j = 0; j < dim[1]; ++j) {
-                rtn[i][j] = rawdata[i + j * dim[0]];
+        double[][] rtn = new double[dimension[0]][dimension[1]];
+        for (int i = 0; i < dimension[0]; ++i) {
+            for (int j = 0; j < dimension[1]; ++j) {
+                rtn[i][j] = rawData[i + j * dimension[0]];
             }
         }
         return rtn;
     }
 
     /**
-     * @param rawdata
-     * @param dim
+     * @param rawData
+     * @param dimension
      * @return
      * @throws Exception
      */
-    public static int[][] reshape(int[] rawdata, int[] dim) throws Exception {
-        if (dim.length != 2) {
-            throw new Exception("Error dim parameters.");
+    public static int[][] reshape(int[] rawData, int[] dimension) throws Exception {
+        if (dimension.length != 2) {
+            throw new Exception("Error dimension parameters.");
         }
-        for (int d : dim) {
+        for (int d : dimension) {
             if (d < 0) {
                 throw new ArrayIndexOutOfBoundsException("Dim out of bounds");
             }
         }
-        if (dim[0] * dim[1] != rawdata.length) {
-            throw new Exception("Error dim parameters or data length.");
+        if (dimension[0] * dimension[1] != rawData.length) {
+            throw new Exception("Error dimension parameters or data length.");
         }
-        int[][] rtn = new int[dim[0]][dim[1]];
-        for (int i = 0; i < dim[0]; ++i) {
-            for (int j = 0; j < dim[1]; ++j) {
-                rtn[i][j] = rawdata[i + j * dim[0]];
+        int[][] rtn = new int[dimension[0]][dimension[1]];
+        for (int i = 0; i < dimension[0]; ++i) {
+            for (int j = 0; j < dimension[1]; ++j) {
+                rtn[i][j] = rawData[i + j * dimension[0]];
             }
         }
         return rtn;
@@ -108,7 +135,7 @@ public class MatrixUtil {
      * @param x 3×3 Matrix
      * @return inv(x)->3×3 Matrix
      */
-    public static double[][] invO3(double[][] x) {
+    public static double[][] inverseOrder3Matrix(double[][] x) {
         assert (x.length == 3);
         double[][] returnValue = {
                 {

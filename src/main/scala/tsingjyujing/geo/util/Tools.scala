@@ -11,7 +11,7 @@ object Tools {
     
     def readGPSData(data: java.lang.Iterable[Array[Double]]): IndexedSeq[GeometryPoint[_ <: Tickable]] = data.asScala.map(gpsPointData => new GeometryPoint[TickImpl](gpsPointData(0), gpsPointData(1), new TickImpl(gpsPointData(0)))).toIndexedSeq
     
-    def writeGPSData(data: IndexedSeq[GeometryPoint[_ <: Tickable]]): Array[Array[Double]] = data.map(x => Array(x.longitude, x.latitude, x.userInfo.getTick)).toArray
+    def writeGPSData(data: IndexedSeq[GeometryPoint[_ <: Tickable]]): Array[Array[Double]] = data.map(x => Array(x.getLongitude, x.getLatitude, x.getUserInfo.getTick)).toArray
     
     def iterableToJava[T](data: Iterable[T]) = data.asJava
 }
