@@ -1,13 +1,13 @@
 package tsingjyujing.geo.basic.geounit;
 
-import tsingjyujing.geo.basic.timeseries.Tickable;
+import tsingjyujing.geo.basic.timeseries.ITick;
 
 /**
  * @author tsingjyujing
  * @Mail tsingjyujing@163.com
  * @Telephone 182-2085-2215
  */
-public class DirectionalPoint implements Tickable {
+public class DirectionalPoint implements ITick {
     public double getDs() {
         return ds;
     }

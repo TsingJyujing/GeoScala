@@ -1,11 +1,11 @@
 package tsingjyujing.geo.util;
 
-import tsingjyujing.geo.basic.timeseries.Tickable;
+import tsingjyujing.geo.basic.timeseries.ITick;
 
 /**
  * @author yuanyifan
  */
-public class TickImpl implements Tickable {
+public class TickImpl implements ITick {
 
     private double tick = Double.NaN;
 

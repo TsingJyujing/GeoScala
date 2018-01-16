@@ -11,7 +11,7 @@ import java.io.File;
 public class CommonDialog {
 
     public static String getFolder(String initPath) throws Exception {
-        return getPath(initPath, JFileChooser.DIRECTORIES_ONLY, "选择文件夹");
+        return getPath(initPath, JFileChooser.DIRECTORIES_ONLY, "Select Path");
     }
 
     public static String getFolder() throws Exception {
@@ -20,7 +20,7 @@ public class CommonDialog {
 
 
     public static String putFile(String initPath) throws Exception {
-        return getPath(initPath, JFileChooser.SAVE_DIALOG, "保存文件");
+        return getPath(initPath, JFileChooser.SAVE_DIALOG, "Save File");
     }
 
     public static String putFile() throws Exception {
@@ -28,7 +28,7 @@ public class CommonDialog {
     }
 
     public static String getFile(String initPath) throws Exception {
-        return getPath(initPath, JFileChooser.FILES_ONLY, "打开文件");
+        return getPath(initPath, JFileChooser.FILES_ONLY, "Open File");
     }
 
     public static String getFile() throws Exception {

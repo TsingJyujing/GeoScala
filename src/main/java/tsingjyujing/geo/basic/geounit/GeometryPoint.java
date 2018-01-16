@@ -380,4 +380,5 @@ public class GeometryPoint<T> implements java.io.Serializable {
     public int nearestPointIndex(List<GeometryPoint> points) {
         return nearestPointIndex(points, this);
     }
+
 }

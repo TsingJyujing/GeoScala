@@ -1,15 +1,14 @@
 package tsingjyujing.geo.algorithm
 
-
 import tsingjyujing.geo.basic.geounit.GeometryPoint
-import tsingjyujing.geo.basic.timeseries.Tickable
+import tsingjyujing.geo.basic.timeseries.ITick
 import tsingjyujing.geo.util.mathematical.GPSUtil
 
 /**
   * @author tsingjyujing
   */
 class SparseGPS(val cleaningParam: Double, val sparsityParam: Double) {
-    def compress[T <: Tickable](gpsSequence: IndexedSeq[GeometryPoint[T]]) = GPSUtil.sparsifyGPS(
+    def compress[T <: ITick](gpsSequence: IndexedSeq[GeometryPoint[T]]) = GPSUtil.sparsifyGPS(
         GPSUtil.cleanGPS(gpsSequence, cleaningParam * 24.0),
         sparsityParam,
         math.round(math.max(sparsityParam * 100, 32)).toInt

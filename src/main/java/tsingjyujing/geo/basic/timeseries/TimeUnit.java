@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
  * @Mail tsingjyujing@163.com
  * @Telephone 182-2085-2215
  */
-public class TimeUnit<T> implements Comparable<TimeUnit>, Tickable {
+public class TimeUnit<T> implements Comparable<TimeUnit>, ITick {
 
     public T getValue() {
         return value;

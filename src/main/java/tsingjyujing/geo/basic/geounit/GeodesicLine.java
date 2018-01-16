@@ -22,8 +22,7 @@ public class GeodesicLine {
         point2 = p2;
         double[] v1 = point1.get3DPos();
         double[] v2 = point2.get3DPos();
-        n = VectorUtil.outerProduct(v1, v2);
-        VectorUtil.norm2Vector(1.0, n);
+        n = VectorUtil.norm2Vector(1.0,VectorUtil.outerProduct(v1, v2));
         double[][] M = {v1, v2, n};
         iM = MatrixUtil.inverseOrder3Matrix(M);
     }

@@ -57,3 +57,4 @@ fabric.properties
 .idea/
 target/
 experimental/
+将删除 geo-library-2.12.iml

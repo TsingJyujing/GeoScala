@@ -1,7 +1,8 @@
 package tsingjyujing.geo.util.mathematical
 
 import tsingjyujing.geo.basic.geounit.{GeodesicLine, GeometryPoint}
-import tsingjyujing.geo.basic.timeseries.Tickable
+import tsingjyujing.geo.scala.basic.geounit.GeometryPoint
+import tsingjyujing.geo.basic.timeseries.ITick
 import tsingjyujing.geo.util.mathematical.VectorUtil.outerProduct
 
 import scala.collection.{immutable, mutable}
@@ -36,7 +37,7 @@ object GPSUtil {
     /*
      * 近似欧氏空间求转弯角，如无特殊需求不再使用
      */
-    @Deprecated
+    @deprecated(message = "Don't using Euclidean angle algorithm no more, instead it of steeringAngleGeodesic")
     def steeringAngleEuclidean[T](
                                    p1: GeometryPoint[T],
                                    p2: GeometryPoint[T],
@@ -53,7 +54,7 @@ object GPSUtil {
         case Seq(a, b) => a.distance(b)
     }.sum
     
-    def sparsifyGPS[T <: Tickable](
+    def sparsifyGPS[T <: ITick](
                                     gpsArray: IndexedSeq[GeometryPoint[T]],
                                     sparsityParam: Double,
                                     sparsitySearchParam: Int
@@ -64,9 +65,9 @@ object GPSUtil {
     )
     
     def sparsifyGPSIndexed(
-                            gpsArray: IndexedSeq[GeometryPoint[_ <: Tickable]],
-                            sparsityParam: Double,
-                            sparsitySearchParam: Int
+                              gpsArray: IndexedSeq[GeometryPoint[_ <: ITick]],
+                              sparsityParam: Double,
+                              sparsitySearchParam: Int
                           ): IndexedSeq[Int] = {
         if (gpsArray.size < 10) return gpsArray.indices
         val returnList = new mutable.MutableList[Int]
@@ -105,7 +106,7 @@ object GPSUtil {
     }
     
     def getMaxDistanceToLine(
-                              gpsArray: IndexedSeq[GeometryPoint[_ <: Tickable]]
+                              gpsArray: IndexedSeq[GeometryPoint[_ <: ITick]]
                             ): IndexedSeq[Double] = 3.to(gpsArray.size - 2).map(i => {
         val line = new GeodesicLine(
             gpsArray.head,
@@ -115,7 +116,7 @@ object GPSUtil {
     })
     
     def getAverageDistanceToLine(
-                                  gpsArray: IndexedSeq[GeometryPoint[_ <: Tickable]]
+                                  gpsArray: IndexedSeq[GeometryPoint[_ <: ITick]]
                                 ): IndexedSeq[Double] = {
         3.to(gpsArray.size).map(i => {
             val line = new GeodesicLine(
@@ -127,7 +128,7 @@ object GPSUtil {
         })
     }
     
-    def cleanGPS[T <: Tickable](
+    def cleanGPS[T <: ITick](
                                  gpsArray: Iterable[GeometryPoint[T]],
                                  velocityLimit: Double
                                ): immutable.IndexedSeq[GeometryPoint[T]] = gpsArray.iterator.sliding(2, 1).filter(data => {
