@@ -1,9 +1,10 @@
 package tsingjyujing.geo.scala.basic
 
-import tsingjyujing.geo.scala.basic.operations.DistanceMeasurable
+import tsingjyujing.geo.scala.basic.operations.GeoDistanceMeasurable
 
-trait IGeoPoint extends DistanceMeasurable[IGeoPoint] with IPoint3{
+trait IGeoPoint extends IPoint3 with GeoDistanceMeasurable[IGeoPoint] {
     def getLongitude: Double
+
     def getLatitude: Double
 
     /**
@@ -12,7 +13,7 @@ trait IGeoPoint extends DistanceMeasurable[IGeoPoint] with IPoint3{
       * @param point geo point
       * @return
       */
-    override def to(point: IGeoPoint): Double = IGeoPoint.geodesicDistance(this, point)
+    override def geoTo(point: IGeoPoint): Double = IGeoPoint.geodesicDistance(this, point)
 
     override def getX: Double = math.cos(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD) * IGeoPoint.EARTH_RADIUS
 

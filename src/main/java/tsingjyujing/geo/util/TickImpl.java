@@ -6,7 +6,6 @@ import tsingjyujing.geo.basic.timeseries.ITick;
  * @author yuanyifan
  */
 public class TickImpl implements ITick {
-
     private double tick = Double.NaN;
 
     @Override
@@ -26,4 +25,8 @@ public class TickImpl implements ITick {
         setTick(tick);
     }
 
+    @Override
+    public int compareTo(ITick t) {
+        return Double.compare(getTick(),t.getTick());
+    }
 }

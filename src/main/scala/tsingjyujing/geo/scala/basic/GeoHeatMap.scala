@@ -1,24 +1,23 @@
 package tsingjyujing.geo.scala.basic
 
-/**
-  * Heatmap of geo
-  */
-class GeoHeatMap {
+import tsingjyujing.geo.scala.basic.operations.{Angleable, InnerProductable, Normable}
 
-    // TODO this is sumable, inner-productable, normable, angleable
-    // TODO revert all points in hashmap
+/**
+  * Heatmap of geo points
+  */
+class GeoHeatMap extends InnerProductable[GeoHeatMap] with Normable with Angleable[GeoHeatMap] {
 
     private val data = scala.collection.mutable.Map[Long, Double]()
 
-    def append(kv: (IHashableGeoPoint, Double)): Unit = {
-        this append(kv._1.indexCode, kv._2)
+    def append(k: IHashableGeoPoint, v: Double): Unit = {
+        this append(k.indexCode, v)
     }
 
-    def append(kv: (Long, Double)): Unit = {
-        if (data contains kv._1) {
-            data.put(kv._1, kv._2 + data(kv._1))
+    def append(k: Long, v: Double): Unit = {
+        if (data contains k) {
+            data.put(k, v + data(k))
         } else {
-            data.put(kv._1, kv._2)
+            data.put(k, v)
         }
     }
 
@@ -26,4 +25,49 @@ class GeoHeatMap {
 
     def remove(key: Long): Unit = data remove key
 
+    def apply(key: Long): Double = if (data contains key) {
+        data(key)
+    } else {
+        0.0D
+    }
+
+    def apply(key: IHashableGeoPoint): Double = this (key.indexCode)
+
+    def +(heatMap: GeoHeatMap): GeoHeatMap = {
+        val mapReturn = new GeoHeatMap()
+        val keySet = data.keySet | heatMap.data.keySet
+        keySet.foreach(
+            key => {
+                mapReturn.data.put(key, this (key) + heatMap(key))
+            }
+        )
+        mapReturn
+    }
+
+    def +=(heatMap: GeoHeatMap): Unit = heatMap.data.foreach(kv => append(kv._1, kv._2))
+
+    /**
+      * Implement inner product by vectorization of sparse-map
+      *
+      * @param point
+      * @return
+      */
+    override def innerProduct(point: GeoHeatMap): Double = (data.keySet & point.data.keySet).map(k => this (k) * point(k)).sum
+
+    /**
+      *
+      * @param n
+      * @return
+      */
+    override def norm(n: Double): Double = math.pow(data.map(kv => math.pow(kv._2, n)).sum, 1.0 / n)
+
+    override def norm2: Double = math.sqrt(data.map(kv => kv._2 * kv._2).sum)
+
+    /**
+      * Get cosed angle value of this and x
+      *
+      * @param x compare unit
+      * @return
+      */
+    override def conAngle(x: GeoHeatMap): Double = innerProduct(x) / (x.norm2 * norm2)
 }

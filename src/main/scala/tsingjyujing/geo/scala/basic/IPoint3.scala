@@ -2,7 +2,7 @@ package tsingjyujing.geo.scala.basic
 
 import tsingjyujing.geo.scala.basic.operations.{Angleable, DistanceMeasurable, InnerProductable, Normable}
 
-trait IPoint3 extends DistanceMeasurable[IPoint3] with InnerProductable[IPoint3] with Normable with Angleable[IPoint3] {
+trait IPoint3 extends InnerProductable[IPoint3] with Normable with Angleable[IPoint3] with DistanceMeasurable[IPoint3] {
     def getX: Double
 
     def getY: Double
@@ -21,9 +21,7 @@ trait IPoint3 extends DistanceMeasurable[IPoint3] with InnerProductable[IPoint3]
       * @param point geo point
       * @return
       */
-    override def to(point: IPoint3): Double = {
-        IPoint3.getPow2Sum(getX - point.getX, getY - point.getY, getZ - point.getZ)
-    }
+    override def to(point: IPoint3): Double = math.sqrt(IPoint3.getPow2Sum(getX - point.getX, getY - point.getY, getZ - point.getZ))
 
     override def innerProduct(point: IPoint3): Double = IPoint3.innerProduct3(this, point)
 

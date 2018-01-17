@@ -5,7 +5,7 @@ package tsingjyujing.geo.scala.basic.operations
   *
   * @tparam T type of the object to compare
   */
-trait DistanceMeasurable[T <: DistanceMeasurable[T]] {
+trait GeoDistanceMeasurable[T <: GeoDistanceMeasurable[T]] {
 
     /**
       * Get distance from this to point or point to this (should be same)
@@ -13,5 +13,5 @@ trait DistanceMeasurable[T <: DistanceMeasurable[T]] {
       * @param point geo point
       * @return
       */
-    def to(point: T): Double
+    def geoTo(point: T): Double
 }

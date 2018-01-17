@@ -13,7 +13,7 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Buffer[T] {
 
     /**
       * Search in sorted array
-      * @param time
+      * @param time query time
       * @return
       */
     def query(time: Double): (Int, Int) = {
@@ -47,7 +47,7 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Buffer[T] {
       * Append unit to time series
       * @param timeUnit
       */
-    def +=(timeUnit: T): Unit = {
+    def append(timeUnit: T): Unit = {
         this += timeUnit
         sortByTick()
     }
@@ -56,7 +56,7 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Buffer[T] {
       * Append many unit to time series
       * @param timeSeries
       */
-    def +=(timeSeries: Iterable[T]): Unit = {
+    def append(timeSeries: Iterable[T]): Unit = {
         this appendAll timeSeries
         sortByTick()
     }
