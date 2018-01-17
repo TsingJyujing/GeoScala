@@ -1,7 +1,7 @@
 package tsingjyujing.geo.basic
 
-import tsingjyujing.geo.element.ImmutableGeoPoint
 import tsingjyujing.geo.basic.operations.IHashedIndex
+import tsingjyujing.geo.element.immutable.GeoPoint
 /**
   * Which geo point can get an Long index value and get hashed.
   */
@@ -36,7 +36,7 @@ object IHashableGeoPoint {
         val lngCode = (code - latCode) / POW2E31
         val lng = lngCode * 180.0 / accuracy - 180.0
         val lat = latCode * 180.0 / accuracy - 90.0
-        new ImmutableGeoPoint(lng, lat)
+        new GeoPoint(lng, lat)
     }
 
 }

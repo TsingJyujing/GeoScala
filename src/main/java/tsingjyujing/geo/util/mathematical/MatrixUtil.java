@@ -168,4 +168,23 @@ public class MatrixUtil {
         }
         return returnValue;
     }
+
+
+    public static double[] matrixProduct(double[][] M, double[] vector) {
+        final int outSize = M.length;
+        final int prodSize = vector.length;
+        final double[] outVector = new double[outSize];
+        for (int i = 0; i < outSize; i++) {
+            final double[] c = M[i];
+            double sumValue = 0.0;
+            if (c.length != prodSize) {
+                throw new RuntimeException("Error while product M and vector: dimension not fetched.");
+            }
+            for (int j = 0; j < prodSize; j++) {
+                sumValue += c[j] * vector[j];
+            }
+            outVector[i] = sumValue;
+        }
+        return outVector;
+    }
 }
