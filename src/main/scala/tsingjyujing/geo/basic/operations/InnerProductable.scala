@@ -1,4 +1,4 @@
-package tsingjyujing.geo.scala.basic.operations
+package tsingjyujing.geo.basic.operations
 
 /**
   * Which can get inner product to another object by given type T

@@ -1,4 +1,4 @@
-package tsingjyujing.geo.scala.basic.operations
+package tsingjyujing.geo.basic.operations
 
 /**
   * Object which can get a norm N

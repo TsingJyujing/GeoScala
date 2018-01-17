@@ -1,4 +1,4 @@
-package tsingjyujing.geo.scala.basic.operations
+package tsingjyujing.geo.basic.operations
 
 /**
   * Which class can get an indexed hash

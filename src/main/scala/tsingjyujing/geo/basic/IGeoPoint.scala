@@ -1,8 +1,9 @@
-package tsingjyujing.geo.scala.basic
+package tsingjyujing.geo.basic
 
-import tsingjyujing.geo.scala.basic.operations.GeoDistanceMeasurable
+import tsingjyujing.geo.basic.operations.GeoDistanceMeasurable
 
-trait IGeoPoint extends IPoint3 with GeoDistanceMeasurable[IGeoPoint] {
+trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with IPoint3{
+
     def getLongitude: Double
 
     def getLatitude: Double

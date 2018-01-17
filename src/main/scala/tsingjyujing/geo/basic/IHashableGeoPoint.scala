@@ -1,7 +1,7 @@
-package tsingjyujing.geo.scala.basic
+package tsingjyujing.geo.basic
 
-import tsingjyujing.geo.scala.basic.operations.IHashedIndex
-
+import tsingjyujing.geo.element.ImmutableGeoPoint
+import tsingjyujing.geo.basic.operations.IHashedIndex
 /**
   * Which geo point can get an Long index value and get hashed.
   */

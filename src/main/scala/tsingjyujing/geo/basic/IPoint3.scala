@@ -1,6 +1,6 @@
-package tsingjyujing.geo.scala.basic
+package tsingjyujing.geo.basic
 
-import tsingjyujing.geo.scala.basic.operations.{Angleable, DistanceMeasurable, InnerProductable, Normable}
+import tsingjyujing.geo.basic.operations.{Angleable, DistanceMeasurable, InnerProductable, Normable}
 
 trait IPoint3 extends InnerProductable[IPoint3] with Normable with Angleable[IPoint3] with DistanceMeasurable[IPoint3] {
     def getX: Double

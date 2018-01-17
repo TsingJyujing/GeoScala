@@ -1,11 +1,12 @@
-package tsingjyujing.geo.scala.basic
+package tsingjyujing.geo.element
 
-import tsingjyujing.geo.scala.basic.operations.{Angleable, InnerProductable, Normable}
+import tsingjyujing.geo.basic.IHashableGeoPoint
+import tsingjyujing.geo.basic.operations.{Angleable, InnerProductable, Jaccardable, Normable}
 
 /**
   * Heatmap of geo points
   */
-class GeoHeatMap extends InnerProductable[GeoHeatMap] with Normable with Angleable[GeoHeatMap] {
+class GeoHeatMap extends InnerProductable[GeoHeatMap] with Normable with Angleable[GeoHeatMap] with Jaccardable[GeoHeatMap] {
 
     private val data = scala.collection.mutable.Map[Long, Double]()
 
@@ -70,4 +71,10 @@ class GeoHeatMap extends InnerProductable[GeoHeatMap] with Normable with Angleab
       * @return
       */
     override def conAngle(x: GeoHeatMap): Double = innerProduct(x) / (x.norm2 * norm2)
+
+    override def jaccardSimilarity(x: GeoHeatMap): Double = (x.data.keySet & data.keySet).size * 1.0 / (x.data.keySet | data.keySet).size
+
+    def valueFix(f: Double => Double): Unit = data.foreach(kv => {
+        data(kv._1) = f(kv._2)
+    })
 }

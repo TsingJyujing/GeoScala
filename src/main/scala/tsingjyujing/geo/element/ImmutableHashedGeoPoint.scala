@@ -1,4 +1,6 @@
-package tsingjyujing.geo.scala.basic
+package tsingjyujing.geo.element
+
+import tsingjyujing.geo.basic.IHashableGeoPoint
 
 final class ImmutableHashedGeoPoint(longitude: Double, latitude: Double, accuracy: Long = 12000) extends IHashableGeoPoint {
     override def getGeoHashAccuracy: Long = accuracy
