@@ -1,16 +1,16 @@
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
         <!--Scala version = main.sub -->
         <scala.version.main>2.10</scala.version.main>
         <scala.version.sub>7</scala.version.sub>
-
     </properties>
 
     <groupId>tsingjyujing</groupId>
     <artifactId>geo-library-${scala.version.main}</artifactId>
-    <version>2.0-Lite</version>
+    <version>2.1-Lite</version>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -1,19 +1,34 @@
 package tsingjyujing.geo.element
 
+import java.util
+
 import tsingjyujing.geo.basic.IHashableGeoPoint
 import tsingjyujing.geo.basic.operations.{Angleable, InnerProductable, Jaccardable, Normable}
+import tsingjyujing.geo.element.immutable.GeoPointValued
+
+import scala.collection.JavaConverters._
 
 /**
   * Heatmap of geo points
   */
-class GeoHeatMap extends InnerProductable[GeoHeatMap] with Normable with Angleable[GeoHeatMap] with Jaccardable[GeoHeatMap] {
+class GeoHeatMap(val accuracy: Long = 0x10000) extends InnerProductable[GeoHeatMap] with Normable with Angleable[GeoHeatMap] with Jaccardable[GeoHeatMap] with Iterable[(Long, Double)] {
 
     private val data = scala.collection.mutable.Map[Long, Double]()
 
-    def append(k: IHashableGeoPoint, v: Double): Unit = {
-        this append(k.indexCode, v)
+    def this(values: Iterable[(Long, Double)]) {
+        this()
+        values.groupBy(_._1).map(kv => {
+            data.put(kv._1, kv._2.map(_._2).sum)
+        })
     }
 
+    def append(k: IHashableGeoPoint, v: Double): Unit = if (k.getGeoHashAccuracy == accuracy) {
+        this append(k.indexCode, v)
+    } else {
+        throw new RuntimeException("Accuracy not same")
+    }
+
+    @deprecated(message = "careful while using this function and ensure the accuracy is same")
     def append(k: Long, v: Double): Unit = {
         if (data contains k) {
             data.put(k, v + data(k))
@@ -22,20 +37,30 @@ class GeoHeatMap extends InnerProductable[GeoHeatMap] with Normable with Angleab
         }
     }
 
-    def remove(key: IHashableGeoPoint): Unit = this remove key.indexCode
+    def remove(key: IHashableGeoPoint): Unit = if (key.getGeoHashAccuracy == accuracy) {
+        this remove key.indexCode
+    } else {
+        throw new RuntimeException("Accuracy not same")
+    }
 
+    @deprecated(message = "careful while using this function and ensure the accuracy is same")
     def remove(key: Long): Unit = data remove key
 
+    @deprecated(message = "careful while using this function and ensure the accuracy is same")
     def apply(key: Long): Double = if (data contains key) {
         data(key)
     } else {
         0.0D
     }
 
-    def apply(key: IHashableGeoPoint): Double = this (key.indexCode)
+    def apply(key: IHashableGeoPoint): Double = if (key.getGeoHashAccuracy == accuracy) {
+        this (key.indexCode)
+    } else {
+        throw new RuntimeException("Accuracy not same")
+    }
 
-    def +(heatMap: GeoHeatMap): GeoHeatMap = {
-        val mapReturn = new GeoHeatMap()
+    def +(heatMap: GeoHeatMap): GeoHeatMap = if (heatMap.accuracy == accuracy) {
+        val mapReturn = new GeoHeatMap(accuracy)
         val keySet = data.keySet | heatMap.data.keySet
         keySet.foreach(
             key => {
@@ -43,9 +68,15 @@ class GeoHeatMap extends InnerProductable[GeoHeatMap] with Normable with Angleab
             }
         )
         mapReturn
+    } else {
+        throw new RuntimeException("Accuracy not same")
     }
 
-    def +=(heatMap: GeoHeatMap): Unit = heatMap.data.foreach(kv => append(kv._1, kv._2))
+    def +=(heatMap: GeoHeatMap): Unit = if (heatMap.accuracy == accuracy) {
+        heatMap.data.foreach(kv => append(kv._1, kv._2))
+    } else {
+        throw new RuntimeException("Accuracy not same")
+    }
 
     /**
       * Implement inner product by vectorization of sparse-map
@@ -53,7 +84,11 @@ class GeoHeatMap extends InnerProductable[GeoHeatMap] with Normable with Angleab
       * @param point
       * @return
       */
-    override def innerProduct(point: GeoHeatMap): Double = (data.keySet & point.data.keySet).map(k => this (k) * point(k)).sum
+    override def innerProduct(point: GeoHeatMap): Double = if (accuracy == point.accuracy) {
+        (data.keySet & point.data.keySet).map(k => this (k) * point(k)).sum
+    } else {
+        throw new RuntimeException("Accuracy not same")
+    }
 
     /**
       *
@@ -72,9 +107,24 @@ class GeoHeatMap extends InnerProductable[GeoHeatMap] with Normable with Angleab
       */
     override def conAngle(x: GeoHeatMap): Double = innerProduct(x) / (x.norm2 * norm2)
 
-    override def jaccardSimilarity(x: GeoHeatMap): Double = (x.data.keySet & data.keySet).size * 1.0 / (x.data.keySet | data.keySet).size
+    override def jaccardSimilarity(x: GeoHeatMap): Double = if (accuracy == x.accuracy) {
+        (x.data.keySet & data.keySet).size * 1.0 / (x.data.keySet | data.keySet).size
+    } else {
+        throw new RuntimeException("Accuracy not same")
+    }
 
     def valueFix(f: Double => Double): Unit = data.foreach(kv => {
         data(kv._1) = f(kv._2)
     })
+
+    override def iterator: Iterator[(Long, Double)] = data.iterator
+
+
+    def getGeoPoints: Iterable[GeoPointValued[Double]] = this.map(kv => {
+        val geoInfo = IHashableGeoPoint.revertFromCode(kv._1, accuracy)
+        new GeoPointValued[Double](geoInfo.getLongitude, geoInfo.getLatitude, kv._2)
+    })
+
+    def getGeoPointsJava: util.List[GeoPointValued[Double]] = getGeoPoints.toIndexedSeq.asJava
+
 }
