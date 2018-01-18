@@ -15,8 +15,8 @@ class GeoHeatMap(val accuracy: Long = 0x10000) extends InnerProductable[GeoHeatM
 
     private val data = scala.collection.mutable.Map[Long, Double]()
 
-    def this(values: Iterable[(Long, Double)]) {
-        this()
+    def this(values: Iterable[(Long, Double)], accuracy: Long = 0x10000) {
+        this(accuracy)
         values.groupBy(_._1).map(kv => {
             data.put(kv._1, kv._2.map(_._2).sum)
         })
