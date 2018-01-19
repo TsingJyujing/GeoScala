@@ -2,7 +2,7 @@ package tsingjyujing.geo.basic
 
 import tsingjyujing.geo.basic.operations.GeoDistanceMeasurable
 
-trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with Vector3{
+trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with Vector3 {
 
     def getLongitude: Double
 
@@ -21,6 +21,8 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with Vector3{
     override def getY: Double = math.sin(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD)
 
     override def getZ: Double = math.sin(getLatitude * IGeoPoint.DEG2RAD)
+
+    override def toString(): String = "Longitude:%3.6f,Latitude:%3.6f".format(getLongitude, getLatitude)
 
 }
 

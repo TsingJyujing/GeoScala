@@ -2,9 +2,9 @@ package tsingjyujing.geo.element
 
 import java.util
 
-import tsingjyujing.geo.basic.IHashableGeoPoint
+import tsingjyujing.geo.basic.{IGeoPoint, IHashableGeoPoint}
 import tsingjyujing.geo.basic.operations.{Angleable, InnerProductable, Jaccardable, Normable}
-import tsingjyujing.geo.element.immutable.GeoPointValued
+import tsingjyujing.geo.element.immutable.{GeoPointValued, HashedGeoPoint}
 
 import scala.collection.JavaConverters._
 
@@ -14,13 +14,6 @@ import scala.collection.JavaConverters._
 class GeoHeatMap(val accuracy: Long = 0x10000) extends InnerProductable[GeoHeatMap] with Normable with Angleable[GeoHeatMap] with Jaccardable[GeoHeatMap] with Iterable[(Long, Double)] {
 
     private val data = scala.collection.mutable.Map[Long, Double]()
-
-    def this(values: Iterable[(Long, Double)], accuracy: Long = 0x10000) {
-        this(accuracy)
-        values.groupBy(_._1).map(kv => {
-            data.put(kv._1, kv._2.map(_._2).sum)
-        })
-    }
 
     def append(k: IHashableGeoPoint, v: Double): Unit = if (k.getGeoHashAccuracy == accuracy) {
         this append(k.indexCode, v)
@@ -127,4 +120,27 @@ class GeoHeatMap(val accuracy: Long = 0x10000) extends InnerProductable[GeoHeatM
 
     def getGeoPointsJava: util.List[GeoPointValued[Double]] = getGeoPoints.toIndexedSeq.asJava
 
+}
+
+object GeoHeatMap {
+
+    def buildFromPoints(values: Iterable[(IGeoPoint, Double)], accuracy: Long = 0x10000): GeoHeatMap = {
+        val newMap = new GeoHeatMap(accuracy)
+        values.groupBy(_._1).map(kv => {
+            newMap.data.put(IHashableGeoPoint.createCodeFromGps(kv._1, accuracy), kv._2.map(_._2).sum)
+        })
+        newMap
+    }
+
+    def buildFromMap(value:GeoHeatMap, accuracy: Long = 0x10000): GeoHeatMap = {
+        val newMap = new GeoHeatMap(accuracy)
+        if (value.accuracy == newMap.accuracy) {
+            value.foreach(kv => newMap.data.put(kv._1, kv._2))
+        } else {
+            value.getGeoPoints.foreach(
+                x => newMap.append(IHashableGeoPoint.createCodeFromGps(x, accuracy), x.getValue)
+            )
+        }
+        newMap
+    }
 }

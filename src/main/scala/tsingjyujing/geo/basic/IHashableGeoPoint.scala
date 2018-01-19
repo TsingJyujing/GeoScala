@@ -2,13 +2,20 @@ package tsingjyujing.geo.basic
 
 import tsingjyujing.geo.basic.operations.IHashedIndex
 import tsingjyujing.geo.element.immutable.GeoPoint
+
+
 /**
   * Which geo point can get an Long index value and get hashed.
+  *
   */
 trait IHashableGeoPoint extends  IGeoPoint with IHashedIndex[Long] {
+
+    // TODO get boundary of this HashBlock, get hashblock you should calculate in range
+
     def getGeoHashAccuracy: Long
 
     override def indexCode: Long = IHashableGeoPoint.createCodeFromGps(this, getGeoHashAccuracy)
+
 }
 
 object IHashableGeoPoint {
