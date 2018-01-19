@@ -12,11 +12,12 @@ class GCJ02Test extends FlatSpec with Matchers {
             new GeoPoint(105,25)
         )
 
+        val testedTransformer = BD09
         geoPoints.foreach(
             point=>{
-                val gcjPoint = GCJ02.transform(point)
-                val wgsPointFast = GCJ02.inverseTransformFast(gcjPoint)
-                val wgsPoint = GCJ02.inverseTransform(gcjPoint)
+                val gcjPoint = testedTransformer.transform(point)
+                val wgsPointFast = testedTransformer.inverseTransformFast(gcjPoint)
+                val wgsPoint = testedTransformer.inverseTransform(gcjPoint)
                 println(point)
                 println(gcjPoint geoTo point)
                 println(wgsPointFast geoTo point)

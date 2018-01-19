@@ -4,7 +4,8 @@ import java.util
 
 import tsingjyujing.geo.basic.{IGeoPoint, IHashableGeoPoint}
 import tsingjyujing.geo.basic.operations.{Angleable, InnerProductable, Jaccardable, Normable}
-import tsingjyujing.geo.element.immutable.{GeoPointValued, HashedGeoPoint}
+import tsingjyujing.geo.element.immutable.GeoPointValued
+import tsingjyujing.geo.util.convertor.ConvertorFactory
 
 import scala.collection.JavaConverters._
 
@@ -113,12 +114,15 @@ class GeoHeatMap(val accuracy: Long = 0x10000) extends InnerProductable[GeoHeatM
     override def iterator: Iterator[(Long, Double)] = data.iterator
 
 
-    def getGeoPoints: Iterable[GeoPointValued[Double]] = this.map(kv => {
-        val geoInfo = IHashableGeoPoint.revertFromCode(kv._1, accuracy)
-        new GeoPointValued[Double](geoInfo.getLongitude, geoInfo.getLatitude, kv._2)
-    })
+    def getGeoPoints(coordinateType: String = "wgs84"): Iterable[GeoPointValued[Double]] = {
+        val convertor = ConvertorFactory(coordinateType)
+        this.map(kv => {
+            val geoInfo = convertor.transform(IHashableGeoPoint.revertFromCode(kv._1, accuracy))
+            new GeoPointValued[Double](geoInfo.getLongitude, geoInfo.getLatitude, kv._2)
+        })
+    }
 
-    def getGeoPointsJava: util.List[GeoPointValued[Double]] = getGeoPoints.toIndexedSeq.asJava
+    def getGeoPointsJava(coordinateType: String = "wgs84"): util.List[GeoPointValued[Double]] = getGeoPoints(coordinateType).toIndexedSeq.asJava
 
 }
 
@@ -132,12 +136,12 @@ object GeoHeatMap {
         newMap
     }
 
-    def buildFromMap(value:GeoHeatMap, accuracy: Long = 0x10000): GeoHeatMap = {
+    def buildFromMap(value: GeoHeatMap, accuracy: Long = 0x10000): GeoHeatMap = {
         val newMap = new GeoHeatMap(accuracy)
         if (value.accuracy == newMap.accuracy) {
             value.foreach(kv => newMap.data.put(kv._1, kv._2))
         } else {
-            value.getGeoPoints.foreach(
+            value.getGeoPoints().foreach(
                 x => newMap.append(IHashableGeoPoint.createCodeFromGps(x, accuracy), x.getValue)
             )
         }

@@ -34,7 +34,7 @@ object GCJ02 extends GeoTransformable {
       * @param point
       * @return
       */
-    private def needTransform(point: IGeoPoint): Boolean = point.getLongitude > 72.004 && point.getLongitude < 137.8347 && point.getLatitude > 0.8293 && point.getLatitude < 55.8271
+    def needTransform(point: IGeoPoint): Boolean = point.getLongitude > 72.004 && point.getLongitude < 137.8347 && point.getLatitude > 0.8293 && point.getLatitude < 55.8271
 
     private def transformLat(x: Double, y: Double): Double = {
         -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y +
