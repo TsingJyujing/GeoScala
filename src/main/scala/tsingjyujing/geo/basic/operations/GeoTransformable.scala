@@ -3,15 +3,28 @@ package tsingjyujing.geo.basic.operations
 import tsingjyujing.geo.basic.IGeoPoint
 import tsingjyujing.geo.element.mutable.GeoPoint
 
+/**
+  * For Chinese only
+  * 注意转换后坐标的逆转换在一些国家和地区是违法的
+  * 我愿意对自己的代码承担风险
+  * 但是该逆转方法也不能保证全局都能做到无误差，也不保证所有的逆向方法都有效
+  * 因为部分加密方法存在一定的信息损失，这些损失不一定能恢复
+  */
 trait GeoTransformable {
+
     /**
-      * Encrypt WGS84 location to other format
+      *
+      * Must override this function to transform position
+      * Encrypt WGS84 location to other type of coordinate
+      *
       * @param x WGS84 position
       * @return
       */
     def transform(x: IGeoPoint): IGeoPoint
 
     /**
+      * auto reverse transform of the position, need position has a goot ability of local-liner
+      *
       * @param y transformed location
       * @return
       */
@@ -24,17 +37,7 @@ trait GeoTransformable {
     }
 
     /**
-      * XON
-      * eps = 1e-6
-      * wgs = rev_transform_rough (bad, worsen)
-      * old = bad
-      * improvement = (99+99j)
-      * while (abs(improvement ) > eps) {
-      *     improvement = worsen(wgs) - bad
-      *     old = wgs
-      *     wgs = wgs - improvement
-      * }
-      * return wgs
+      * use iter-function method to auto reverse position
       *
       * @param y transformed location
       * @return
@@ -48,8 +51,8 @@ trait GeoTransformable {
             errorValue = fcx geoTo y
             returnValue.setLongitude(returnValue.getLongitude - fcx.getLongitude + y.getLongitude)
             returnValue.setLatitude(returnValue.getLatitude - fcx.getLatitude + y.getLatitude)
-            i +=1
-        } while (errorValue > eps)
+            i += 1
+        } while (errorValue > eps || i >= 32)
         returnValue
     }
 }

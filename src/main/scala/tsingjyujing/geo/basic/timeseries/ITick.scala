@@ -1,7 +1,7 @@
 package tsingjyujing.geo.basic.timeseries
 
 /**
-  *
+  * Which
   */
 trait ITick extends Comparable[ITick] {
 

@@ -14,13 +14,13 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with Vector3 {
       * @param point geo point
       * @return
       */
-    override def geoTo(point: IGeoPoint): Double = IGeoPoint.geodesicDistance(this, point)
+    override final def geoTo(point: IGeoPoint): Double = IGeoPoint.geodesicDistance(this, point)
 
-    override def getX: Double = math.cos(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD)
+    override final def getX: Double = math.cos(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD)
 
-    override def getY: Double = math.sin(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD)
+    override final def getY: Double = math.sin(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD)
 
-    override def getZ: Double = math.sin(getLatitude * IGeoPoint.DEG2RAD)
+    override final def getZ: Double = math.sin(getLatitude * IGeoPoint.DEG2RAD)
 
     override def toString(): String = "Longitude:%3.6f,Latitude:%3.6f".format(getLongitude, getLatitude)
 

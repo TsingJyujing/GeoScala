@@ -102,7 +102,7 @@ class GeoHeatMap(val accuracy: Long = 0x10000) extends InnerProductable[GeoHeatM
     override def conAngle(x: GeoHeatMap): Double = innerProduct(x) / (x.norm2 * norm2)
 
     override def jaccardSimilarity(x: GeoHeatMap): Double = if (accuracy == x.accuracy) {
-        (x.data.keySet & data.keySet).size * 1.0 / (x.data.keySet | data.keySet).size
+        (x.data.keySet intersect data.keySet).size * 1.0 / (x.data.keySet union data.keySet).size
     } else {
         throw new RuntimeException("Accuracy not same")
     }

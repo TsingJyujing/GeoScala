@@ -10,8 +10,8 @@ trait DistanceMeasurable[T <: DistanceMeasurable[T]] {
     /**
       * Get distance from this to point or point to this (should be same)
       *
-      * @param point geo point
+      * @param x object to get distance
       * @return
       */
-    def to(point: T): Double
+    def to(x: T): Double
 }

@@ -4,6 +4,10 @@ import tsingjyujing.geo.basic.IGeoPoint
 import tsingjyujing.geo.basic.operations.GeoTransformable
 import tsingjyujing.geo.element.immutable.GeoPoint
 
+/**
+  * WGS84坐标系和GCJ02加密坐标系的互相转换
+  * GSJ02坐标系适用于大部分的地图，例如高德地图
+  */
 object GCJ02 extends GeoTransformable {
     /**
       * Encrypt WGS84 location to other format

@@ -2,17 +2,20 @@ package tsingjyujing.geo.basic.timeseries
 
 import scala.collection.mutable
 
-trait ITimeIndexSeq[T <: ITick] extends mutable.Buffer[T] {
+trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
+
+    private val data = mutable.Buffer[T]()
 
     /**
       * Sort time series by time
       */
     def sortByTick(): Unit = {
-        this.sortBy(_.getTick)
+        data.sortBy(_.getTick)
     }
 
     /**
       * Search in sorted array
+      *
       * @param time query time
       * @return
       */
@@ -27,7 +30,7 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Buffer[T] {
             (1 until size).foreach(
                 _ => {
                     val mid = (startIndex + endIndex) / 2
-                    val currentTick = apply(mid).getTick
+                    val currentTick = data(mid).getTick
                     if (currentTick < time) startIndex = mid
                     else if (currentTick > time) endIndex = mid
                     else {
@@ -38,32 +41,29 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Buffer[T] {
                     }
                 }
             )
-            (-1,-1)
+            (-1, -1)
         }
     }
 
-
     /**
       * Append unit to time series
+      *
       * @param timeUnit
       */
-    def append(timeUnit: T): Unit = {
-        this += timeUnit
+    def append(timeUnit: T*): Unit = {
+        data append (timeUnit: _*)
         sortByTick()
     }
 
     /**
       * Append many unit to time series
+      *
       * @param timeSeries
       */
-    def append(timeSeries: Iterable[T]): Unit = {
-        this appendAll timeSeries
+    def append(timeSeries: TraversableOnce[T]): Unit = {
+        data appendAll timeSeries
         sortByTick()
     }
 
-}
-
-
-object ITimeIndexSeq {
-
+    override def iterator: Iterator[T] = data.iterator
 }

@@ -3,7 +3,9 @@ package tsingjyujing.geo.util.convertor
 import tsingjyujing.geo.basic.IGeoPoint
 import tsingjyujing.geo.basic.operations.GeoTransformable
 import tsingjyujing.geo.element.mutable.GeoPoint
-
+/**
+  * Return a new object which extends IGeoPoint and has same longitude and latitude
+  */
 object WGS84 extends GeoTransformable {
     /**
       * Encrypt WGS84 location to other format
