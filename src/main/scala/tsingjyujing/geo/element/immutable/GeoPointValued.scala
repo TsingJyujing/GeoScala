@@ -1,6 +1,7 @@
 package tsingjyujing.geo.element.immutable
 
-import tsingjyujing.geo.basic.{IGeoPoint, IValue}
+import tsingjyujing.geo.basic.IGeoPoint
+import tsingjyujing.geo.basic.operations.IValue
 
 final class GeoPointValued[T](longitude: Double, latitude: Double, value: T) extends IGeoPoint with IValue[T] {
     override def getLongitude: Double = longitude

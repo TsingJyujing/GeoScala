@@ -2,7 +2,7 @@ package tsingjyujing.geo.element
 
 import java.util
 
-import tsingjyujing.geo.basic.{IGeoPoint, IHashableGeoPoint}
+import tsingjyujing.geo.basic.{IGeoPoint, IHashableGeoBlock}
 import tsingjyujing.geo.basic.operations.{Angleable, InnerProductable, Jaccardable, Normable}
 import tsingjyujing.geo.element.immutable.GeoPointValued
 import tsingjyujing.geo.util.convertor.ConvertorFactory
@@ -16,7 +16,7 @@ class GeoHeatMap(val accuracy: Long = 0x10000) extends InnerProductable[GeoHeatM
 
     private val data = scala.collection.mutable.Map[Long, Double]()
 
-    def append(k: IHashableGeoPoint, v: Double): Unit = if (k.getGeoHashAccuracy == accuracy) {
+    def append(k: IHashableGeoBlock, v: Double): Unit = if (k.getGeoHashAccuracy == accuracy) {
         this append(k.indexCode, v)
     } else {
         throw new RuntimeException("Accuracy not same")
@@ -31,7 +31,7 @@ class GeoHeatMap(val accuracy: Long = 0x10000) extends InnerProductable[GeoHeatM
         }
     }
 
-    def remove(key: IHashableGeoPoint): Unit = if (key.getGeoHashAccuracy == accuracy) {
+    def remove(key: IHashableGeoBlock): Unit = if (key.getGeoHashAccuracy == accuracy) {
         this remove key.indexCode
     } else {
         throw new RuntimeException("Accuracy not same")
@@ -47,7 +47,7 @@ class GeoHeatMap(val accuracy: Long = 0x10000) extends InnerProductable[GeoHeatM
         0.0D
     }
 
-    def apply(key: IHashableGeoPoint): Double = if (key.getGeoHashAccuracy == accuracy) {
+    def apply(key: IHashableGeoBlock): Double = if (key.getGeoHashAccuracy == accuracy) {
         this (key.indexCode)
     } else {
         throw new RuntimeException("Accuracy not same")
@@ -117,7 +117,7 @@ class GeoHeatMap(val accuracy: Long = 0x10000) extends InnerProductable[GeoHeatM
     def getGeoPoints(coordinateType: String = "wgs84"): Iterable[GeoPointValued[Double]] = {
         val convertor = ConvertorFactory(coordinateType)
         this.map(kv => {
-            val geoInfo = convertor.transform(IHashableGeoPoint.revertFromCode(kv._1, accuracy))
+            val geoInfo = convertor.transform(IHashableGeoBlock.revertFromCode(kv._1, accuracy))
             new GeoPointValued[Double](geoInfo.getLongitude, geoInfo.getLatitude, kv._2)
         })
     }
@@ -131,7 +131,7 @@ object GeoHeatMap {
     def buildFromPoints(values: Iterable[(IGeoPoint, Double)], accuracy: Long = 0x10000): GeoHeatMap = {
         val newMap = new GeoHeatMap(accuracy)
         values.groupBy(_._1).map(kv => {
-            newMap.data.put(IHashableGeoPoint.createCodeFromGps(kv._1, accuracy), kv._2.map(_._2).sum)
+            newMap.data.put(IHashableGeoBlock.createCodeFromGps(kv._1, accuracy), kv._2.map(_._2).sum)
         })
         newMap
     }
@@ -142,7 +142,7 @@ object GeoHeatMap {
             value.foreach(kv => newMap.data.put(kv._1, kv._2))
         } else {
             value.getGeoPoints().foreach(
-                x => newMap.append(IHashableGeoPoint.createCodeFromGps(x, accuracy), x.getValue)
+                x => newMap.append(IHashableGeoBlock.createCodeFromGps(x, accuracy), x.getValue)
             )
         }
         newMap

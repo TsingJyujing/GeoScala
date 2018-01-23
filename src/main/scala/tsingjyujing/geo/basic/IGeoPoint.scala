@@ -2,7 +2,7 @@ package tsingjyujing.geo.basic
 
 import tsingjyujing.geo.basic.operations.GeoDistanceMeasurable
 
-trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with Vector3 {
+trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with IVector3 {
 
     def getLongitude: Double
 

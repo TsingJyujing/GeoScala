@@ -1,5 +1,7 @@
 package tsingjyujing.geo.basic.timeseries
 
+import com.sun.istack.internal.Nullable
+
 import scala.collection.mutable
 
 trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
@@ -12,6 +14,8 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
     def sortByTick(): Unit = {
         data.sortBy(_.getTick)
     }
+
+    def getValue(time: Double): T
 
     /**
       * Search in sorted array
@@ -63,6 +67,19 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
     def append(timeSeries: TraversableOnce[T]): Unit = {
         data appendAll timeSeries
         sortByTick()
+    }
+
+    def apply(index: Int): T = data(index)
+
+    def statusMachine[S, R](statusFunction: (T, S) => (S, R), initialStatus: S = null): Iterable[R] = {
+        var status: S = initialStatus
+        this.map(
+            elem => {
+                val statusAndResult = statusFunction(elem, status)
+                status = statusAndResult._1
+                statusAndResult._2
+            }
+        )
     }
 
     override def iterator: Iterator[T] = data.iterator

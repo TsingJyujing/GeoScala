@@ -6,7 +6,7 @@ import tsingjyujing.geo.element.immutable.GeoPoint
 
 /**
   * 中国境内的WGS84坐标和Baidu09坐标系的互相转换
-  * Baidu09坐标系是在国测局坐标洗基础上加了一个三角函数噪声
+  * Baidu09坐标系是在国测局坐标的基础上加了一个三角函数噪声
   * 俗称2B坐标系
   */
 object BD09 extends GeoTransformable {

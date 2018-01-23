@@ -1,7 +1,7 @@
 package tsingjyujing.geo.basic
 
 import org.scalatest._
-import IHashableGeoPoint.{createCodeFromGps, revertFromCode}
+import IHashableGeoBlock.{createCodeFromGps, revertFromCode}
 import tsingjyujing.geo.element.immutable.GeoPoint
 
 class GeoHashTest extends FlatSpec with Matchers {
