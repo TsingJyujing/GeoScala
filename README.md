@@ -3,12 +3,8 @@ A geo library written by Java and Scala, contains GPS 2d-spherical geometry, GPS
 
 ## Todo
 
-- Find nearest geo-points in a set of geo-point // Points Tree
 - Geo-Frechet algorithm to evaluate similarity of two routes
 - Sparsity route by given parameters
-- 
-
-
 
 ## Document
 

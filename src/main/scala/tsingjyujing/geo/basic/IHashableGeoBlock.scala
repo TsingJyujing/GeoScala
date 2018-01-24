@@ -11,12 +11,11 @@ import scala.collection.mutable
   * Which geo point can get an Long index value and get hashed.
   *
   */
-trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] with GeoDistanceRangeable[IHashableGeoBlock] {
+trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
     def getGeoHashAccuracy: Long
 
-    // Don't change indexCode value, this implementation for higher speed
-    lazy val getCenterPoint: IGeoPoint = IHashableGeoBlock.revertFromCode(indexCode, getGeoHashAccuracy)
+    def getCenterPoint:IGeoPoint
 
     override def getLongitude: Double = getCenterPoint.getLongitude
 
@@ -30,18 +29,13 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] with GeoDistan
 
     def getBoundaryPoints(point: IGeoPoint): Iterable[IGeoPoint] = IHashableGeoBlock.getGeoHashBlockBoundaryPoints(point, getGeoHashAccuracy, indexCode)
 
-    override def getMinDistance(x: IHashableGeoBlock): Double = {
-        val centerDistance = getCenterPoint geoTo x.getCenterPoint
-        val circumDistance = circumradius + x.circumradius
-        if (circumDistance > centerDistance) {
-            0.0D
-        } else {
-            centerDistance - circumDistance
-        }
-    }
+    def getMinDistance(x: IHashableGeoBlock): Double = math.max((getCenterPoint geoTo x.getCenterPoint) - circumradius + x.circumradius, 0.0)
 
-    override def getMaxDistance(x: IHashableGeoBlock): Double = (getCenterPoint geoTo x.getCenterPoint) + (circumradius + x.circumradius)
+    def getMaxDistance(x: IHashableGeoBlock): Double = (getCenterPoint geoTo x.getCenterPoint) + (circumradius + x.circumradius)
 
+    def getMinDistance(x: IGeoPoint): Double = math.max(getCenterPoint geoTo x, 0.0)
+
+    def getMaxDistance(x: IGeoPoint): Double = (getCenterPoint geoTo x) + circumradius
 }
 
 object IHashableGeoBlock {

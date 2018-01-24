@@ -3,6 +3,9 @@ package tsingjyujing.geo.element.immutable
 import tsingjyujing.geo.basic.{IGeoPoint, IHashableGeoBlock}
 
 final class HashedGeoBlock(code: Long, accuracy: Long = 12000) extends IHashableGeoBlock {
+
+    private lazy val centerPoint = IHashableGeoBlock.revertFromCode(indexCode, getGeoHashAccuracy)
+
     override def getGeoHashAccuracy: Long = accuracy
 
     /**
@@ -12,6 +15,7 @@ final class HashedGeoBlock(code: Long, accuracy: Long = 12000) extends IHashable
       */
     override def indexCode: Long = code
 
+    override def getCenterPoint: IGeoPoint = centerPoint
 }
 
 object HashedGeoBlock {
