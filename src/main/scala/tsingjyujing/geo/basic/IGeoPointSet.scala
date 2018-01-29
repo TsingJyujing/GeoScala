@@ -5,7 +5,7 @@ package tsingjyujing.geo.basic
   *
   * @tparam T Type to save geo points, any type extends IGeoPoint
   */
-trait IGeoPointSet[T <: IGeoPoint] extends Iterable[T] {
+trait IGeoPointSet[T <: IGeoPoint] {
 
     def appendPoint(point: T): Unit
 
@@ -14,8 +14,5 @@ trait IGeoPointSet[T <: IGeoPoint] extends Iterable[T] {
     def geoNear(point: IGeoPoint, maxDistance: Double = 1.0): Option[T]
 
     def geoWithin(point: IGeoPoint, minDistance: Double = 0.0, maxDistance: Double = 1.0): Iterable[T]
-
-    override def iterator: Iterator[T] = getPoints.toIterator
-
 
 }

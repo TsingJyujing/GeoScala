@@ -1,8 +1,9 @@
 package tsingjyujing.geo.basic
 
 import tsingjyujing.geo.basic.operations.GeoDistanceMeasurable
+import tsingjyujing.geo.element.immutable.{Vector2, Vector3}
 
-trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with IVector3 {
+trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] {
 
     def getLongitude: Double
 
@@ -16,13 +17,19 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with IVector3 {
       */
     override final def geoTo(point: IGeoPoint): Double = IGeoPoint.geodesicDistance(this, point)
 
-    override final def getX: Double = math.cos(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD)
 
-    override final def getY: Double = math.sin(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD)
+    implicit final def toIVector3:IVector3 = new Vector3(
+        math.cos(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD),
+        math.sin(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD),
+        math.sin(getLatitude * IGeoPoint.DEG2RAD)
+    )
 
-    override final def getZ: Double = math.sin(getLatitude * IGeoPoint.DEG2RAD)
+    implicit final def toIVector2:IVector2 = new Vector2(
+        getLongitude,
+        getLatitude
+    )
 
-    override def toString(): String = "Longitude:%3.6f,Latitude:%3.6f".format(getLongitude, getLatitude)
+    override def toString: String = "Longitude:%3.6f,Latitude:%3.6f".format(getLongitude, getLatitude)
 
 }
 

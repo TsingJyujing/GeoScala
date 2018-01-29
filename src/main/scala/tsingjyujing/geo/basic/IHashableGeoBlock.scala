@@ -1,6 +1,6 @@
 package tsingjyujing.geo.basic
 
-import tsingjyujing.geo.basic.operations.{GeoDistanceMeasurable, GeoDistanceRangeable, IHashedIndex}
+import tsingjyujing.geo.basic.operations.IHashedIndex
 import tsingjyujing.geo.element.immutable.GeoPoint
 
 import scala.collection.mutable
@@ -15,7 +15,7 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
     def getGeoHashAccuracy: Long
 
-    def getCenterPoint:IGeoPoint
+    def getCenterPoint: IGeoPoint
 
     override def getLongitude: Double = getCenterPoint.getLongitude
 

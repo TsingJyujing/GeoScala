@@ -4,16 +4,16 @@ package tsingjyujing.geo.basic
 import tsingjyujing.geo.basic.operations._
 
 trait IVector2
-    extends InnerProductable[IVector2]
-        with Normable
+    extends IVector
+        with InnerProductable[IVector2]
         with Angleable[IVector2]
         with DistanceMeasurable[IVector2]
-        with Iterable[Double] {
+        with Addable[IVector2]
+{
 
     def getX: Double
 
     def getY: Double
-
 
     override def norm(n: Double): Double = {
         math.pow(math.pow(getX, n) + math.pow(getY, n), 1.0 / n)

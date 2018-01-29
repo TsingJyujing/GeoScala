@@ -44,12 +44,15 @@ object SeqUtil {
         while (iter.hasNext) {
             currentValue = iter.next()
             currentResult = func(currentValue)
-            if (currentResult && lastResult) mutableBuffer += currentValue else if (currentResult && (!lastResult)) {
+            if (currentResult && lastResult) {
+                mutableBuffer += currentValue
+            }else if (currentResult && (!lastResult)) {
                 //Upper
                 mutableBuffer = new mutable.MutableList[T]
                 mutableBuffer += currentValue
-            } else if ((!currentResult) && lastResult) segmentedValues += mutableBuffer.toList
-            
+            } else if ((!currentResult) && lastResult) {
+                segmentedValues += mutableBuffer.toList
+            }
             lastResult = currentResult
         }
         if (lastResult) segmentedValues += mutableBuffer.toList

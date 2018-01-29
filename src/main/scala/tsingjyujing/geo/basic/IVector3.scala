@@ -5,12 +5,13 @@ import tsingjyujing.geo.element.immutable.Vector3
 import tsingjyujing.geo.util.mathematical.VectorUtil
 
 trait IVector3
-    extends InnerProductable[IVector3]
-        with Normable
+    extends IVector
+        with InnerProductable[IVector3]
         with Angleable[IVector3]
         with DistanceMeasurable[IVector3]
-        with Iterable[Double]
-        with OutProductable[IVector3, IVector3] {
+        with OutProductable[IVector3, IVector3]
+        with Addable[IVector3]
+{
 
     def getX: Double
 

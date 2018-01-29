@@ -10,13 +10,13 @@ trait IGeoLine extends GeoDistanceMeasurable[IGeoPoint] {
     val n: Array[Double] = {
         val v1 = getTerminalPoints._1
         val v2 = getTerminalPoints._2
-        VectorUtil.norm2Vector(v1.outProduct(v2).getVector)
+        VectorUtil.norm2Vector(v1.toIVector3.outProduct(v2.toIVector3).getVector)
     }
     
     val iM: Array[Array[Double]] = {
         val v1 = getTerminalPoints._1
         val v2 = getTerminalPoints._2
-        val M = Array(v1.getVector, v2.getVector, n)
+        val M = Array(v1.toIVector3.getVector, v2.toIVector3.getVector, n)
         MatrixUtil.inverseOrder3Matrix(M)
     }
 
@@ -27,7 +27,7 @@ trait IGeoLine extends GeoDistanceMeasurable[IGeoPoint] {
       * @return
       */
     override def geoTo(point: IGeoPoint): Double = {
-        val v3 = point.getVector
+        val v3 = point.toIVector3.getVector
         val params = MatrixUtil.matrixProduct(iM, v3)
         if (params(0) > 0 && params(1) > 0) { //返回和n的内积的角度的余角计算出的数值
             math.asin(n(0) * v3(0) + n(1) * v3(1) + n(2) * v3(2)) * IGeoPoint.EARTH_RADIUS
