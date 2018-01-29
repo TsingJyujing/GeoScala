@@ -113,8 +113,12 @@ object GeoHeatMapCommon {
 
     def buildFromPoints[T <: Addable[T]](values: Iterable[(IGeoPoint, T)], baseValue: T, accuracy: Long = 0x10000): GeoHeatMapCommon[T] = {
         val newMap = new GeoHeatMapCommon[T](baseValue, accuracy)
-        values.groupBy(_._1).map(kv => {
-            newMap.data.put(IHashableGeoBlock.createCodeFromGps(kv._1, accuracy), kv._2.map(_._2).reduce((a, b) => a + b))
+        values.groupBy(
+            pointValue=>{
+                IHashableGeoBlock.createCodeFromGps(pointValue._1,accuracy)
+            }
+        ).map(kv => {
+            newMap.data.put(kv._1, kv._2.map(_._2).reduce((a, b) => a + b))
         })
         newMap
     }

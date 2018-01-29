@@ -48,8 +48,12 @@ object GeoHeatMap {
 
     def buildFromPoints(values: Iterable[(IGeoPoint, Double)], accuracy: Long = 0x10000): GeoHeatMap = {
         val newMap = new GeoHeatMap(accuracy)
-        values.groupBy(_._1).map(kv => {
-            newMap.data.put(IHashableGeoBlock.createCodeFromGps(kv._1, accuracy), new DoubleValue(kv._2.map(_._2).sum))
+        values.groupBy(
+            pointValue => {
+                IHashableGeoBlock.createCodeFromGps(pointValue._1, accuracy)
+            }
+        ).map(kv => {
+            newMap.data.put(kv._1, new DoubleValue(kv._2.map(_._2).sum))
         })
         newMap
     }

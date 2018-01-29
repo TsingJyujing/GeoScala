@@ -2,20 +2,14 @@ package tsingjyujing.geo.element.mutable
 
 import tsingjyujing.geo.basic.operations.{Addable, Productable}
 
-class DoubleValue extends Addable[DoubleValue] with Productable[DoubleValue] {
+final case class DoubleValue(var value: Double) extends Addable[DoubleValue] with Productable[DoubleValue] {
 
-    def this(v: Double) = {
-        this()
-        value = v
-    }
+    override def +(v: DoubleValue) = DoubleValue(value + v.value)
 
-    override def +(v: DoubleValue) = new DoubleValue(value + v.value)
+    override def zero = DoubleValue(0.0D)
 
-    override def zero = new DoubleValue(0.0D)
+    override def *(v: DoubleValue) = DoubleValue(value * v.value)
 
-    override def *(v: DoubleValue) = new DoubleValue(value * v.value)
+    override def one = DoubleValue(1.0D)
 
-    override def one = new DoubleValue(1.0D)
-
-    var value: Double = Double.NaN
 }
