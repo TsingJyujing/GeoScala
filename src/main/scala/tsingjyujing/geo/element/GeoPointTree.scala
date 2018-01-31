@@ -9,7 +9,7 @@ class GeoPointTree[T <: IGeoPoint](
                                       currentCode: Long = 0,
                                       maxDepth: Int = 17,
                                       depthStep: Int = 3
-                                  ) extends IGeoPointSet[T] with IHashableGeoBlock {
+                                  ) extends IGeoPointSet[T] with IHashableGeoBlock{
 
     private val isLastLevel = currentDepth >= maxDepth
 
@@ -54,6 +54,8 @@ class GeoPointTree[T <: IGeoPoint](
       * 找到的符合条件的最近点的distance作为maxDistanceLimit传入下一个Block，
       * 本质上是一个状态机
       * 这样找最快，但是并行度低
+      *
+      * 如果只是确定有没有半径内的点，还可以更快一点，存在范围内的Block有点就可以返回True了
       *
       * @param point
       * @param maxDistance

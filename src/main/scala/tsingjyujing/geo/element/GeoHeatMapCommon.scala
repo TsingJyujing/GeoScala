@@ -70,7 +70,7 @@ class GeoHeatMapCommon[T <: Addable[T]](
         val keySet = data.keySet | heatMap.data.keySet
         keySet.foreach(
             key => {
-                mapReturn.data.put(key, this (key) + heatMap(key))
+                mapReturn.data.put(key, this.applyByCode(key) + heatMap.applyByCode(key))
             }
         )
         mapReturn
@@ -111,14 +111,25 @@ class GeoHeatMapCommon[T <: Addable[T]](
 
 object GeoHeatMapCommon {
 
-    def buildFromPoints[T <: Addable[T]](values: Iterable[(IGeoPoint, T)], baseValue: T, accuracy: Long = 0x10000): GeoHeatMapCommon[T] = {
+    def buildFromPoints[T <: Addable[T]](values: Traversable[(IGeoPoint, T)], baseValue: T, accuracy: Long = 0x10000): GeoHeatMapCommon[T] = {
         val newMap = new GeoHeatMapCommon[T](baseValue, accuracy)
         values.groupBy(
             pointValue=>{
                 IHashableGeoBlock.createCodeFromGps(pointValue._1,accuracy)
             }
         ).map(kv => {
-            newMap.data.put(kv._1, kv._2.map(_._2).reduce((a, b) => a + b))
+            newMap.data.put(kv._1, kv._2.map(_._2).reduce(_+_))
+        })
+        newMap
+    }
+
+    @deprecated(message = "Be careful while using this API and ensure your accuracy is right")
+    def buildFromCodes[T <: Addable[T]](values: Traversable[(Long, T)], baseValue: T, accuracy: Long): GeoHeatMapCommon[T] = {
+        val newMap = new GeoHeatMapCommon[T](baseValue, accuracy)
+        values.groupBy(
+            _._1
+        ).map(kv => {
+            newMap.data.put(kv._1, kv._2.map(_._2).reduce(_+_))
         })
         newMap
     }

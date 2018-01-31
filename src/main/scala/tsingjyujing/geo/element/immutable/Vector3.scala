@@ -11,5 +11,4 @@ final case class Vector3(x: Double, y: Double, z: Double) extends IVector3 {
 
     override def +(v: IVector3): IVector3 = Vector3(v.getX + getX, v.getY + getY, v.getZ + getZ)
 
-    override def zero: IVector3 = Vector3(0, 0, 0)
 }

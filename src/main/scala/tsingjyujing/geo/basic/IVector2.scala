@@ -2,14 +2,14 @@ package tsingjyujing.geo.basic
 
 
 import tsingjyujing.geo.basic.operations._
+import tsingjyujing.geo.element.immutable.Vector2
 
 trait IVector2
     extends IVector
         with InnerProductable[IVector2]
         with Angleable[IVector2]
         with DistanceMeasurable[IVector2]
-        with Addable[IVector2]
-{
+        with Addable[IVector2] {
 
     def getX: Double
 
@@ -37,7 +37,6 @@ trait IVector2
 
     override def iterator: Iterator[Double] = getVector.iterator
 
-
 }
 
 object IVector2 {
@@ -46,4 +45,5 @@ object IVector2 {
     def innerProduct2(point1: IVector2, point2: IVector2): Double = point1.getX * point2.getX + point1.getY * point2.getY
 
     def cosAngle(point1: IVector2, point2: IVector2): Double = (point1 innerProduct point2) / (point1.norm2 * point2.norm2)
+
 }

@@ -4,7 +4,9 @@ A geo library written by Java and Scala, contains GPS 2d-spherical geometry, GPS
 ## Todo
 
 - Geo-Frechet algorithm to evaluate similarity of two routes
-- Sparsity route by given parameters
+- DBScan algorithm on 2d-sphere
+- K-means algorithm on 2d-sphere
+- Distance matrix algorithm (if have a great linear-algebra library)
 
 ## Document
 

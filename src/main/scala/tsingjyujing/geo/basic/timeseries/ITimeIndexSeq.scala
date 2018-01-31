@@ -1,12 +1,11 @@
 package tsingjyujing.geo.basic.timeseries
 
-import com.sun.istack.internal.Nullable
-
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
 
-    private val data = mutable.Buffer[T]()
+    protected val data: ArrayBuffer[T] = mutable.ArrayBuffer[T]()
 
     /**
       * Sort time series by time

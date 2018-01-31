@@ -23,5 +23,5 @@ final case class Vector2(x: Double, y: Double) extends IVector2 {
 
     override def +(v: IVector2): IVector2 = Vector2(x + v.getX, y + v.getY)
 
-    override def zero: IVector2 = Vector2(0.0, 0.0)
 }
+

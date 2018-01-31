@@ -6,10 +6,9 @@ final case class DoubleValue(var value: Double) extends Addable[DoubleValue] wit
 
     override def +(v: DoubleValue) = DoubleValue(value + v.value)
 
-    override def zero = DoubleValue(0.0D)
-
     override def *(v: DoubleValue) = DoubleValue(value * v.value)
 
-    override def one = DoubleValue(1.0D)
+    implicit def toDouble: Double = value
+
 
 }

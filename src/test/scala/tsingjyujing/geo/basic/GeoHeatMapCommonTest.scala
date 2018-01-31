@@ -1,9 +1,8 @@
 package tsingjyujing.geo.basic
 
 import org.scalatest._
-import tsingjyujing.geo.element.{GeoHeatMap, GeoHeatMapCommon}
+import tsingjyujing.geo.element.GeoHeatMapCommon
 import tsingjyujing.geo.element.immutable.{GeoPoint, Vector2}
-import tsingjyujing.geo.element.mutable.DoubleValue
 
 class GeoHeatMapCommonTest extends FlatSpec with Matchers {
     "GeoHeatMapCommon" should "geo heat map common" in {
@@ -21,20 +20,13 @@ class GeoHeatMapCommonTest extends FlatSpec with Matchers {
         geoHeatMap.foreach(
             println
         )
-    }
-    "GeoHeatMap" should "geo heat map common" in {
-        val points = IndexedSeq(
-            (GeoPoint(120, 30), 1.01),
-            (GeoPoint(120, 30), 1.01),
-            (GeoPoint(120, 30), 1.01),
-            (GeoPoint(120, 30), 1.01),
-            (GeoPoint(121, 30), 1.01),
-            (GeoPoint(120, 31), 1.01),
-            (GeoPoint(120, 31), 1.01)
-        )
 
-        val geoHeatMap = GeoHeatMap.buildFromPoints(points)
-        geoHeatMap.foreach(println)
+        println("————————————")
+
+        val newMap = geoHeatMap + geoHeatMap
+        newMap.foreach(
+            println
+        )
     }
 
 }

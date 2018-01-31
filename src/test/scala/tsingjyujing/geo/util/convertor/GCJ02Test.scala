@@ -7,9 +7,9 @@ import tsingjyujing.geo.element.mutable.GeoPoint
 class GCJ02Test extends FlatSpec with Matchers {
     "GCJ02" should "Test" in {
         val geoPoints = IndexedSeq(
-            new GeoPoint(120,30),
-            new GeoPoint(108,35),
-            new GeoPoint(105,25)
+            GeoPoint(120,30),
+            GeoPoint(108,35),
+            GeoPoint(105,25)
         )
 
         val testedTransformer = BD09

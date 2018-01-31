@@ -7,5 +7,6 @@ package tsingjyujing.geo.basic.operations
   */
 trait Addable[T <: Addable[T]] {
     def +(v: T): T
-    def zero: T
 }
+
+
