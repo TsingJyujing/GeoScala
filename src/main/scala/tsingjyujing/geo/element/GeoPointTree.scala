@@ -9,7 +9,7 @@ class GeoPointTree[T <: IGeoPoint](
                                       currentCode: Long = 0,
                                       maxDepth: Int = 17,
                                       depthStep: Int = 3
-                                  ) extends IGeoPointSet[T] with IHashableGeoBlock{
+                                  ) extends IGeoPointSet[T] with IHashableGeoBlock {
 
     private val isLastLevel = currentDepth >= maxDepth
 
@@ -53,7 +53,7 @@ class GeoPointTree[T <: IGeoPoint](
       * 给每个Block评分，优先在符合条件的，且最近的Block里面找，
       * 找到的符合条件的最近点的distance作为maxDistanceLimit传入下一个Block，
       * 本质上是一个状态机
-      * 这样找最快，但是并行度低
+      * 这样找最快(单核条件下)，但是并行度低
       *
       * 如果只是确定有没有半径内的点，还可以更快一点，存在范围内的Block有点就可以返回True了
       *
@@ -73,7 +73,7 @@ class GeoPointTree[T <: IGeoPoint](
             val blockMinDistance = b._1.getMinDistance(point)
             (b, blockMinDistance)
         }).filter(
-            _._2 > maxDistance
+            _._2 <= maxDistance
         ).toSeq
 
         if (filteredRange.isEmpty) {
@@ -81,16 +81,20 @@ class GeoPointTree[T <: IGeoPoint](
         } else {
             var namedMaxDistance: Double = maxDistance
             var nearestPoint: Option[T] = None
+
             filteredRange.sortBy(_._2).foreach(b => {
+                // If current block min distance is less than current nearest distance
                 if (b._1._1.getMinDistance(point) < namedMaxDistance) {
                     val currentNearest = b._1._2.geoNear(point, maxDistance)
                     if (currentNearest.isDefined) {
-                        namedMaxDistance = math.min(nearestPoint.get.geoTo(point), namedMaxDistance)
-                        if (nearestPoint.isDefined) {
-                            if ((nearestPoint.get geoTo point) > (currentNearest.get geoTo point)) {
-                                nearestPoint = currentNearest
-                            }
+
+                        val isUpdatePoint = if (nearestPoint.isDefined) {
+                            (nearestPoint.get geoTo point) > (currentNearest.get geoTo point)
                         } else {
+                            true
+                        }
+                        if (isUpdatePoint) {
+                            namedMaxDistance = math.min(currentNearest.get.geoTo(point), namedMaxDistance)
                             nearestPoint = currentNearest
                         }
                     }
@@ -110,9 +114,15 @@ class GeoPointTree[T <: IGeoPoint](
         )
     } else {
         nextLayer.filter(
-            b => !(maxDistance < b._1.getMinDistance(point) || minDistance > b._1.getMaxDistance(point))
+            b => {
+                val blockMinDistance = b._1.getMinDistance(point)
+                val blockMaxDistance = b._1.getMaxDistance(point)
+                !(maxDistance < blockMinDistance || minDistance > blockMaxDistance)
+            }
         ).flatMap(
-            _._2.geoWithin(point, minDistance, maxDistance)
+            x => {
+                x._2.geoWithin(point, minDistance, maxDistance)
+            }
         )
     }
 

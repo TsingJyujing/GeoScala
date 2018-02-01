@@ -5,6 +5,11 @@ import tsingjyujing.geo.basic.IGeoPoint
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
+/**
+  * Data struct to describe
+  * @tparam K
+  * @tparam V
+  */
 class ClusterResult[K, V <: IGeoPoint] extends Iterable[LabeledPoint[K, V]] {
 
     val data: mutable.Map[K, mutable.ArrayBuffer[V]] = mutable.Map[K, mutable.ArrayBuffer[V]]()
@@ -29,7 +34,7 @@ class ClusterResult[K, V <: IGeoPoint] extends Iterable[LabeledPoint[K, V]] {
         }
     ).iterator
 
-    def apply: mutable.Map[K, ArrayBuffer[V]] = data
+    def resultMap: mutable.Map[K, ArrayBuffer[V]] = data
 
     def classes: collection.Set[K] = data.keySet
 

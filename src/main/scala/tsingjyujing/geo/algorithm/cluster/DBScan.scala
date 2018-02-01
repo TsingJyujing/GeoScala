@@ -1,6 +1,5 @@
 package tsingjyujing.geo.algorithm.cluster
 
-import tsingjyujing.geo.algorithm.GeoCluster
 import tsingjyujing.geo.algorithm.containers.{ClusterResult, LabeledPoint}
 import tsingjyujing.geo.basic.IGeoPoint
 import tsingjyujing.geo.element.GeoPointTree
@@ -17,10 +16,36 @@ class DBScan[V <: IGeoPoint](
     val data = new GeoPointTree[LabeledPoint[Int, V]]
     val keySet: mutable.HashSet[Int] = mutable.HashSet[Int]()
 
+    def getNewClassId: Int = if (keySet.isEmpty) {
+        0
+    } else {
+        keySet.max + 1
+    }
+
     def append(point: V): Int = if (isMergeClass) {
-        val searchResult = data.geoWithin(point, searchRadius)
+        appendWithMerge(point)
+    } else {
+        appendWithoutMerge(point)
+    }
+
+    private def appendWithoutMerge(point: V): Int = {
+        val searchResult = data.geoNear(point, searchRadius)
+        if (searchResult.isDefined) {
+            val classId = searchResult.get.classId
+            data.appendPoint(LabeledPoint(classId, point))
+            classId
+        } else {
+            val classId = getNewClassId
+            data.appendPoint(LabeledPoint(classId, point))
+            keySet.add(classId)
+            classId
+        }
+    }
+
+    private def appendWithMerge(point: V): Int = {
+        val searchResult = data.geoWithin(point, 0, searchRadius)
         if (searchResult.isEmpty) {
-            val classId = keySet.max + 1
+            val classId = getNewClassId
             data.appendPoint(LabeledPoint(classId, point))
             keySet.add(classId)
             classId
@@ -47,21 +72,9 @@ class DBScan[V <: IGeoPoint](
             }
             classId
         }
-    } else {
-        val searchResult = data.geoNear(point, searchRadius)
-        if (searchResult.isDefined) {
-            val classId = searchResult.get.classId
-            data.appendPoint(LabeledPoint(classId, point))
-            classId
-        } else {
-            val classId = keySet.max + 1
-            data.appendPoint(LabeledPoint(classId, point))
-            keySet.add(classId)
-            classId
-        }
     }
 
-    implicit def toClusterResult: ClusterResult[Int, V] = ClusterResult(data)
+    def toClusterResult: ClusterResult[Int, V] = ClusterResult(data)
 }
 
 object DBScan {
@@ -70,11 +83,11 @@ object DBScan {
                                  searchRadius: Double = 0.5,
                                  isMergeClass: Boolean = false
                              ): ClusterResult[Int, V] = {
-        val c = new DBScan[V](searchRadius, isMergeClass)
+        val cr = new DBScan[V](searchRadius, isMergeClass)
         points.foreach(point => {
-            c.append(point)
+            cr.append(point)
         })
-        c.toClusterResult
+        cr.toClusterResult
     }
 
 }

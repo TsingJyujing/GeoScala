@@ -33,9 +33,53 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
     def getMaxDistance(x: IHashableGeoBlock): Double = (getCenterPoint geoTo x.getCenterPoint) + (circumradius + x.circumradius)
 
-    def getMinDistance(x: IGeoPoint): Double = math.max(getCenterPoint geoTo x, 0.0)
+    /**
+      * get min distance from block to point
+      *
+      * if point in block: --> 0
+      * else:
+      * if point out of circumradius --> distanceToCenter - circumradius
+      * else --> calculate for each boundary point
+      *
+      * @param x
+      * @return
+      */
+    def getMinDistance(x: IGeoPoint): Double = {
+        val currentPointHash = IHashableGeoBlock.createCodeFromGps(x, getGeoHashAccuracy)
+        if (currentPointHash == indexCode) {
+            0
+        } else {
+            val distanceToCenter = x.geoTo(getCenterPoint)
+            if (distanceToCenter > circumradius) {
+                distanceToCenter - circumradius
+            } else if (distanceToCenter > inradius) {
+                getBoundaryPoints(x).map(_.geoTo(x)).min
+            } else {
+                throw new RuntimeException("InnerError: Distance less than inradius but not in block.")
+            }
+        }
+    }
 
+    /**
+      * get max distance from block to point
+      *
+      * @param x
+      * @return
+      */
     def getMaxDistance(x: IGeoPoint): Double = (getCenterPoint geoTo x) + circumradius
+
+    override def equals(o: Any): Boolean = o match {
+        case ob: IHashableGeoBlock =>
+            if (ob.getGeoHashAccuracy == getGeoHashAccuracy) {
+                ob.indexCode == indexCode
+            } else {
+                false
+            }
+        case _: Any =>
+            false
+    }
+
+    override def hashCode(): Int = indexCode.hashCode()
 }
 
 object IHashableGeoBlock {
@@ -48,25 +92,22 @@ object IHashableGeoBlock {
       * 2 pow 31
       **/
     val POW2E31: Long = 0x80000000L
-    val DEG2RAD: Double = math.Pi / 180.0
-    val RAD2DEG: Double = 1.0 / DEG2RAD
     val MAX_INNER_PRODUCT_FOR_UNIT_VECTOR: Double = 1.0
     val EARTH_RADIUS: Double = 6378.5
 
     def createCodeFromGps(point: IGeoPoint, accuracy: Long): Long = {
-        val lngCode = Math.round((point.getLongitude + 180.0D) / 180 * accuracy)
-        val latCode = Math.round((point.getLatitude + 90.00D) / 180 * accuracy)
+        val lngCode = math.round((point.getLongitude + 180.0d) / 180.0d * accuracy)
+        val latCode = math.round((point.getLatitude + 90.00d) / 180.0d * accuracy)
         lngCode * IHashableGeoBlock.POW2E31 + latCode
     }
 
-    // TODO get boundary of current hash block
 
     def revertFromCode(code: Long, accuracy: Long): IGeoPoint = {
         val latCode = code & (POW2E31 - 1)
         val lngCode = (code - latCode) / POW2E31
         val lng = lngCode * 180.0 / accuracy - 180.0
         val lat = latCode * 180.0 / accuracy - 90.0
-        new GeoPoint(lng, lat)
+        GeoPoint(lng, lat)
     }
 
 
@@ -80,41 +121,41 @@ object IHashableGeoBlock {
       */
     def getGeoHashBlockBoundaryPoints(centerPoint: IGeoPoint, accuracy: Long, code: Long): Iterable[IGeoPoint] = {
         val returnPoints = new mutable.ArrayBuffer[IGeoPoint]()
-        val latCode = code & (POW2E31 - 1)
-        val lngCode = (code - latCode) / POW2E31
-        val lngMin = (180.0D * lngCode - 180.0D * accuracy) / accuracy.toDouble
-        val latMin = (180.0D * latCode - 90.00D * accuracy) / accuracy.toDouble
-        val lngMax = (180.0D * (lngCode + 1) - 180.0D * accuracy) / accuracy.toDouble
-        val latMax = (180.0D * (latCode + 1) - 90.00D * accuracy) / accuracy.toDouble
+        val latCode: Long = code & (POW2E31 - 1)
+        val lngCode: Long = (code - latCode) / POW2E31
+        val lngMin: Double = (180.0D * (lngCode - 0.5) - 180.0D * accuracy) / accuracy
+        val latMin: Double = (180.0D * (latCode - 0.5) - 90.00D * accuracy) / accuracy
+        val lngMax: Double = (180.0D * (lngCode + 0.5) - 180.0D * accuracy) / accuracy
+        val latMax: Double = (180.0D * (latCode + 0.5) - 90.00D * accuracy) / accuracy
 
         returnPoints.append(
-            new GeoPoint(lngMin, latMin),
-            new GeoPoint(lngMin, latMax),
-            new GeoPoint(lngMax, latMin),
-            new GeoPoint(lngMax, latMax)
+            GeoPoint(lngMin, latMin),
+            GeoPoint(lngMin, latMax),
+            GeoPoint(lngMax, latMin),
+            GeoPoint(lngMax, latMax)
         )
 
         if (lngMin < centerPoint.getLongitude && lngMax > centerPoint.getLatitude) {
             returnPoints.append(
-                new GeoPoint(centerPoint.getLongitude, latMin),
-                new GeoPoint(centerPoint.getLongitude, latMax)
+                GeoPoint(centerPoint.getLongitude, latMin),
+                GeoPoint(centerPoint.getLongitude, latMax)
             )
         }
 
-        val boundary0 = math.cos((lngMin - centerPoint.getLongitude) * DEG2RAD)
-        val boundary1 = math.cos((lngMax - centerPoint.getLongitude) * DEG2RAD)
+        val boundary0: Double = math.cos((lngMin - centerPoint.getLongitude).toRadians)
+        val boundary1: Double = math.cos((lngMax - centerPoint.getLongitude).toRadians)
 
-        val downBoundary = math.min(boundary0, boundary1)
-        val upBoundary = math.max(boundary0, boundary1)
+        val downBoundary: Double = math.min(boundary0, boundary1)
+        val upBoundary: Double = math.max(boundary0, boundary1)
 
-        val partialDiffVariable = math.tan(centerPoint.getLatitude * DEG2RAD)
-        val judgeMinLatitude = partialDiffVariable / math.tan(latMin * DEG2RAD)
-        val judgeMaxLatitude = partialDiffVariable / math.tan(latMax * DEG2RAD)
+        val partialDiffVariable: Double = math.tan(centerPoint.getLatitude.toRadians)
+        val judgeMinLatitude: Double = partialDiffVariable / math.tan(latMin.toRadians)
+        val judgeMaxLatitude: Double = partialDiffVariable / math.tan(latMax.toRadians)
         if (judgeMinLatitude < upBoundary && judgeMinLatitude > downBoundary) {
-            returnPoints.append(new GeoPoint(centerPoint.getLongitude + math.acos(judgeMinLatitude) * RAD2DEG, judgeMinLatitude))
+            returnPoints.append(GeoPoint(centerPoint.getLongitude + math.acos(judgeMinLatitude).toDegrees, judgeMinLatitude))
         }
         if (judgeMaxLatitude < upBoundary && judgeMaxLatitude > downBoundary) {
-            returnPoints.append(new GeoPoint(centerPoint.getLongitude + math.acos(judgeMaxLatitude) * RAD2DEG, judgeMinLatitude))
+            returnPoints.append(GeoPoint(centerPoint.getLongitude + math.acos(judgeMaxLatitude).toDegrees , judgeMinLatitude))
         }
         returnPoints
     }

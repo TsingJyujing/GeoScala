@@ -8,9 +8,9 @@
         <scala.version.sub>7</scala.version.sub>
     </properties>
 
-    <groupId>tsingjyujing</groupId>
+    <groupId>com.github.tsingjyujing</groupId>
     <artifactId>geo-library-${scala.version.main}</artifactId>
-    <version>2.4-Lite</version>
+    <version>2.5</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -19,12 +19,6 @@
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version.main}.${scala.version.sub}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>algebird-core_${scala.version.main}</artifactId>
-            <version>0.13.3</version>
         </dependency>
 
         <dependency>

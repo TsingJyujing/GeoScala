@@ -1,13 +1,14 @@
 package tsingjyujing.geo.element.mutable
 
 import tsingjyujing.geo.basic.IGeoPoint
-import tsingjyujing.geo.basic.operations.IContains
+import tsingjyujing.geo.basic.operations.{GeoJSONable, IContains}
 import tsingjyujing.geo.element.GeoBox
 import tsingjyujing.geo.util.mathematical.PolygonUtil
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.parsing.json.JSONObject
 
-class GeoPolygon(x: Iterable[IGeoPoint]) extends Iterable[IGeoPoint] with IContains[IGeoPoint] {
+class GeoPolygon(x: Iterable[IGeoPoint]) extends Iterable[IGeoPoint] with IContains[IGeoPoint] with GeoJSONable {
 
     override def iterator: Iterator[IGeoPoint] = polygon.iterator
 
@@ -35,5 +36,6 @@ class GeoPolygon(x: Iterable[IGeoPoint]) extends Iterable[IGeoPoint] with IConta
         false
     }
 
+    override def toGeoJSON: JSONObject = GeoJSONable.createRingPolygon(polygon)
 }
 

@@ -1,9 +1,13 @@
 package tsingjyujing.geo.basic
 
-import tsingjyujing.geo.basic.operations.GeoDistanceMeasurable
+import tsingjyujing.geo.basic.operations.{GeoDistanceMeasurable, GeoJSONable}
 import tsingjyujing.geo.element.immutable.{Vector2, Vector3}
 
-trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] {
+import scala.util.parsing.json.JSONObject
+
+trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable{
+
+    override def toGeoJSON: JSONObject = GeoJSONable.createPoint(this)
 
     def getLongitude: Double
 

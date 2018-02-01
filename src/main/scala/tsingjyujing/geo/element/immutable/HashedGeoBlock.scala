@@ -4,7 +4,7 @@ import tsingjyujing.geo.basic.{IGeoPoint, IHashableGeoBlock}
 
 final class HashedGeoBlock(code: Long, accuracy: Long = 12000) extends IHashableGeoBlock {
 
-    private lazy val centerPoint = IHashableGeoBlock.revertFromCode(indexCode, getGeoHashAccuracy)
+    private val centerPoint = IHashableGeoBlock.revertFromCode(indexCode, getGeoHashAccuracy)
 
     override def getGeoHashAccuracy: Long = accuracy
 

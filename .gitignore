@@ -52,9 +52,11 @@ fabric.properties
 ### Scala template
 *.class
 *.log
-
-.gitignore
+*.json
+*.csv
+.ipynb_checkpoints
 .idea/
 target/
 experimental/
 将删除 geo-library-2.12.iml
+将删除 plot_group_by.m
