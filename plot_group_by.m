@@ -14,6 +14,11 @@ hold on;
 cs = unique(c);
 for i = 1:length(cs)
     index = c==cs(i);
-    plot(x(index),y(index),'.')
+    if sum(index)<100
+        shape = 'o';
+    else
+        shape = '.';
+    end
+    plot(x(index),y(index),shape)
 end
 hold off;

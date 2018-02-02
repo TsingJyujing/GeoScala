@@ -5,9 +5,11 @@ import tsingjyujing.geo.basic.IGeoPoint
 import scala.util.parsing.json._
 
 trait GeoJSONable {
+
     def toGeoJSON: JSONObject
 
     def toGeoJSONString: String = toGeoJSON.toString()
+
 }
 
 object GeoJSONable {

@@ -8,17 +8,13 @@ import tsingjyujing.geo.basic.IHashableGeoBlock.{createCodeFromGps, revertFromCo
 import tsingjyujing.geo.element.{GeoHeatMapCommon, GeoPointTree}
 import tsingjyujing.geo.element.immutable.{GeoPoint, HashedGeoBlock, Vector2}
 import tsingjyujing.geo.util.convertor.{BD09, GCJ02}
-
-import scala.util.Random
+import tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
 
 class GeoAutoTest extends FlatSpec with Matchers {
-    val random = new Random(System.currentTimeMillis())
-
-    def rand(ratio: Double = 1.0): Double = random.nextDouble() * ratio
 
     "Elements" should "GeoHash" in {
-        val block = HashedGeoBlock(120,30,0x10000)
-        assert(block.inradius<block.circumradius)
+        val block = HashedGeoBlock(120, 30, 0x10000)
+        assert(block.inradius < block.circumradius)
 
         val accuracy = 0x4000000L
         1 to 100 foreach (_ => {
@@ -28,10 +24,39 @@ class GeoAutoTest extends FlatSpec with Matchers {
             val maxDistance = 2 * math.Pi / accuracy * IGeoPoint.EARTH_RADIUS * math.sqrt(2)
             assert((pointX geoTo revertPoint) < maxDistance)
         })
+    }
+
+    /**
+      * Monte Carlo method to test correction of HashedBlock
+      */
+    it should "Monte Carlo GeoHashBlock Test" in {
+        val initPoint = GeoPoint(120, 30)
+        val geoBlock = HashedGeoBlock(initPoint, 0x1000)
+        val geoBox = geoBlock.toGeoBox
+        val centerPoint = geoBlock.getCenterPoint
+        val points = (1 to 100000).map(_ => {
+            GeoPoint(centerPoint.getLongitude + randn(0, rand(0, 0.05)), centerPoint.getLatitude + rand(0, 0.05))
+        })
+
+        val inRadius = geoBlock.inradius
+        val outRadius = geoBlock.circumradius
+
+        val minDistance = points.filter(point => {
+            geoBox nonContains point
+        }).map(_.geoTo(centerPoint)).min
+
+        val maxDistance = points.filter(point => {
+            geoBox contains point
+        }).map(_.geoTo(centerPoint)).max
+
+        val minError = math.abs(minDistance - inRadius) / minDistance
+        val maxError = math.abs(maxDistance - outRadius) / maxDistance
+
+        assert(maxError < 0.05, "Max distance error too large")
+        assert(minError < 0.05, "Min distance error too large")
 
 
     }
-
     it should "GeoHeatMapCommon" in {
         val points = IndexedSeq(
             (GeoPoint(120, 30), Vector2(1.01, 2.01)),
@@ -65,7 +90,7 @@ class GeoAutoTest extends FlatSpec with Matchers {
 
         (1 to 10000).foreach(_ => {
             centers.foreach(center => {
-                val newPoint = GeoPoint(center.getLongitude + rand(0.5), center.getLatitude + rand(0.5))
+                val newPoint = GeoPoint(center.getLongitude + rand(0, 0.5), center.getLatitude + rand(0, 0.5))
                 points.appendPoint(newPoint)
             })
         })

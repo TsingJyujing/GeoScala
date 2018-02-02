@@ -3,7 +3,7 @@ package tsingjyujing.geo.algorithm.cluster
 import tsingjyujing.geo.algorithm.containers.{ClusterResult, LabeledPoint}
 import tsingjyujing.geo.basic.IGeoPoint
 import tsingjyujing.geo.element.GeoPointTree
-
+import sys.process.stdout
 import scala.collection.mutable
 
 /**
@@ -43,7 +43,7 @@ class DBScan[V <: IGeoPoint](
     }
 
     private def appendWithMerge(point: V): Int = {
-        val searchResult = data.geoWithin(point, 0, searchRadius)
+        val searchResult = data.geoWithin(point, -1.0, searchRadius)
         if (searchResult.isEmpty) {
             val classId = getNewClassId
             data.appendPoint(LabeledPoint(classId, point))
@@ -62,12 +62,14 @@ class DBScan[V <: IGeoPoint](
                         }
                     }
                 )
-                data.foreach(point => {
-                    val cls = point.classId
-                    if (cls != classId && uniqueClassIds.contains(cls)) {
-                        point.classId = classId
+                data.foreach(
+                    point => {
+                        val cls = point.classId
+                        if (cls != classId && uniqueClassIds.contains(cls)) {
+                            point.classId = classId
+                        }
                     }
-                })
+                )
 
             }
             classId
@@ -79,14 +81,24 @@ class DBScan[V <: IGeoPoint](
 
 object DBScan {
     def apply[V <: IGeoPoint](
-                                 points: TraversableOnce[V],
+                                 points: Iterable[V],
                                  searchRadius: Double = 0.5,
                                  isMergeClass: Boolean = false
                              ): ClusterResult[Int, V] = {
+        val startTime = System.currentTimeMillis()
         val cr = new DBScan[V](searchRadius, isMergeClass)
-        points.foreach(point => {
-            cr.append(point)
+        val pointCount = points.size
+        val printMargin = math.floor(pointCount / 100.0)
+        points.zipWithIndex.foreach(pid => {
+            cr.append(pid._1)
+            if (pid._2 % printMargin == 0) {
+                val pastTime = System.currentTimeMillis() - startTime
+                val speed = pid._2 * 1.0 / pastTime
+                stdout.print("\rClustering:%3.0f%%  %10.3f kpps".format(pid._2 * 100.0 / pointCount, speed))
+                stdout.flush()
+            }
         })
+        println("\nDone")
         cr.toClusterResult
     }
 

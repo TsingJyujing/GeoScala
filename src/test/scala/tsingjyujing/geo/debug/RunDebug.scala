@@ -1,23 +1,15 @@
 package tsingjyujing.geo.debug
 
-import java.io.{File, PrintWriter}
-
 import tsingjyujing.geo.algorithm.cluster.DBScan
-import tsingjyujing.geo.basic.operations.GeoJSONable
 import tsingjyujing.geo.element.GeoPointTree
-import tsingjyujing.geo.element.immutable.GeoPoint
-
-import scala.util.Random
+import tsingjyujing.geo.element.immutable.{GeoPoint, HashedGeoBlock, Vector2}
+import tsingjyujing.geo.util.FileIO
+import tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn}
 
 object RunDebug {
-    val random = new Random(System.currentTimeMillis())
-
-    def rand(ratio: Double = 1.0): Double = random.nextDouble() * ratio
-
-    def randn(mean: Double = 0.0, std: Double = 1.0): Double = math.sqrt(-2 * math.log(rand())) * math.cos(2 * math.Pi * rand()) * std + mean
 
 
-    def main(args: Array[String]): Unit = GeoPointTreeDebug()
+    def main(args: Array[String]): Unit = DBScanDebug()
 
     def GeoPointTreeDebug(): Unit = {
         val points = new GeoPointTree[GeoPoint]()
@@ -30,7 +22,10 @@ object RunDebug {
 
         (1 to 10000).foreach(_ => {
             centers.foreach(center => {
-                val newPoint = GeoPoint(center.getLongitude + randn(0.5), center.getLatitude + randn(0.5))
+                val newPoint = GeoPoint(
+                    center.getLongitude + randn(0, 0.5),
+                    center.getLatitude + randn(0, 0.5)
+                )
                 points.appendPoint(newPoint)
             })
         })
@@ -72,25 +67,11 @@ object RunDebug {
                 GeoPoint(center.getLongitude + randn(std = 0.1), center.getLatitude + randn(std = 0.1))
             })
         })
-        println("Start to cluster")
+
+        println("Clustering started.")
         val result = DBScan(points = points, searchRadius = 10.0, isMergeClass = true)
         println("Done, %d class found, writing...".format(result.classes.size))
-        val writer = new PrintWriter(new File("dbscan_result.json"))
-        writer.write(GeoJSONable.createGeometryCollection(result.resultMap.map(
-            lp => {
-                GeoJSONable.createMultiPoints(lp._2)
-            }
-        )).toString())
-        writer.close()
 
-        val writerCSV = new PrintWriter(new File("dbscan_result.csv"))
-        result.resultMap.flatMap(kv => {
-            kv._2.map(p => {
-                "%d,%3.6f,%3.6f\n".format(kv._1, p.getLongitude, p.getLatitude)
-            })
-        }).foreach(
-            writerCSV.write
-        )
-        writerCSV.close()
+        FileIO.writeLabeledPoints("dbscan_result.csv", result.toIterable)
     }
 }

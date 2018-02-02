@@ -1,6 +1,8 @@
 package tsingjyujing.geo.basic
 
+import tsingjyujing.geo.basic.IHashableGeoBlock.POW2E31
 import tsingjyujing.geo.basic.operations.IHashedIndex
+import tsingjyujing.geo.element.GeoBox
 import tsingjyujing.geo.element.immutable.GeoPoint
 
 import scala.collection.mutable
@@ -15,19 +17,52 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
     def getGeoHashAccuracy: Long
 
-    def getCenterPoint: IGeoPoint
+    def getCenterPoint: IGeoPoint = IHashableGeoBlock.revertFromCode(indexCode, getGeoHashAccuracy)
 
     override def getLongitude: Double = getCenterPoint.getLongitude
 
     override def getLatitude: Double = getCenterPoint.getLatitude
 
-    lazy val circumradius: Double = getBoundaryPoints(getCenterPoint).map(_ geoTo getCenterPoint).max
+    /**
+      * Get a spherical crown to
+      */
+    lazy val circumradius: Double = geoBox.anglePoints.map(_ geoTo getCenterPoint).max
 
-    lazy val inradius: Double = getBoundaryPoints(getCenterPoint).map(_ geoTo getCenterPoint).min
+    lazy val inradius: Double = {
+        //Calculate tow distance to longitude and latitude boundary
+        val centerLatitude = getCenterPoint.getLatitude
+        val centerLongitude = getCenterPoint.getLongitude
+        val latitudeDirectionalDistance = math.min(
+            math.abs(centerLatitude - geoBox.minLatitude),
+            math.abs(centerLatitude - geoBox.maxLatitude)
+        ).toRadians * IGeoPoint.EARTH_RADIUS
+        val longitudeDirectionalDistance = math.min(
+            math.abs(centerLongitude - geoBox.minLongitude),
+            math.abs(centerLongitude - geoBox.maxLongitude)
+        ).toRadians * IGeoPoint.EARTH_RADIUS * math.cos(centerLatitude.toRadians)
+        math.min(longitudeDirectionalDistance, latitudeDirectionalDistance)
+    }
 
-    def getBoundaryPoints(blockCode: Long): Iterable[IGeoPoint] = IHashableGeoBlock.getGeoHashBlockBoundaryPoints(this, getGeoHashAccuracy, blockCode)
-
-    def getBoundaryPoints(point: IGeoPoint): Iterable[IGeoPoint] = IHashableGeoBlock.getGeoHashBlockBoundaryPoints(point, getGeoHashAccuracy, indexCode)
+    def getBoundaryPoints(point: IGeoPoint): Iterable[IGeoPoint] = {
+        val boxPoints = List(geoBox.anglePoints: _*)
+        val boundLongitude = if (geoBox.getLongitudeRange.contains(point.getLongitude)) {
+            List(
+                GeoPoint(point.getLongitude, geoBox.minLatitude),
+                GeoPoint(point.getLongitude, geoBox.minLatitude)
+            )
+        } else {
+            List.empty
+        }
+        val boundLatitude = if (geoBox.getLatitudeRange.contains(point.getLatitude)) {
+            List(
+                GeoPoint(geoBox.minLongitude, point.getLatitude),
+                GeoPoint(geoBox.maxLongitude, point.getLatitude)
+            )
+        } else {
+            List.empty
+        }
+        boxPoints ::: boundLatitude ::: boundLongitude
+    }
 
     def getMinDistance(x: IHashableGeoBlock): Double = math.max((getCenterPoint geoTo x.getCenterPoint) - circumradius + x.circumradius, 0.0)
 
@@ -55,7 +90,7 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
             } else if (distanceToCenter > inradius) {
                 getBoundaryPoints(x).map(_.geoTo(x)).min
             } else {
-                throw new RuntimeException("InnerError: Distance less than inradius but not in block.")
+                throw new RuntimeException("InternalError: Distance less than inradius but not in block.")
             }
         }
     }
@@ -80,6 +115,23 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
     }
 
     override def hashCode(): Int = indexCode.hashCode()
+
+    val geoBox: GeoBox = {
+        val accuracy = getGeoHashAccuracy
+        val code = indexCode
+        val latCode = code & (POW2E31 - 1)
+        val lngCode = (code - latCode) / POW2E31
+        GeoBox(
+            (180.0D * (lngCode - 0.5) - 180.0D * accuracy) / accuracy,
+            (180.0D * (lngCode + 0.5) - 180.0D * accuracy) / accuracy,
+            (180.0D * (latCode - 0.5) - 90.00D * accuracy) / accuracy,
+            (180.0D * (latCode + 0.5) - 90.00D * accuracy) / accuracy
+        )
+    }
+
+    def toGeoBox: GeoBox = geoBox
+
+
 }
 
 object IHashableGeoBlock {
@@ -119,6 +171,7 @@ object IHashableGeoBlock {
       * @param centerPoint search point opp to this block
       * @return List of the points seems to nearest or farthest
       */
+    @deprecated(message = "Some bugs in this function, will remove in RELEASE version")
     def getGeoHashBlockBoundaryPoints(centerPoint: IGeoPoint, accuracy: Long, code: Long): Iterable[IGeoPoint] = {
         val returnPoints = new mutable.ArrayBuffer[IGeoPoint]()
         val latCode: Long = code & (POW2E31 - 1)
@@ -155,7 +208,7 @@ object IHashableGeoBlock {
             returnPoints.append(GeoPoint(centerPoint.getLongitude + math.acos(judgeMinLatitude).toDegrees, judgeMinLatitude))
         }
         if (judgeMaxLatitude < upBoundary && judgeMaxLatitude > downBoundary) {
-            returnPoints.append(GeoPoint(centerPoint.getLongitude + math.acos(judgeMaxLatitude).toDegrees , judgeMinLatitude))
+            returnPoints.append(GeoPoint(centerPoint.getLongitude + math.acos(judgeMaxLatitude).toDegrees, judgeMinLatitude))
         }
         returnPoints
     }

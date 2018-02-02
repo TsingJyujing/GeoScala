@@ -7,10 +7,11 @@ import scala.collection.mutable.ArrayBuffer
 
 /**
   * Data struct to describe
+  *
   * @tparam K
   * @tparam V
   */
-class ClusterResult[K, V <: IGeoPoint] extends Iterable[LabeledPoint[K, V]] {
+class ClusterResult[K, V <: IGeoPoint] {
 
     val data: mutable.Map[K, mutable.ArrayBuffer[V]] = mutable.Map[K, mutable.ArrayBuffer[V]]()
 
@@ -28,11 +29,11 @@ class ClusterResult[K, V <: IGeoPoint] extends Iterable[LabeledPoint[K, V]] {
         mutable.ArrayBuffer[V]()
     }
 
-    override def iterator: Iterator[LabeledPoint[K, V]] = data.flatMap(
+    implicit def toIterable: Iterable[LabeledPoint[K, V]] = data.flatMap(
         kv => {
             kv._2.map(LabeledPoint(kv._1, _))
         }
-    ).iterator
+    )
 
     def resultMap: mutable.Map[K, ArrayBuffer[V]] = data
 
