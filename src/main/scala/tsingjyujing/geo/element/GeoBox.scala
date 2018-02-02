@@ -19,9 +19,9 @@ case class GeoBox(
         GeoPoint(maxLongitude, minLatitude)
     )
 
-    def getLongitudeRange = Range(minLongitude, maxLongitude)
+    def getLongitudeRange = DoubleRange(minLongitude, maxLongitude)
 
-    def getLatitudeRange = Range(minLatitude, maxLatitude)
+    def getLatitudeRange = DoubleRange(minLatitude, maxLatitude)
 }
 
 object GeoBox {
