@@ -4,6 +4,13 @@ import com.github.tsingjyujing.geo.basic.IGeoPoint
 import com.github.tsingjyujing.geo.basic.operations.IContains
 import com.github.tsingjyujing.geo.element.immutable.GeoPoint
 
+/**
+  * A boundary box with min/max longitude/latitude
+  * @param minLongitude
+  * @param maxLongitude
+  * @param minLatitude
+  * @param maxLatitude
+  */
 case class GeoBox(
                      minLongitude: Double,
                      maxLongitude: Double,

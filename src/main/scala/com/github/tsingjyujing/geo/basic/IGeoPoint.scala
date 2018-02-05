@@ -2,15 +2,25 @@ package com.github.tsingjyujing.geo.basic
 
 import com.github.tsingjyujing.geo.basic.operations.{GeoDistanceMeasurable, GeoJSONable}
 import com.github.tsingjyujing.geo.element.immutable.{Vector2, Vector3}
-
 import scala.util.parsing.json.JSONObject
 
+/**
+  * Any type which can get longitude and latitude (on earth)
+  */
 trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
 
     override def toGeoJSON: JSONObject = GeoJSONable.createPoint(this)
 
+    /**
+      * Get longitude recommended in WGS84 format
+      * @return Longitude in degree
+      */
     def getLongitude: Double
 
+    /**
+      * Get latitude recommended in WGS84 format
+      * @return Latitude in degree
+      */
     def getLatitude: Double
 
     /**
@@ -21,14 +31,21 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
       */
     override final def geoTo(point: IGeoPoint): Double = IGeoPoint.geodesicDistance(this, point)
 
-
-    implicit final def toIVector3: IVector3 = new Vector3(
-        math.cos(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD),
-        math.sin(getLongitude * IGeoPoint.DEG2RAD) * math.cos(getLatitude * IGeoPoint.DEG2RAD),
-        math.sin(getLatitude * IGeoPoint.DEG2RAD)
+    /**
+      * Get vector3 in R3 on 2d sphere
+      * @return
+      */
+    final def toIVector3: IVector3 = Vector3(
+        math.cos(getLongitude.toRadians) * math.cos(getLatitude.toRadians),
+        math.sin(getLongitude.toRadians) * math.cos(getLatitude.toRadians),
+        math.sin(getLatitude.toRadians)
     )
 
-    implicit final def toIVector2: IVector2 = new Vector2(
+    /**
+      * Get Mercator projection potision as vector2
+      * @return
+      */
+    final def toIVector2: IVector2 = Vector2(
         getLongitude,
         getLatitude
     )
@@ -39,7 +56,6 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
 
 
 object IGeoPoint {
-    val DEG2RAD: Double = math.Pi / 180.0
     val MAX_INNER_PRODUCT_FOR_UNIT_VECTOR: Double = 1.0
     val EARTH_RADIUS: Double = 6378.5
 
@@ -50,7 +66,7 @@ object IGeoPoint {
       * @param point2 point2
       * @return
       */
-    def getInnerProduct(point1: IGeoPoint, point2: IGeoPoint): Double = math.sin(point1.getLatitude * DEG2RAD) * math.sin(point2.getLatitude * DEG2RAD) + math.cos(point1.getLatitude * DEG2RAD) * math.cos(point2.getLatitude * DEG2RAD) * math.cos(point1.getLongitude * DEG2RAD - point2.getLongitude * DEG2RAD)
+    def getInnerProduct(point1: IGeoPoint, point2: IGeoPoint): Double = math.sin(point1.getLatitude.toRadians) * math.sin(point2.getLatitude.toRadians) + math.cos(point1.getLatitude.toRadians) * math.cos(point2.getLatitude.toRadians) * math.cos(point1.getLongitude.toRadians - point2.getLongitude.toRadians)
 
     /**
       * Get distance on earth of two points

@@ -13,6 +13,13 @@ A geo library written by Java and Scala, contains GPS 2d-spherical geometry, GPS
 
 ### Entity Objects
 
+#### Type of points
+All the geo point type has extends `com.github.tsingjyujing.geo.basic.IGeoPoint`, to extends this trait, you should implement these functions:
+```scala
+def getLongitude: Double
+def getLatitude: Double
+```
+
 ### Basic Units
 
 #### Properties: operations

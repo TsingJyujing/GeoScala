@@ -1,14 +1,15 @@
 package com.github.tsingjyujing.geo
 
 import com.github.tsingjyujing.geo.algorithm.cluster.DBScan
-import com.github.tsingjyujing.geo.element.GeoPointTree
-import com.github.tsingjyujing.geo.element.immutable.GeoPoint
+import com.github.tsingjyujing.geo.algorithm.containers.LabeledPoint
+import com.github.tsingjyujing.geo.element.{GeoPointTree, GeoPolygon}
+import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, Vector2}
 import com.github.tsingjyujing.geo.util.FileIO
-import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn}
+import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
 
 object RunDebug {
 
-    def main(args: Array[String]): Unit = DBScanDebug()
+    def main(args: Array[String]): Unit = createPolygonSamples()
 
     def GeoPointTreeDebug(): Unit = {
         val points = new GeoPointTree[GeoPoint]()
@@ -30,7 +31,7 @@ object RunDebug {
         })
 
         centers.foreach(center => {
-            val withInPoints = points.geoWithin(center, 0, radius)
+            val withInPoints = points.geoWithinRing(center, 0, radius)
             val count1 = withInPoints.size
             val count2 = points.count(point => point.geoTo(center) <= radius)
             withInPoints.foreach(p => {
@@ -72,5 +73,24 @@ object RunDebug {
         println("Done, %d class found, writing...".format(result.classes.size))
 
         FileIO.writeLabeledPoints("dbscan_result.csv", result.toIterable)
+    }
+
+    def createPolygonSamples(): Unit = {
+        val offsets = Array(
+            Vector2(1, 0),
+            Vector2(2, 1),
+            Vector2(2, 2),
+            Vector2(1, 3),
+            Vector2(0, 1)
+        )
+        val pointO = GeoPoint(108, 36)
+        val polygonInfo = new GeoPolygon(offsets.map(pointO + _))
+        val randomPoins = (1 to 3000).map(_ => {
+            val point = pointO + Vector2(rand(1.5, 5), rand(1.5, 5))
+            val isInPolygon = if(polygonInfo.contains(point)){1}else{0}
+            LabeledPoint(isInPolygon, point)
+        })
+        FileIO.writePoints("polygon.csv",polygonInfo)
+        FileIO.writeLabeledPoints("test_polygon.csv",randomPoins)
     }
 }

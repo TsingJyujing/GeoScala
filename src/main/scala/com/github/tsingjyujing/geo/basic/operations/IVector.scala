@@ -1,6 +1,11 @@
 package com.github.tsingjyujing.geo.basic.operations
 
+/**
+  * This vector is not same in Scala's `scala.collection.immutable.Vector`
+  * it means a point in N-dimensional Euclid space
+  */
 trait IVector extends Normable with Iterable[Double] {
+
     /**
       * Get norm of self object
       *

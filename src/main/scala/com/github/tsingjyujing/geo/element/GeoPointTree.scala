@@ -3,7 +3,14 @@ package com.github.tsingjyujing.geo.element
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IGeoPointSet, IHashableGeoBlock}
 import com.github.tsingjyujing.geo.element.immutable.HashedGeoBlock
 
-
+/**
+  * Layered Geo points index as an TreeSet
+  * @param currentDepth
+  * @param currentCode
+  * @param maxDepth
+  * @param depthStep
+  * @tparam T Type to save geo points, any type extends IGeoPoint
+  */
 class GeoPointTree[T <: IGeoPoint](
                                       currentDepth: Int = 4,
                                       currentCode: Long = 0,
@@ -105,7 +112,7 @@ class GeoPointTree[T <: IGeoPoint](
 
     }
 
-    override def geoWithin(point: IGeoPoint, minDistance: Double, maxDistance: Double): Iterable[T] = if (isLastLevel) {
+    override def geoWithinRing(point: IGeoPoint, minDistance: Double, maxDistance: Double): Iterable[T] = if (isLastLevel) {
         dataList.filter(
             p => {
                 val d = p.geoTo(point)
@@ -121,7 +128,7 @@ class GeoPointTree[T <: IGeoPoint](
             }
         ).flatMap(
             x => {
-                x._2.geoWithin(point, minDistance, maxDistance)
+                x._2.geoWithinRing(point, minDistance, maxDistance)
             }
         )
     }

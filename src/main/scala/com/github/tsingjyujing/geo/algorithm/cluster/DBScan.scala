@@ -53,7 +53,7 @@ class DBScan[V <: IGeoPoint](
     }
 
     private def appendWithMerge(point: V): Int = {
-        val searchResult = data.geoWithin(point, -1.0, searchRadius)
+        val searchResult = data.geoWithinRing(point, -1.0, searchRadius)
         if (searchResult.isEmpty) {
             val classId = getNewClassId
             data.appendPoint(LabeledPoint(classId, point))
@@ -98,7 +98,7 @@ object DBScan {
         val startTime = System.currentTimeMillis()
         val cr = new DBScan[V](searchRadius, isMergeClass)
         val pointCount = points.size
-        val printMargin = math.floor(pointCount / 100.0)
+        val printMargin = math.max(math.min(300, math.floor(pointCount / 100.0)), 10)
         points.zipWithIndex.foreach(pid => {
             cr.append(pid._1)
             if (pid._2 % printMargin == 0) {

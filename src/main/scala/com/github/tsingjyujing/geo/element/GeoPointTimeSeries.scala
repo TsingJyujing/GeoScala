@@ -7,7 +7,9 @@ import com.github.tsingjyujing.geo.util.mathematical.SeqUtil
 
 import scala.util.control.Breaks
 
-
+/**
+  * A TimeSeries with GeoPoint as value
+  */
 class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[GeoPoint]] {
 
     override def getValue(time: Double): TimeElement[GeoPoint] = {

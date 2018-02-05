@@ -2,6 +2,11 @@ package com.github.tsingjyujing.geo.element.immutable
 
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
 
+/**
+  * Get a immutable geo point
+  * @param longitude
+  * @param latitude
+  */
 final case class GeoPoint(longitude: Double, latitude: Double) extends IGeoPoint {
     override def getLongitude: Double = longitude
 

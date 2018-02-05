@@ -1,13 +1,16 @@
-package com.github.tsingjyujing.geo.element.mutable
+package com.github.tsingjyujing.geo.element
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint
 import com.github.tsingjyujing.geo.basic.operations.{GeoJSONable, IContains}
-import com.github.tsingjyujing.geo.element.GeoBox
 import com.github.tsingjyujing.geo.util.mathematical.PolygonUtil
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.parsing.json.JSONObject
 
+/**
+  * Mutable implementation of polygon
+  * @param x
+  */
 class GeoPolygon(x: Iterable[IGeoPoint]) extends Iterable[IGeoPoint] with IContains[IGeoPoint] with GeoJSONable {
 
     override def iterator: Iterator[IGeoPoint] = polygon.iterator
@@ -24,7 +27,10 @@ class GeoPolygon(x: Iterable[IGeoPoint]) extends Iterable[IGeoPoint] with IConta
         geoBox = GeoBox(polygon)
     }
 
-
+    /**
+      * Change polygon
+      * @param operate
+      */
     def operatePolygon(operate: ArrayBuffer[IGeoPoint] => Unit): Unit = {
         operate(polygon)
         updateBoxBoundary()

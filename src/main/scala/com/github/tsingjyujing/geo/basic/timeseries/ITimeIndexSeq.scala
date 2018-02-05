@@ -3,6 +3,10 @@ package com.github.tsingjyujing.geo.basic.timeseries
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
+/**
+  * A common time series trait contains some common methods
+  * @tparam T
+  */
 trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
 
     protected val data: ArrayBuffer[T] = mutable.ArrayBuffer[T]()
@@ -70,6 +74,15 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
 
     def apply(index: Int): T = data(index)
 
+    /**
+      * Apply a status machine on timeseries
+      *
+      * @param statusFunction function to process element[T] and last (or initial) status[S], get result[R] and next status
+      * @param initialStatus initial status
+      * @tparam S Type of status
+      * @tparam R Type of result
+      * @return
+      */
     def statusMachine[S, R](statusFunction: (T, S) => (S, R), initialStatus: S = null): Iterable[R] = {
         var status: S = initialStatus
         this.map(

@@ -11,12 +11,19 @@ import scala.collection.mutable
 /**
   * Squared hash of geo
   * Which geo point can get an Long index value and get hashed.
-  *
   */
 trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
+    /**
+      * Accuracy to devide earth into N*N parts
+      * @return
+      */
     def getGeoHashAccuracy: Long
 
+    /**
+      * Get center point of the hash block
+      * @return
+      */
     def getCenterPoint: IGeoPoint = IHashableGeoBlock.revertFromCode(indexCode, getGeoHashAccuracy)
 
     override def getLongitude: Double = getCenterPoint.getLongitude
@@ -24,10 +31,13 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
     override def getLatitude: Double = getCenterPoint.getLatitude
 
     /**
-      * Get a spherical crown to
+      * Get a spherical crown to hash block
       */
     lazy val circumradius: Double = geoBox.anglePoints.map(_ geoTo getCenterPoint).max
 
+    /**
+      * Get an inner circle in hash block
+      */
     lazy val inradius: Double = {
         //Calculate tow distance to longitude and latitude boundary
         val centerLatitude = getCenterPoint.getLatitude
@@ -43,6 +53,11 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
         math.min(longitudeDirectionalDistance, latitudeDirectionalDistance)
     }
 
+    /**
+      * Get points on boundary maybe the min/max distance
+      * @param point reference points
+      * @return
+      */
     def getBoundaryPoints(point: IGeoPoint): Iterable[IGeoPoint] = {
         val boxPoints = List(geoBox.anglePoints: _*)
         val boundLongitude = if (geoBox.getLongitudeRange.contains(point.getLongitude)) {
@@ -64,8 +79,18 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
         boxPoints ::: boundLatitude ::: boundLongitude
     }
 
+    /**
+      * Get min distance from block to this block
+      * @param x block info
+      * @return
+      */
     def getMinDistance(x: IHashableGeoBlock): Double = math.max((getCenterPoint geoTo x.getCenterPoint) - circumradius + x.circumradius, 0.0)
 
+    /**
+      * Get max distance from block to this block
+      * @param x block info
+      * @return
+      */
     def getMaxDistance(x: IHashableGeoBlock): Double = (getCenterPoint geoTo x.getCenterPoint) + (circumradius + x.circumradius)
 
     /**
@@ -129,8 +154,11 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
         )
     }
 
+    /**
+      * Get boundary box of hash block
+      * @return
+      */
     def toGeoBox: GeoBox = geoBox
-
 
 }
 

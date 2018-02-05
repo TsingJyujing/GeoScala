@@ -2,6 +2,11 @@ package com.github.tsingjyujing.geo.element.immutable
 
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IHashableGeoBlock}
 
+/**
+  * Get a hashed geo block
+  * @param code
+  * @param accuracy
+  */
 final class HashedGeoBlock(code: Long, accuracy: Long = 12000) extends IHashableGeoBlock {
 
     private val centerPoint = IHashableGeoBlock.revertFromCode(indexCode, getGeoHashAccuracy)

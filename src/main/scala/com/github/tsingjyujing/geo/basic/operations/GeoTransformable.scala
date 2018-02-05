@@ -30,7 +30,7 @@ trait GeoTransformable {
       */
     def inverseTransformFast(y: IGeoPoint): GeoPoint = {
         val ffx = transform(y)
-        new GeoPoint(
+        GeoPoint(
             y.getLongitude * 2 - ffx.getLongitude,
             y.getLatitude * 2 - ffx.getLatitude
         )

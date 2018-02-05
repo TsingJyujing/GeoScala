@@ -1,7 +1,7 @@
 package com.github.tsingjyujing.geo.basic.timeseries
 
 /**
-  * Which
+  * Which can get tick and comparable
   */
 trait ITick extends Comparable[ITick] {
 

@@ -1,11 +1,10 @@
 package com.github.tsingjyujing.geo
 
 import java.io.{File, PrintWriter}
-
 import com.github.tsingjyujing.geo.basic.IHashableGeoBlock.{createCodeFromGps, revertFromCode}
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, HashedGeoBlock, Vector2}
-import com.github.tsingjyujing.geo.element.{GeoHeatMapCommon, GeoPointTree}
+import com.github.tsingjyujing.geo.element.{GeoHeatMap, GeoPointTree}
 import com.github.tsingjyujing.geo.util.convertor.{BD09, GCJ02}
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
 import org.scalatest._
@@ -68,7 +67,7 @@ class GeoAutoTest extends FlatSpec with Matchers {
             (GeoPoint(120, 31), Vector2(1.01, 2.01))
         )
 
-        val geoHeatMap = GeoHeatMapCommon.buildFromPoints[IVector2](points, Vector2(0, 0), 0x20000)
+        val geoHeatMap = GeoHeatMap.buildFromPoints[IVector2](points, Vector2(0, 0), 0x20000)
         assert(geoHeatMap.size == 3, "GeoMap size not correct")
     }
 
@@ -96,7 +95,7 @@ class GeoAutoTest extends FlatSpec with Matchers {
         })
 
         centers.foreach(center => {
-            val withInPoints = points.geoWithin(center, 0, radius)
+            val withInPoints = points.geoWithinRing(center, 0, radius)
             val count1 = withInPoints.size
             val count2 = points.count(point => point.geoTo(center) <= radius)
             withInPoints.foreach(p => {

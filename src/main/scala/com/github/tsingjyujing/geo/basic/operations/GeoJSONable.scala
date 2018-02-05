@@ -4,14 +4,27 @@ import com.github.tsingjyujing.geo.basic.IGeoPoint
 
 import scala.util.parsing.json._
 
+/**
+  * Object which can convert to GeoJSON, for more details, see:
+  * http://geojson.org/
+  */
 trait GeoJSONable {
 
+    /**
+      * Get scala orignal JSON object,
+      * JSON object deprecated in Scala 2.12 but still using in 2.10
+      * @return
+      */
     def toGeoJSON: JSONObject
 
     def toGeoJSONString: String = toGeoJSON.toString()
 
+
 }
 
+/**
+  * Common utils of generating GeoJSON object
+  */
 object GeoJSONable {
 
     private def JSONSeq[T](elems: T*): JSONArray = JSONArray(List(elems: _*))
@@ -20,6 +33,13 @@ object GeoJSONable {
 
     private def JSONMap[V](elems: (String, V)*): JSONObject = JSONObject(elems.toMap)
 
+    /**
+      * Create Point GeoJSON object
+      * <a href="https://tools.ietf.org/html/rfc7946#section-3.1.2">Point</a>
+      *
+      * @param point which can get longitude and latitude
+      * @return
+      */
     def createPoint(point: IGeoPoint): JSONObject = {
         JSONMap(
             "type" -> "Point",
@@ -27,13 +47,27 @@ object GeoJSONable {
         )
     }
 
-    def createMultiPoints(points: TraversableOnce[IGeoPoint]): JSONObject = {
+    /**
+      * Create MultiPoint GeoJSON object
+      * <a href="https://tools.ietf.org/html/rfc7946#section-3.1.3">MultiPoint</a>
+      *
+      * @param points points
+      * @return
+      */
+    def createMultiPoint(points: TraversableOnce[IGeoPoint]): JSONObject = {
         JSONMap(
             "type" -> "MultiPoint",
             "coordinates" -> JSONList(points.map(point => JSONSeq(point.getLongitude, point.getLatitude)))
         )
     }
 
+    /**
+      * Create LineString GeoJSON object
+      * <a href="https://tools.ietf.org/html/rfc7946#section-3.1.4">LineString</a>
+      *
+      * @param points
+      * @return
+      */
     def createLineString(points: TraversableOnce[IGeoPoint]): JSONObject = {
         JSONMap(
             "type" -> "LineString",
@@ -41,6 +75,12 @@ object GeoJSONable {
         )
     }
 
+    /**
+      * MultiLineString
+      * <a href="https://tools.ietf.org/html/rfc7946#section-3.1.5">MultiLineString</a>
+      * @param pointsList
+      * @return
+      */
     def createMultiLineString(pointsList: TraversableOnce[TraversableOnce[IGeoPoint]]): JSONObject = {
         JSONMap(
             "type" -> "MultiLineString",
@@ -48,6 +88,14 @@ object GeoJSONable {
         )
     }
 
+    /**
+      * Standard support of polygon GeoJSON
+      * <a href="https://tools.ietf.org/html/rfc7946#section-3.1.6">Polygon</a>
+      *
+      * @param pointsList ring and hole
+      * @param autoClose is auto close the polygon
+      * @return
+      */
     def createPolygon(pointsList: TraversableOnce[Traversable[IGeoPoint]], autoClose: Boolean = true): JSONObject = {
         JSONMap(
             "type" -> "Polygon",
@@ -67,8 +115,23 @@ object GeoJSONable {
         )
     }
 
+    /**
+      * Simple polygon without hole
+      * <a href="https://tools.ietf.org/html/rfc7946#section-3.1.6">Polygon</a>
+      *
+      * @param points ring
+      * @param autoClose is auto close the polygon
+      * @return
+      */
     def createRingPolygon(points: Traversable[IGeoPoint], autoClose: Boolean = true): JSONObject = createPolygon(List(points), autoClose)
 
+    /**
+      * Create GeometryCollection GsonObject
+      * <a href="https://tools.ietf.org/html/rfc7946#section-3.1.8">GeometryCollection</a>
+      *
+      * @param objects
+      * @return
+      */
     def createGeometryCollection(objects: TraversableOnce[JSONObject]): JSONObject = {
         JSONMap(
             "type" -> "GeometryCollection",

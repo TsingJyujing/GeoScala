@@ -3,12 +3,15 @@ package com.github.tsingjyujing.geo.basic
 import com.github.tsingjyujing.geo.basic.operations._
 import com.github.tsingjyujing.geo.element.immutable.Vector3
 
+/**
+  * vector in 2d Euclid space
+  */
 trait IVector3
     extends IVector
         with InnerProductable[IVector3]
         with Angleable[IVector3]
         with DistanceMeasurable[IVector3]
-        with OutProductable[IVector3, IVector3]
+        with OuterProductable[IVector3, IVector3]
         with Addable[IVector3] {
 
     def getX: Double
@@ -31,10 +34,25 @@ trait IVector3
       */
     override def to(point: IVector3): Double = math.sqrt(IVector3.getPow2Sum(getX - point.getX, getY - point.getY, getZ - point.getZ))
 
+    /**
+      * Get inner product of two vectors
+      * @param point
+      * @return
+      */
     override def innerProduct(point: IVector3): Double = IVector3.innerProduct3(this, point)
 
+    /**
+      * Get cosed value of two points
+      * @param x compare unit
+      * @return
+      */
     override def conAngle(x: IVector3): Double = IVector3.cosAngle(this, x)
 
+    /**
+      * Get array format value
+      * very useful in Matlab
+      * @return
+      */
     def getVector: Array[Double] = Array(getX, getY, getZ)
 
     override def iterator: Iterator[Double] = getVector.iterator
