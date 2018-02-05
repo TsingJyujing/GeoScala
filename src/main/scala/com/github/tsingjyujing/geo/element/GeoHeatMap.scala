@@ -6,7 +6,6 @@ import com.github.tsingjyujing.geo.basic.operations.{Addable, _}
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IHashableGeoBlock}
 import com.github.tsingjyujing.geo.element.immutable.GeoPointValued
 import com.github.tsingjyujing.geo.util.convertor.ConvertorFactory
-
 import scala.collection.JavaConverters._
 
 

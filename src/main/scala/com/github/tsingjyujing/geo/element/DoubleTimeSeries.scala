@@ -32,7 +32,7 @@ class DoubleTimeSeries extends ITimeIndexSeq[TimeElement[Double]] {
 object DoubleTimeSeries {
     def apply(data: TraversableOnce[TimeElement[Double]]): DoubleTimeSeries = {
         val result = new DoubleTimeSeries()
-        result.append(data)
+        result.appendAll(data)
         result
     }
 }

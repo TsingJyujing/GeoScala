@@ -21,16 +21,10 @@ final case class GeoPoint(private var longitude: Double, private var latitude: D
         this.latitude = value
     }
 
-    def +(x: IVector2): GeoPoint = GeoPoint(getLongitude + x.getX, getLatitude + x.getY)
-
     def +=(x: IVector2): Unit = {
         setLongitude(getLongitude + x.getX)
         setLatitude(getLatitude + x.getY)
     }
-
-    def -(x: IVector2): GeoPoint = GeoPoint(getLongitude - x.getX, getLatitude - x.getY)
-
-    def -(x: GeoPoint): Vector2 = Vector2(getLongitude - x.getLongitude, getLatitude - x.getLatitude)
 
     def -=(x: IVector2): Unit = {
         setLongitude(getLongitude - x.getX)

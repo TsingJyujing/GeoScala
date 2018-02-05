@@ -1,8 +1,8 @@
 package com.github.tsingjyujing.geo.element
 
+import com.github.tsingjyujing.geo.basic.IGeoPoint
 import com.github.tsingjyujing.geo.basic.timeseries.ITimeIndexSeq
-import com.github.tsingjyujing.geo.element.immutable.{GeoLine, TimeElement}
-import com.github.tsingjyujing.geo.element.mutable.GeoPoint
+import com.github.tsingjyujing.geo.element.immutable.{GeoLine, TimeElement, GeoPoint}
 import com.github.tsingjyujing.geo.util.mathematical.SeqUtil
 
 import scala.util.control.Breaks
@@ -10,9 +10,9 @@ import scala.util.control.Breaks
 /**
   * A TimeSeries with GeoPoint as value
   */
-class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[GeoPoint]] {
+class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
 
-    override def getValue(time: Double): TimeElement[GeoPoint] = {
+    override def getValue(time: Double): TimeElement[IGeoPoint] = {
         val indexInfo = query(time)
         if (indexInfo._1 == (-1) && indexInfo._2 == (-1)) {
             throw new RuntimeException("Error while querying value")
@@ -23,7 +23,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[GeoPoint]] {
         } else {
             val dv = apply(indexInfo._2).getValue - apply(indexInfo._1).getValue
             val dt = apply(indexInfo._2).getTick - apply(indexInfo._1).getTick
-            new TimeElement[GeoPoint](
+            new TimeElement[IGeoPoint](
                 time,
                 apply(indexInfo._1).getValue + dv * (time - apply(indexInfo._1).getTick) / dt
             )
@@ -40,7 +40,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[GeoPoint]] {
         new TimeElement[Double]((p2.head.getTick + p2.last.getTick) / 2.0, ds * ratio / dt)
     }))
 
-    private def cleanSliding(cleanFunc: (TimeElement[GeoPoint], TimeElement[GeoPoint]) => Boolean): GeoPointTimeSeries = GeoPointTimeSeries(sliding(2).filter(p2 => cleanFunc(p2.head, p2.last)).map(_.head))
+    private def cleanSliding(cleanFunc: (TimeElement[IGeoPoint], TimeElement[IGeoPoint]) => Boolean): GeoPointTimeSeries = GeoPointTimeSeries(sliding(2).filter(p2 => cleanFunc(p2.head, p2.last)).map(_.head))
 
     def cleanOverSpeed(speedLimit: Double): GeoPointTimeSeries = this.cleanSliding(
         (p1, p2) => {
@@ -73,9 +73,9 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[GeoPoint]] {
 
 object GeoPointTimeSeries {
 
-    def apply(data: TraversableOnce[TimeElement[GeoPoint]]): GeoPointTimeSeries = {
+    def apply(data: TraversableOnce[TimeElement[IGeoPoint]]): GeoPointTimeSeries = {
         val result = new GeoPointTimeSeries()
-        result.append(data)
+        result.appendAll(data)
         result
     }
 

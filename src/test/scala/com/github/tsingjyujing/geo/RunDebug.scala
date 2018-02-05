@@ -2,14 +2,15 @@ package com.github.tsingjyujing.geo
 
 import com.github.tsingjyujing.geo.algorithm.cluster.DBScan
 import com.github.tsingjyujing.geo.algorithm.containers.LabeledPoint
-import com.github.tsingjyujing.geo.element.{GeoPointTree, GeoPolygon}
-import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, Vector2}
+import com.github.tsingjyujing.geo.basic.IGeoPoint
+import com.github.tsingjyujing.geo.element.{GeoPointTimeSeries, GeoPointTree, GeoPolygon}
+import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, TimeElement, Vector2}
 import com.github.tsingjyujing.geo.util.FileIO
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
 
 object RunDebug {
 
-    def main(args: Array[String]): Unit = createPolygonSamples()
+    def main(args: Array[String]): Unit = visualizeFrechetResult()
 
     def GeoPointTreeDebug(): Unit = {
         val points = new GeoPointTree[GeoPoint]()
@@ -87,10 +88,34 @@ object RunDebug {
         val polygonInfo = new GeoPolygon(offsets.map(pointO + _))
         val randomPoins = (1 to 3000).map(_ => {
             val point = pointO + Vector2(rand(1.5, 5), rand(1.5, 5))
-            val isInPolygon = if(polygonInfo.contains(point)){1}else{0}
+            val isInPolygon = if (polygonInfo.contains(point)) {
+                1
+            } else {
+                0
+            }
             LabeledPoint(isInPolygon, point)
         })
-        FileIO.writePoints("polygon.csv",polygonInfo)
-        FileIO.writeLabeledPoints("test_polygon.csv",randomPoins)
+        FileIO.writePoints("polygon.csv", polygonInfo)
+        FileIO.writeLabeledPoints("test_polygon.csv", randomPoins)
+    }
+
+    def visualizeFrechetResult(): Unit = {
+        val route = (-math.Pi).to(math.Pi, 0.01).map(t => {
+            TimeElement(t + math.Pi, GeoPoint(108, 20) + Vector2(0.3 * math.sin(0.2 * t), 0.3 * math.cos(0.3 * t)))
+        })
+
+        val fetchRoute = GeoPointTimeSeries(route)
+        val pointTree = new GeoPointTree[GeoPoint]()
+        pointTree.appendPoints(route.map(
+            p => {
+                GeoPoint(p.value.getLongitude + 0.002, p.value.getLatitude + 0.003)
+            }
+        ))
+        val fetchValue = pointTree.geoFrechet(fetchRoute.map(_.getValue))
+        val result = fetchValue.toIterable.zip(fetchRoute).map(vs => {
+            LabeledPoint(vs._1, vs._2.value)
+        })
+        FileIO.writeLabeledPoints("fetch_result.csv", result)
+        FileIO.writePoints("fetch_set.csv", pointTree)
     }
 }

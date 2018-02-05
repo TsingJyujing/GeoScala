@@ -147,4 +147,5 @@ class GeoPointTree[T <: IGeoPoint](
         }
         nextLayer(currentPointHash).appendPoint(point)
     }
+
 }

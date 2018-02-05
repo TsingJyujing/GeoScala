@@ -2,6 +2,7 @@ package com.github.tsingjyujing.geo.basic
 
 
 import com.github.tsingjyujing.geo.basic.operations._
+import com.github.tsingjyujing.geo.element.immutable.Vector2
 
 /**
   * vector in 2d Euclid space
@@ -12,6 +13,22 @@ trait IVector2
         with Angleable[IVector2]
         with DistanceMeasurable[IVector2]
         with Addable[IVector2] {
+
+    def -(v: IVector2) = Vector2(getX - v.getX, getY - v.getY)
+
+    def *(v: IVector2) = Vector2(getX * v.getX, getY * v.getY)
+
+    def /(v: IVector2) = Vector2(getX / v.getX, getY / v.getY)
+
+    def +(v: Double) = Vector2(getX + v, getY + v)
+
+    def -(v: Double) = Vector2(getX - v, getY - v)
+
+    def *(v: Double) = Vector2(getX * v, getY * v)
+
+    def /(v: Double) = Vector2(getX / v, getY / v)
+
+    override def +(v: IVector2): IVector2 = Vector2(getX + v.getX, getY + v.getY)
 
     def getX: Double
 

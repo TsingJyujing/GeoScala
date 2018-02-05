@@ -57,8 +57,8 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
       *
       * @param timeUnit
       */
-    def append(timeUnit: T*): Unit = {
-        data append (timeUnit: _*)
+    def append(timeUnit: T): Unit = {
+        data append timeUnit
         sortByTick()
     }
 
@@ -67,7 +67,7 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
       *
       * @param timeSeries
       */
-    def append(timeSeries: TraversableOnce[T]): Unit = {
+    def appendAll(timeSeries: TraversableOnce[T]): Unit = {
         data appendAll timeSeries
         sortByTick()
     }

@@ -20,6 +20,8 @@ trait IGeoPointSet[T <: IGeoPoint] extends Iterable[T] with GeoJSONable {
       */
     def appendPoint(point: T): Unit
 
+    def appendPoints(points: TraversableOnce[T]): Unit = points.foreach(appendPoint)
+
     /**
       * Query all points in set
       *
@@ -50,9 +52,40 @@ trait IGeoPointSet[T <: IGeoPoint] extends Iterable[T] with GeoJSONable {
 
     /**
       * Search all points in radius of maxDistance
-      * @param point center point
+      *
+      * @param point       center point
       * @param maxDistance max radius
       * @return
       */
     def geoWithin(point: IGeoPoint, maxDistance: Double = 1.0): Iterable[T] = geoWithinRing(point, -1, maxDistance)
+
+    /**
+      * Get geo distance of nearest point in set
+      *
+      * @param points
+      * @param searchRadius
+      * @return
+      */
+    def geoFrechet(points: TraversableOnce[IGeoPoint], searchRadius: Double = 0.5): TraversableOnce[Double] = {
+        points.map(p => {
+            val searchResult = geoNear(p, searchRadius)
+            if (searchResult.isDefined) {
+                searchResult.get.geoTo(p)
+            } else {
+                IGeoPoint.EARTH_RADIUS * math.Pi
+            }
+        })
+    }
+
+    /**
+      * Get similarity of the route and set
+      *
+      * @param points
+      * @param searchRadius
+      * @return
+      */
+    def geoFrechetSimilarity(points: TraversableOnce[IGeoPoint], searchRadius: Double = 0.5): Double = {
+        val frechetResult = geoFrechet(points, searchRadius)
+        frechetResult.count(_ <= searchRadius) / frechetResult.size
+    }
 }
