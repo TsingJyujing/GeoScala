@@ -52,10 +52,16 @@ fabric.properties
 ### Scala template
 *.class
 *.log
-*.json
-*.csv
+/*.json
+/*.csv
+visualize/*.json
+
 .ipynb_checkpoints
 .idea/
 target/
 experimental/
 .iml
+
+doc/amWiki
+doc/github-wiki
+doc/index.html
