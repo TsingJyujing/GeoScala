@@ -14,4 +14,6 @@ It support:
 - (DOING) Machine learning algorithms such as DBScan (To be develop)
 - (TODO) Clean and filter route with noises
 - (TODO) Add road-network processing support
-It's a useful tool to process GPS data,
+
+
+**It's tool to process GPS data usefully and quiet easily**
