@@ -8,6 +8,8 @@ import com.github.tsingjyujing.geo.util.mathematical.SeqUtil
 import scala.util.control.Breaks
 
 /**
+  * TODO Extract this into a trait
+  *
   * A TimeSeries with GeoPoint as value
   */
 class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {

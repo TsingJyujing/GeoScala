@@ -1,7 +1,7 @@
 package com.github.tsingjyujing.geo.util
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint
-import com.github.tsingjyujing.geo.element.immutable.Vector2
+import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, Vector2}
 
 object GeoUtil {
 
@@ -10,7 +10,6 @@ object GeoUtil {
                                  p2: IGeoPoint,
                                  p3: IGeoPoint
                              ): Double = {
-
         val v1 = p1.toIVector3
         val v2 = p2.toIVector3
         val v3 = p3.toIVector3
@@ -34,4 +33,11 @@ object GeoUtil {
         )
     }
 
+    def mean(points: TraversableOnce[IGeoPoint]): IGeoPoint = {
+        val sumVector3 = points.reduce(_.toIVector3 + _.toIVector3)
+        val meanVector3 = sumVector3 / sumVector3.norm2
+        val latitude = math.asin(meanVector3.getZ).toDegrees
+        val longitude = math.asin(meanVector3.getY / math.cos(latitude))
+        GeoPoint(longitude, latitude)
+    }
 }

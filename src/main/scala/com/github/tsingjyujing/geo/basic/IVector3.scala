@@ -36,6 +36,7 @@ trait IVector3
 
     /**
       * Get inner product of two vectors
+      *
       * @param point
       * @return
       */
@@ -43,6 +44,7 @@ trait IVector3
 
     /**
       * Get cosed value of two points
+      *
       * @param x compare unit
       * @return
       */
@@ -51,6 +53,7 @@ trait IVector3
     /**
       * Get array format value
       * very useful in Matlab
+      *
       * @return
       */
     def getVector: Array[Double] = Array(getX, getY, getZ)
@@ -62,6 +65,14 @@ trait IVector3
         0.0D - this.getX * x.getZ + this.getZ * x.getX,
         0.0D + this.getX * x.getY - this.getY * x.getX
     )
+
+    override def +(v: IVector3): IVector3 = Vector3(v.getX + getX, v.getY + getY, v.getZ + getZ)
+
+    def -(v: IVector3): IVector3 = Vector3(-v.getX + getX, -v.getY + getY, -v.getZ + getZ)
+
+    def /(v: Double): IVector3 = Vector3(getX / v, getY / v, getZ / v)
+
+    def *(v: Double): IVector3 = Vector3(getX * v, getY * v, getZ * v)
 }
 
 object IVector3 {
