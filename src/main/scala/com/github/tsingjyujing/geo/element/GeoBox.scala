@@ -19,8 +19,8 @@ case class GeoBox(
                      maxLatitude: Double
                  ) extends IContains[IGeoPoint] {
 
-    assert(maxLongitude > minLongitude, "max longitude is less than min longitude")
-    assert(maxLatitude > minLatitude, "max latitude is less than min latitude")
+    assert(maxLongitude > minLongitude, "max longitude is less than min longitude: " + toString)
+    assert(maxLatitude > minLatitude, "max latitude is less than min latitude: " + toString)
 
     override def contains(x: IGeoPoint): Boolean = (x.getLongitude > minLongitude && x.getLongitude < maxLongitude) && (x.getLatitude > minLatitude && x.getLatitude < maxLatitude)
 
@@ -39,6 +39,7 @@ case class GeoBox(
 
     /**
       * Get intersect zone of GeoBlock
+      *
       * @param b geo-block
       * @return
       */
@@ -77,7 +78,7 @@ object GeoBox {
 
     def apply(
                  longitudeRange: DoubleRange,
-                 latitudeRange: DoubleRange,
+                 latitudeRange: DoubleRange
              ): GeoBox = GeoBox(
         longitudeRange.min,
         longitudeRange.max,

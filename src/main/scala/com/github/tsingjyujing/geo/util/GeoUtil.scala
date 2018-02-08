@@ -2,9 +2,20 @@ package com.github.tsingjyujing.geo.util
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, Vector2}
+import scala.collection.parallel.ParIterable
 
+/**
+  * Some geographical utility methods
+  */
 object GeoUtil {
 
+    /**
+      * Get steering angle by GPS info
+      * @param p1 point1
+      * @param p2 point2
+      * @param p3 point3
+      * @return
+      */
     def steeringAngleGeodesic(
                                  p1: IGeoPoint,
                                  p2: IGeoPoint,
@@ -33,8 +44,26 @@ object GeoUtil {
         )
     }
 
+    /**
+      * Get center point of points
+      * @param points points
+      * @return
+      */
     def mean(points: TraversableOnce[IGeoPoint]): IGeoPoint = {
-        val sumVector3 = points.reduce(_.toIVector3 + _.toIVector3)
+        val sumVector3 = points.map(_.toIVector3).reduce(_ + _)
+        val meanVector3 = sumVector3 / sumVector3.norm2
+        val latitude = math.asin(meanVector3.getZ).toDegrees
+        val longitude = math.asin(meanVector3.getY / math.cos(latitude))
+        GeoPoint(longitude, latitude)
+    }
+
+    /**
+      * Get center point of points in parallel
+      * @param points points
+      * @return
+      */
+    def mean(points:ParIterable[IGeoPoint]):IGeoPoint = {
+        val sumVector3 = points.map(_.toIVector3).reduce(_ + _)
         val meanVector3 = sumVector3 / sumVector3.norm2
         val latitude = math.asin(meanVector3.getZ).toDegrees
         val longitude = math.asin(meanVector3.getY / math.cos(latitude))

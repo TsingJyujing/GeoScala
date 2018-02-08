@@ -5,6 +5,7 @@ import com.github.tsingjyujing.geo.element.immutable.HashedGeoBlock
 
 /**
   * Layered Geo points index as an TreeSet
+  *
   * @param currentDepth
   * @param currentCode
   * @param maxDepth
@@ -19,6 +20,8 @@ class GeoPointTree[T <: IGeoPoint](
                                   ) extends IGeoPointSet[T] with IHashableGeoBlock {
 
     private val isLastLevel = currentDepth >= maxDepth
+
+    override def getGeoHashAccuracy: Long = 2L << currentDepth
 
     val nextLayer: scala.collection.mutable.Map[IHashableGeoBlock, GeoPointTree[T]] = if (!isLastLevel) {
         new scala.collection.mutable.HashMap[IHashableGeoBlock, GeoPointTree[T]]()
@@ -37,9 +40,6 @@ class GeoPointTree[T <: IGeoPoint](
         nextLayer.flatMap(_._2.getPoints)
     }
 
-    private val currentAccuracy: Long = math.pow(2, currentDepth).toLong
-
-    override def getGeoHashAccuracy: Long = currentAccuracy
 
     /**
       * center point of the block for immutable index code and faster performance
@@ -137,6 +137,7 @@ class GeoPointTree[T <: IGeoPoint](
         dataList.append(point)
     } else {
         val currentPointHash = HashedGeoBlock(point, getGeoHashAccuracy)
+
         if (!(nextLayer contains currentPointHash)) {
             nextLayer(currentPointHash) = new GeoPointTree[T](
                 currentDepth = currentDepth + depthStep,

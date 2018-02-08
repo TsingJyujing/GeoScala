@@ -15,5 +15,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.scalatest:scalatest_2.10:3.0.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.scalactic:scalactic_2.10:3.0.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.scala-lang:scala-reflect:2.10.6" level="project" />
+    <orderEntry type="library" name="scala-sdk-2.10.6" level="application" />
   </component>
 </module>
