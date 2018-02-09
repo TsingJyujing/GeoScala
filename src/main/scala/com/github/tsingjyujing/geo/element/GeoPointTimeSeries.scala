@@ -2,7 +2,8 @@ package com.github.tsingjyujing.geo.element
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint
 import com.github.tsingjyujing.geo.basic.timeseries.ITimeIndexSeq
-import com.github.tsingjyujing.geo.element.immutable.{GeoLine, TimeElement, GeoPoint}
+import com.github.tsingjyujing.geo.element.immutable.{GeoLine, GeoPoint, TimeElement}
+import com.github.tsingjyujing.geo.util.GeoUtil
 import com.github.tsingjyujing.geo.util.mathematical.SeqUtil
 
 import scala.util.control.Breaks
@@ -23,14 +24,18 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
         } else if (indexInfo._2 == (-1)) {
             apply(indexInfo._1)
         } else {
-            val dv = apply(indexInfo._2).getValue - apply(indexInfo._1).getValue
             val dt = apply(indexInfo._2).getTick - apply(indexInfo._1).getTick
-            new TimeElement[IGeoPoint](
+            val tickRatio = (time - apply(indexInfo._1).getTick) / dt
+            TimeElement[IGeoPoint](
                 time,
-                apply(indexInfo._1).getValue + dv * (time - apply(indexInfo._1).getTick) / dt
+                GeoUtil.interp(apply(indexInfo._1).getValue, apply(indexInfo._2).getValue, tickRatio)
             )
         }
     }
+
+    def sliceByTime(startTime: Double, endTime: Double): GeoPointTimeSeries = GeoPointTimeSeries(
+        slice(query(startTime)._1, query(endTime)._2)
+    )
 
     def indices: Range = data.indices
 
@@ -52,17 +57,37 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
         }
     )
 
+    /**
+      * ResultType: Iterable[TimeElement[IGeoPoint]]
+      * StatusType: (lastValidPoint:TimeElement[IGeoPoint])
+      *
+      * @param marginDistance
+      * @param maxTolerance
+      * @return
+      */
+    def isometricallyResample(marginDistance: Double, maxTolerance: Double = 3.0): GeoPointTimeSeries = GeoPointTimeSeries(statusMachine[TimeElement[IGeoPoint], Iterable[TimeElement[IGeoPoint]]](
+        (currentPoint, status) => {
+            val d = currentPoint.value geoTo status.value
+            if (d < marginDistance) {
+                (Array.empty[TimeElement[IGeoPoint]], status)
+            } else if (d <= marginDistance * maxTolerance) {
+                (Array(currentPoint), currentPoint)
+            } else {
+                (GeoUtil.interp(status, currentPoint, math.ceil(d / marginDistance).toInt), currentPoint)
+            }
+        }, apply(0)
+    ).flatten)
+
 
     def toSparse(
                     sparsityParam: Double,
                     sparsitySearchParam: Int
-                ): GeoPointTimeSeries = GeoPointTimeSeries(
+                ): GeoPointTimeSeries
+    = GeoPointTimeSeries(
         toSparseIndex(
             sparsityParam,
             sparsitySearchParam
-        ).map(
-            i => this (i)
-        )
+        ).map(apply)
     )
 
     def toSparseIndex(

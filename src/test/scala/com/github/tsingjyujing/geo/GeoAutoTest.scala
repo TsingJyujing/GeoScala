@@ -1,10 +1,12 @@
 package com.github.tsingjyujing.geo
 
 import java.io.{File, PrintWriter}
+
 import com.github.tsingjyujing.geo.basic.IHashableGeoBlock.{createCodeFromGps, revertFromCode}
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, HashedGeoBlock, Vector2}
 import com.github.tsingjyujing.geo.element.{GeoHeatMap, GeoPointTree}
+import com.github.tsingjyujing.geo.util.GeoUtil
 import com.github.tsingjyujing.geo.util.convertor.{BD09, GCJ02}
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
 import org.scalatest._
@@ -111,6 +113,16 @@ class GeoAutoTest extends FlatSpec with Matchers {
             val count1 = points.geoNear(center, radius * 2).get.geoTo(center)
             val count2 = points.map(_.geoTo(center)).min
             assert(count1 == count2, "Assert failed while test geo within")
+        })
+    }
+
+    it should "Convert position between vector and GeoPoint" in {
+        (-180).to(180, 20).foreach(lng => {
+            (-90).to(90, 10).foreach(lat => {
+                val point = GeoPoint(lng, lat)
+                val ipoint = GeoUtil.vector3ToGeoPoint(point.toIVector3)
+                assert(point.geoTo(ipoint) <= 0.1, "Convert failed.")
+            })
         })
     }
 

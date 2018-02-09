@@ -60,7 +60,7 @@ trait IVector3
 
     override def iterator: Iterator[Double] = getVector.iterator
 
-    override def outProduct(x: IVector3): IVector3 = new Vector3(
+    override def outProduct(x: IVector3): IVector3 = Vector3(
         0.0D + this.getY * x.getZ - this.getZ * x.getY,
         0.0D - this.getX * x.getZ + this.getZ * x.getX,
         0.0D + this.getX * x.getY - this.getY * x.getX

@@ -5,7 +5,9 @@ import java.util
 import com.github.tsingjyujing.geo.basic.operations.{Addable, _}
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IHashableGeoBlock}
 import com.github.tsingjyujing.geo.element.immutable.GeoPointValued
+import com.github.tsingjyujing.geo.util.BeCarefulWhileUsing
 import com.github.tsingjyujing.geo.util.convertor.ConvertorFactory
+
 import scala.collection.JavaConverters._
 
 
@@ -38,7 +40,7 @@ class GeoHeatMap[T <: Addable[T]](
       * @param k
       * @param v
       */
-    @deprecated(message = "careful while using this function and ensure the accuracy is same")
+    @BeCarefulWhileUsing(message = "careful while using this function and ensure the accuracy is same")
     def append(k: Long, v: T): Unit = appendByCode(k, v)
 
     protected def appendByCode(k: Long, v: T): Unit = {
@@ -65,12 +67,12 @@ class GeoHeatMap[T <: Addable[T]](
       * @param key
       * @return
       */
-    @deprecated(message = "careful while using this function and ensure the accuracy is same")
+    @BeCarefulWhileUsing(message = "careful while using this function and ensure the accuracy is same")
     def remove(key: Long): Option[T] = removeByCode(key)
 
     protected def removeByCode(key: Long): Option[T] = data remove key
 
-    @deprecated(message = "careful while using this function and ensure the accuracy is same")
+    @BeCarefulWhileUsing(message = "careful while using this function and ensure the accuracy is same")
     def apply(key: Long): T = applyByCode(key)
 
     protected def applyByCode(key: Long): T = if (data contains key) {
@@ -165,7 +167,7 @@ object GeoHeatMap {
         newMap
     }
 
-    @deprecated(message = "Be careful while using this API and ensure your accuracy is right")
+    @BeCarefulWhileUsing(message = "Be careful while using this API and ensure your accuracy is right")
     def buildFromCodes[T <: Addable[T]](values: Traversable[(Long, T)], baseValue: T, accuracy: Long): GeoHeatMap[T] = {
         val newMap = new GeoHeatMap[T](baseValue, accuracy)
         values.groupBy(

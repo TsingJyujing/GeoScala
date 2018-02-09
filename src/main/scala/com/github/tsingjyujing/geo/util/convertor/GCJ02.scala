@@ -5,7 +5,13 @@ import com.github.tsingjyujing.geo.basic.operations.GeoTransformable
 import com.github.tsingjyujing.geo.element.immutable.GeoPoint
 
 /**
-  * WGS84坐标系和GCJ02加密坐标系的互相转换
+  * GCJ02是中国国家测绘局提出的坐标加密系统
+  * 其复杂的函数表达式为政府瞎JB收费提供了便利
+  * 其良好的局部线性和全局近似线性为我等屁民破解提供了便利
+  *
+  * 经过测试，所有的坐标点都可以完美的和WGS84相互转换
+  *
+  * 本类适用于WGS84坐标系和GCJ02加密坐标系的互相转换
   * GSJ02坐标系适用于大部分的地图，例如高德地图
   */
 object GCJ02 extends GeoTransformable {

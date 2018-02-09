@@ -1,7 +1,9 @@
 package com.github.tsingjyujing.geo.util
 
-import com.github.tsingjyujing.geo.basic.IGeoPoint
-import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, Vector2}
+import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector3}
+import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, TimeElement, Vector2, Vector3}
+import com.github.tsingjyujing.geo.util.mathematical.VectorUtil
+
 import scala.collection.parallel.ParIterable
 
 /**
@@ -11,6 +13,7 @@ object GeoUtil {
 
     /**
       * Get steering angle by GPS info
+      *
       * @param p1 point1
       * @param p2 point2
       * @param p3 point3
@@ -44,12 +47,37 @@ object GeoUtil {
         )
     }
 
+    def vector3ToGeoPoint(v: IVector3): IGeoPoint = {
+        val meanVector = v / v.norm2
+        val latitude = math.asin(meanVector.getZ)
+        val rawAngle = math.asin(meanVector.getY / math.cos(latitude))
+        val longitude = if (v.getX > 0) {
+            rawAngle
+        } else {
+            if (rawAngle > 0) {
+                math.Pi - rawAngle
+            } else {
+                -(math.Pi + rawAngle)
+            }
+        }
+        GeoPoint(longitude.toDegrees, latitude.toDegrees)
+    }
+
     /**
       * Get center point of points
+      *
       * @param points points
       * @return
       */
-    def mean(points: TraversableOnce[IGeoPoint]): IGeoPoint = {
+    def mean(points: TraversableOnce[IGeoPoint]): IGeoPoint = vector3ToGeoPoint(points.map(_.toIVector3).reduce(_ + _))
+
+    /**
+      * Get center point of points in parallel
+      *
+      * @param points points
+      * @return
+      */
+    def mean(points: ParIterable[IGeoPoint]): IGeoPoint = {
         val sumVector3 = points.map(_.toIVector3).reduce(_ + _)
         val meanVector3 = sumVector3 / sumVector3.norm2
         val latitude = math.asin(meanVector3.getZ).toDegrees
@@ -57,16 +85,31 @@ object GeoUtil {
         GeoPoint(longitude, latitude)
     }
 
-    /**
-      * Get center point of points in parallel
-      * @param points points
-      * @return
-      */
-    def mean(points:ParIterable[IGeoPoint]):IGeoPoint = {
-        val sumVector3 = points.map(_.toIVector3).reduce(_ + _)
-        val meanVector3 = sumVector3 / sumVector3.norm2
-        val latitude = math.asin(meanVector3.getZ).toDegrees
-        val longitude = math.asin(meanVector3.getY / math.cos(latitude))
-        GeoPoint(longitude, latitude)
+    def interp[T <: IGeoPoint](fromPoint: T, toPoint: T, insertPointCount: Int): TraversableOnce[IGeoPoint] = {
+        assert(insertPointCount >= 1, "Parameter insertPointCount invalid.")
+        val angleMax = math.acos(fromPoint.toIVector3.innerProduct(toPoint.toIVector3))
+        val dAngle = angleMax / (1 + insertPointCount)
+        VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, (0 to (insertPointCount + 1)).map(_ * dAngle)).map(vector3ToGeoPoint)
+    }
+
+    def interp[T <: IGeoPoint](fromPoint: T, toPoint: T, ratio: Double): IGeoPoint = {
+        assert(ratio <= 1 && ratio >= 0, "Parameter ratio invalid.")
+        vector3ToGeoPoint(VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, ratio * math.acos(fromPoint.toIVector3.innerProduct(toPoint.toIVector3))))
+    }
+
+    def interp[T <: IGeoPoint](fromPoint: T, toPoint: T, ratios: TraversableOnce[Double]): TraversableOnce[IGeoPoint] = {
+        assert(ratios.forall(ratio => ratio <= 1 && ratio >= 0), "Parameter ratios invalid.")
+        val maxAngle = math.acos(fromPoint.toIVector3.innerProduct(toPoint.toIVector3))
+        VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, ratios.map(_ * maxAngle)).map(vector3ToGeoPoint)
+    }
+
+    def interp[T <: IGeoPoint](fromPoint: TimeElement[T], toPoint: TimeElement[T], insertPointCount: Int): Iterable[TimeElement[IGeoPoint]] = {
+        assert(insertPointCount >= 1, "Parameter insertPointCount invalid.")
+        val angleMax = math.acos(fromPoint.value.toIVector3.innerProduct(toPoint.value.toIVector3))
+        val dAngle = angleMax / (1 + insertPointCount)
+        val dt = (toPoint.getTick - fromPoint.getTick) / (1 + insertPointCount)
+        VectorUtil.sphereInterpFast(fromPoint.getValue.toIVector3, toPoint.getValue.toIVector3, (0 to (insertPointCount + 1)).map(_ * dAngle)).toIterable.zipWithIndex.map(xi => {
+            TimeElement(fromPoint.getTick + dt * xi._2, vector3ToGeoPoint(xi._1))
+        })
     }
 }

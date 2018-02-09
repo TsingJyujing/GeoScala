@@ -2,15 +2,14 @@ package com.github.tsingjyujing.geo
 
 import com.github.tsingjyujing.geo.algorithm.cluster.DBScan
 import com.github.tsingjyujing.geo.algorithm.containers.LabeledPoint
-import com.github.tsingjyujing.geo.basic.IGeoPoint
 import com.github.tsingjyujing.geo.element.{GeoPointTimeSeries, GeoPointTree, GeoPolygon}
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, TimeElement, Vector2}
-import com.github.tsingjyujing.geo.util.FileIO
+import com.github.tsingjyujing.geo.util.{FileIO, GeoUtil}
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
 
 object RunDebug {
 
-    def main(args: Array[String]): Unit = visualizeFrechetResult()
+    def main(args: Array[String]): Unit = testInterp()
 
     def GeoPointTreeDebug(): Unit = {
         val points = new GeoPointTree[GeoPoint]()
@@ -117,5 +116,17 @@ object RunDebug {
         })
         FileIO.writeLabeledPoints("fetch_result.csv", result)
         FileIO.writePoints("fetch_set.csv", pointTree)
+    }
+
+    def testInterp(): Unit = {
+        FileIO.writeLabeledPoints(
+            "geo_interp_test.csv",
+            GeoUtil.interp(
+                TimeElement(0, GeoPoint(-160, 20)),
+                TimeElement(1000, GeoPoint(160, -20)),
+                30
+            ).map(
+                p => LabeledPoint(p.getTick, p.getValue))
+        )
     }
 }

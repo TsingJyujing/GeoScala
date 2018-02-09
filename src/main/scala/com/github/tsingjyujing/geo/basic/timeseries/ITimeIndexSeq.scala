@@ -9,16 +9,17 @@ import scala.collection.mutable.ArrayBuffer
   */
 trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
 
-    protected val data: ArrayBuffer[T] = mutable.ArrayBuffer[T]()
+    protected var data: ArrayBuffer[T] = mutable.ArrayBuffer[T]()
 
     /**
       * Sort time series by time
       */
     def sortByTick(): Unit = {
-        data.sortBy(_.getTick)
+        data = data.sortBy(_.getTick)
     }
 
     def getValue(time: Double): T
+
 
     /**
       * Search in sorted array
@@ -83,13 +84,13 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
       * @tparam R Type of result
       * @return
       */
-    def statusMachine[S, R](statusFunction: (T, S) => (S, R), initialStatus: S = null): Iterable[R] = {
+    def statusMachine[S, R](statusFunction: (T, S) => (R, S), initialStatus: S = null): Iterable[R] = {
         var status: S = initialStatus
         this.map(
             elem => {
                 val statusAndResult = statusFunction(elem, status)
-                status = statusAndResult._1
-                statusAndResult._2
+                status = statusAndResult._2
+                statusAndResult._1
             }
         )
     }
