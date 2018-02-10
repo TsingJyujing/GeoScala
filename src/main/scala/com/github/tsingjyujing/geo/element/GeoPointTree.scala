@@ -17,7 +17,7 @@ class GeoPointTree[T <: IGeoPoint](
                                       currentCode: Long = 0,
                                       maxDepth: Int = 17,
                                       depthStep: Int = 3
-                                  ) extends IGeoPointSet[T] with IHashableGeoBlock {
+                                  ) extends IGeoPointSet[T] with IHashableGeoBlock with Serializable {
 
     private val isLastLevel = currentDepth >= maxDepth
 

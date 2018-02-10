@@ -6,10 +6,11 @@ import com.github.tsingjyujing.geo.element.{GeoPointTimeSeries, GeoPointTree, Ge
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, TimeElement, Vector2}
 import com.github.tsingjyujing.geo.util.{FileIO, GeoUtil}
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
+import com.google.gson.Gson
 
 object RunDebug {
 
-    def main(args: Array[String]): Unit = testInterp()
+    def main(args: Array[String]): Unit = visualizeFrechetResult()
 
     def GeoPointTreeDebug(): Unit = {
         val points = new GeoPointTree[GeoPoint]()
@@ -116,6 +117,7 @@ object RunDebug {
         })
         FileIO.writeLabeledPoints("fetch_result.csv", result)
         FileIO.writePoints("fetch_set.csv", pointTree)
+        FileIO.writeString("pointTree.json", new Gson().toJson(pointTree, pointTree.getClass))
     }
 
     def testInterp(): Unit = {
@@ -126,7 +128,8 @@ object RunDebug {
                 TimeElement(1000, GeoPoint(160, -20)),
                 30
             ).map(
-                p => LabeledPoint(p.getTick, p.getValue))
+                p => LabeledPoint(p.getTick, p.getValue)
+            )
         )
     }
 }

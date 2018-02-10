@@ -2,7 +2,7 @@ package com.github.tsingjyujing.geo.element
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint
 import com.github.tsingjyujing.geo.basic.timeseries.ITimeIndexSeq
-import com.github.tsingjyujing.geo.element.immutable.{GeoLine, GeoPoint, TimeElement}
+import com.github.tsingjyujing.geo.element.immutable.{GeoLine, TimeElement}
 import com.github.tsingjyujing.geo.util.GeoUtil
 import com.github.tsingjyujing.geo.util.mathematical.SeqUtil
 

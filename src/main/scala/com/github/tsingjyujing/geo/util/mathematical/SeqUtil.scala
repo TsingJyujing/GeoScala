@@ -1,5 +1,7 @@
 package com.github.tsingjyujing.geo.util.mathematical
 
+import com.github.tsingjyujing.geo.element.immutable.Vector2
+
 import scala.collection.mutable
 import scala.util.control.Breaks
 
@@ -63,5 +65,11 @@ object SeqUtil {
         }
         if (lastResult) segmentedValues += mutableBuffer.toList
         segmentedValues.toList
+    }
+
+
+    def getMean(values: TraversableOnce[Double]): Double = {
+        val result = values.map(x => Vector2(x, 1.0)).reduce(_ + _)
+        result.getX / result.getY
     }
 }

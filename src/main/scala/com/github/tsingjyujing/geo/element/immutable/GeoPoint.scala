@@ -4,6 +4,7 @@ import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
 
 /**
   * Get a immutable geo point
+  *
   * @param longitude
   * @param latitude
   */

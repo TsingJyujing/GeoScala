@@ -33,4 +33,13 @@ object FileIO {
         }
     }
 
+    def writeString(filename: String,data: String): Unit = {
+        val writer = new PrintWriter(new File(filename))
+        try {
+            writer.write(data)
+        } finally {
+            writer.close()
+        }
+    }
+
 }

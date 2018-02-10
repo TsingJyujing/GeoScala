@@ -28,7 +28,7 @@ trait IVector2
 
     def /(v: Double) = Vector2(getX / v, getY / v)
 
-    override def +(v: IVector2): IVector2 = Vector2(getX + v.getX, getY + v.getY)
+    override def +(v: IVector2) = Vector2(getX + v.getX, getY + v.getY)
 
     def getX: Double
 
@@ -50,6 +50,7 @@ trait IVector2
 
     /**
       * Get inner product of two vectors
+      *
       * @param point
       * @return
       */
@@ -57,6 +58,7 @@ trait IVector2
 
     /**
       * Get cosed value of two points
+      *
       * @param x compare unit
       * @return
       */
@@ -65,6 +67,7 @@ trait IVector2
     /**
       * Get array format value
       * very useful in Matlab
+      *
       * @return
       */
     def getVector: Array[Double] = Array(getX, getY)

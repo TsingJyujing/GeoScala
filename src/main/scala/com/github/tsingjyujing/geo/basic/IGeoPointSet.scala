@@ -1,6 +1,9 @@
 package com.github.tsingjyujing.geo.basic
 
 import com.github.tsingjyujing.geo.basic.operations.GeoJSONable
+import com.github.tsingjyujing.geo.element.immutable.Vector2
+import com.github.tsingjyujing.geo.util.GeoUtil
+import com.github.tsingjyujing.geo.util.mathematical.SeqUtil
 
 import scala.util.parsing.json.JSONObject
 
@@ -84,8 +87,17 @@ trait IGeoPointSet[T <: IGeoPoint] extends Iterable[T] with GeoJSONable {
       * @param searchRadius
       * @return
       */
-    def geoFrechetSimilarity(points: TraversableOnce[IGeoPoint], searchRadius: Double = 0.5): Double = {
-        val frechetResult = geoFrechet(points, searchRadius)
-        frechetResult.count(_ <= searchRadius) / frechetResult.size
+    def geoFrechetSimilarity(points: Iterable[IGeoPoint], searchRadius: Double = 0.5): Double = {
+        val staticValue = points.map(point => {
+            (point, geoNear(point, searchRadius).isDefined)
+        }).sliding(2).map(pointSlide2 => {
+            val ds = pointSlide2.head._1.geoTo(pointSlide2.last._1)
+            Vector2(if (pointSlide2.forall(_._2)) {
+                ds
+            } else {
+                0.0
+            }, ds)
+        }).reduce(_ + _)
+        staticValue.getX / staticValue.getY
     }
 }

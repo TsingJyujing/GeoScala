@@ -9,7 +9,7 @@ import scala.util.parsing.json.JSONObject
 /**
   * Any type which can get longitude and latitude (on earth)
   */
-trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
+trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with Serializable{
     def -(x: IVector2):IGeoPoint = GeoPoint(getLongitude - x.getX, getLatitude - x.getY)
 
     def -(x: IGeoPoint):IVector2 = Vector2(getLongitude - x.getLongitude, getLatitude - x.getLatitude)

@@ -5,7 +5,7 @@ package com.github.tsingjyujing.geo.basic.operations
   * you can make a collection with type _<:IValue[T] and getValue as T foreach
   * @tparam T value type
   */
-trait IValue[T] {
+trait IValue[+T] {
 
     /**
       * Get value
