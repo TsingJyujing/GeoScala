@@ -4,13 +4,14 @@ import com.github.tsingjyujing.geo.algorithm.cluster.DBScan
 import com.github.tsingjyujing.geo.algorithm.containers.LabeledPoint
 import com.github.tsingjyujing.geo.element.{GeoPointTimeSeries, GeoPointTree, GeoPolygon}
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, TimeElement, Vector2}
+import com.github.tsingjyujing.geo.util.mathematical.ConvexHull2
 import com.github.tsingjyujing.geo.util.{FileIO, GeoUtil}
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
 import com.google.gson.Gson
 
 object RunDebug {
 
-    def main(args: Array[String]): Unit = visualizeFrechetResult()
+    def main(args: Array[String]): Unit = testConvHull()
 
     def GeoPointTreeDebug(): Unit = {
         val points = new GeoPointTree[GeoPoint]()
@@ -132,4 +133,20 @@ object RunDebug {
             )
         )
     }
+
+    def testConvHull(): Unit = {
+        val pointO = GeoPoint(108, 36)
+        val randomPoints = (1 to 3000).map(_ => {
+            pointO + Vector2(rand(1.5, 5), rand(1.5, 5))
+        })
+        val hull = ConvexHull2(randomPoints.map(_.toIVector2))
+        FileIO.writePoints("visualize/random_hull_points.csv", randomPoints)
+        FileIO.writePoints("visualize/calc_hull_points.csv", hull.map(p => {
+            GeoPoint(p.getX, p.getY)
+        }))
+        FileIO.writeString("test_polygon.json", new GeoPolygon(hull.map(p => {
+            GeoPoint(p.getX, p.getY)
+        })).toGeoJSONString)
+    }
+
 }

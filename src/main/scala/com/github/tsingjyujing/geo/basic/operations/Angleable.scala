@@ -4,6 +4,7 @@ package com.github.tsingjyujing.geo.basic.operations
   * Which can get angle between this to T (use rad as unit)
   * Commonly, we use classOf[this] as T for symmetry
   *
+  * @author tsingjyujing@163.com
   * @tparam T Type of the object to compare
   */
 trait Angleable[T] {

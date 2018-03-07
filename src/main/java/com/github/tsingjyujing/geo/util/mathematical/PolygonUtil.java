@@ -1,11 +1,12 @@
 package com.github.tsingjyujing.geo.util.mathematical;
-
-
 import com.github.tsingjyujing.geo.basic.IGeoPoint;
 import scala.collection.IndexedSeq;
 
 /**
  * Polygon common methods
+ * @author tsingjyujing@163.com
+ * @since 2.0
+ * @version 1.0
  */
 public class PolygonUtil {
 

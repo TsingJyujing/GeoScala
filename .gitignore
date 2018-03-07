@@ -53,7 +53,7 @@ fabric.properties
 *.class
 *.log
 /*.json
-/*.csv
+*.csv
 visualize/*.json
 
 .ipynb_checkpoints
@@ -65,3 +65,5 @@ experimental/
 doc/amWiki
 doc/export
 doc/index.html
+
+visualize/*.csv

@@ -1,10 +1,15 @@
 package com.github.tsingjyujing.geo.util.mathematical;
 
 
+import com.github.tsingjyujing.geo.exceptions.ParameterException;
+
 import java.lang.reflect.Array;
 
 /**
  * Matrix and linear algebra utils
+ * @author tsingjyujing@163.com
+ * @since 1.0
+ * @version 2.0
  */
 public class MatrixUtil {
 
@@ -34,8 +39,8 @@ public class MatrixUtil {
     /**
      * Get a column by given matrix and given index
      *
-     * @param matrix  input matrix
-     * @param index which column to get (count start from 0)
+     * @param matrix input matrix
+     * @param index  which column to get (count start from 0)
      * @return column of the vector
      */
     public static double[] columnSlice(double[][] matrix, int index) {
@@ -52,6 +57,7 @@ public class MatrixUtil {
 
     /**
      * Array constructor
+     *
      * @param data array of integers
      * @return int[]
      */
@@ -60,11 +66,11 @@ public class MatrixUtil {
     }
 
     /**
-     * Reshape matrix
-     * @param rawData data input
+     * Reshape T array into matrix
+     * @param rawData   data input
      * @param dimension an array has two value, row size and column size
-     * @param type data type
-     * @param <T> data type
+     * @param type      data type
+     * @param <T>       data type
      * @return matrix reshaped
      * @throws Exception some error
      */
@@ -92,22 +98,22 @@ public class MatrixUtil {
     }
 
     /**
-     * @param rawData data input
-     * @param dimension  an array has two value, row size and column size
+     * Reshape double array into matrix
+     * @param rawData   data input
+     * @param dimension an array has two value, row size and column size
      * @return a double matrix
-     * @throws Exception
      */
-    public static double[][] reshape(double[] rawData, int[] dimension) throws Exception {
+    public static double[][] reshape(double[] rawData, int[] dimension){
         if (dimension.length != 2) {
-            throw new Exception("Error dimension parameters.");
+            throw new ParameterException("Error dimension parameters.");
         }
         for (int d : dimension) {
             if (d <= 0) {
-                throw new ArrayIndexOutOfBoundsException("Dim out of bounds");
+                throw new ArrayIndexOutOfBoundsException("Dimension is out of bounds");
             }
         }
         if (dimension[0] * dimension[1] != rawData.length) {
-            throw new Exception("Error dimension parameters or data length.");
+            throw new ParameterException("Error dimension parameters or data length.");
         }
         double[][] rtn = new double[dimension[0]][dimension[1]];
         for (int i = 0; i < dimension[0]; ++i) {
@@ -119,14 +125,14 @@ public class MatrixUtil {
     }
 
     /**
-     * @param rawData data input
-     * @param dimension  an array has two value, row size and column size
+     * Reshape int array into matrix
+     * @param rawData   data input
+     * @param dimension an array has two value, row size and column size
      * @return an int matrix
-     * @throws Exception
      */
-    public static int[][] reshape(int[] rawData, int[] dimension) throws Exception {
+    public static int[][] reshape(int[] rawData, int[] dimension) {
         if (dimension.length != 2) {
-            throw new Exception("Error dimension parameters.");
+            throw new RuntimeException("Error dimension parameters.");
         }
         for (int d : dimension) {
             if (d < 0) {
@@ -134,7 +140,7 @@ public class MatrixUtil {
             }
         }
         if (dimension[0] * dimension[1] != rawData.length) {
-            throw new Exception("Error dimension parameters or data length.");
+            throw new ParameterException("Error dimension parameters or data length.");
         }
         int[][] rtn = new int[dimension[0]][dimension[1]];
         for (int i = 0; i < dimension[0]; ++i) {
@@ -147,6 +153,7 @@ public class MatrixUtil {
 
 
     /**
+     * inverse a 3×3 matrix
      * @param x 3×3 Matrix
      * @return inv(x)->3×3 Matrix
      */
@@ -186,7 +193,8 @@ public class MatrixUtil {
 
     /**
      * product  matrix and vector
-     * @param M matrix
+     *
+     * @param M      matrix
      * @param vector vector
      * @return vector result
      */

@@ -13,6 +13,7 @@ trait GeoJSONable {
     /**
       * Get scala orignal JSON object,
       * JSON object deprecated in Scala 2.12 but still using in 2.10
+      *
       * @return
       */
     def toGeoJSON: JSONObject
@@ -78,6 +79,7 @@ object GeoJSONable {
     /**
       * MultiLineString
       * <a href="https://tools.ietf.org/html/rfc7946#section-3.1.5">MultiLineString</a>
+      *
       * @param pointsList
       * @return
       */
@@ -93,7 +95,7 @@ object GeoJSONable {
       * <a href="https://tools.ietf.org/html/rfc7946#section-3.1.6">Polygon</a>
       *
       * @param pointsList ring and hole
-      * @param autoClose is auto close the polygon
+      * @param autoClose  is auto close the polygon
       * @return
       */
     def createPolygon(pointsList: TraversableOnce[Traversable[IGeoPoint]], autoClose: Boolean = true): JSONObject = {
@@ -104,10 +106,15 @@ object GeoJSONable {
                     val first = points.head
                     val last = points.last
                     JSONList(
-                        if (autoClose && first.geoTo(last) >= 1e-10) {
-                            List(points.toSeq: _*) ::: List(first)
-                        } else {
-                            points
+                        {
+                            val pointsClosed = if (autoClose && first.geoTo(last) >= 1e-10) {
+                                List(points.toSeq: _*) ::: List(first)
+                            } else {
+                                points
+                            }
+                            pointsClosed.map(p => {
+                                JSONList(Array(p.getLongitude, p.getLatitude))
+                            })
                         }
                     )
                 })
@@ -119,7 +126,7 @@ object GeoJSONable {
       * Simple polygon without hole
       * <a href="https://tools.ietf.org/html/rfc7946#section-3.1.6">Polygon</a>
       *
-      * @param points ring
+      * @param points    ring
       * @param autoClose is auto close the polygon
       * @return
       */

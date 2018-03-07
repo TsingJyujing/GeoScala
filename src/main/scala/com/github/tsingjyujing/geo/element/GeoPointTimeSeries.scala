@@ -60,7 +60,6 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
     /**
       * ResultType: Iterable[TimeElement[IGeoPoint]]
       * StatusType: (lastValidPoint:TimeElement[IGeoPoint])
-      *
       * @param marginDistance
       * @param maxTolerance
       * @return

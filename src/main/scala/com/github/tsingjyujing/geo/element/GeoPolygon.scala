@@ -9,15 +9,17 @@ import scala.util.parsing.json.JSONObject
 
 /**
   * Mutable implementation of polygon
-  * @param x
+  * @author tsingjyujing@163.com
+  * @param polygonPoints polygon points with out first point in the last position
+  *                      For example: p0,p1,p2 represents polygon of p0->p1->p2->p0
   */
-class GeoPolygon(x: Iterable[IGeoPoint]) extends Iterable[IGeoPoint] with IContains[IGeoPoint] with GeoJSONable {
+class GeoPolygon(polygonPoints: Iterable[IGeoPoint]) extends Iterable[IGeoPoint] with IContains[IGeoPoint] with GeoJSONable {
 
     override def iterator: Iterator[IGeoPoint] = polygon.iterator
 
     private val polygon: ArrayBuffer[IGeoPoint] = {
         val dataObject = ArrayBuffer[IGeoPoint]()
-        dataObject.appendAll(x)
+        dataObject.appendAll(polygonPoints)
         dataObject
     }
 
@@ -29,7 +31,8 @@ class GeoPolygon(x: Iterable[IGeoPoint]) extends Iterable[IGeoPoint] with IConta
 
     /**
       * Change polygon
-      * @param operate
+      *
+      * @param operate operation to process polygon
       */
     def operatePolygon(operate: ArrayBuffer[IGeoPoint] => Unit): Unit = {
         operate(polygon)

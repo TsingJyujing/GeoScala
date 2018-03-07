@@ -14,21 +14,22 @@ trait IVector2
         with DistanceMeasurable[IVector2]
         with Addable[IVector2] {
 
-    def -(v: IVector2) = Vector2(getX - v.getX, getY - v.getY)
+    override def +(v: IVector2): Vector2 = Vector2(getX + v.getX, getY + v.getY)
 
-    def *(v: IVector2) = Vector2(getX * v.getX, getY * v.getY)
+    def -(v: IVector2): Vector2 = Vector2(getX - v.getX, getY - v.getY)
 
-    def /(v: IVector2) = Vector2(getX / v.getX, getY / v.getY)
+    def *(v: IVector2): Vector2 = Vector2(getX * v.getX, getY * v.getY)
 
-    def +(v: Double) = Vector2(getX + v, getY + v)
+    def /(v: IVector2): Vector2 = Vector2(getX / v.getX, getY / v.getY)
 
-    def -(v: Double) = Vector2(getX - v, getY - v)
+    def +(v: Double): Vector2 = Vector2(getX + v, getY + v)
 
-    def *(v: Double) = Vector2(getX * v, getY * v)
+    def -(v: Double): Vector2 = Vector2(getX - v, getY - v)
 
-    def /(v: Double) = Vector2(getX / v, getY / v)
+    def *(v: Double): Vector2 = Vector2(getX * v, getY * v)
 
-    override def +(v: IVector2) = Vector2(getX + v.getX, getY + v.getY)
+    def /(v: Double): Vector2 = Vector2(getX / v, getY / v)
+
 
     def getX: Double
 
@@ -73,6 +74,8 @@ trait IVector2
     def getVector: Array[Double] = Array(getX, getY)
 
     override def iterator: Iterator[Double] = getVector.iterator
+
+    def direction: Double = math.atan2(getY, getX)
 
 }
 

@@ -85,6 +85,14 @@ object GeoUtil {
         GeoPoint(longitude, latitude)
     }
 
+    /**
+      * "linear" interpolation in two gps points with insert count
+      * @param fromPoint Start point
+      * @param toPoint
+      * @param insertPointCount
+      * @tparam T
+      * @return
+      */
     def interp[T <: IGeoPoint](fromPoint: T, toPoint: T, insertPointCount: Int): TraversableOnce[IGeoPoint] = {
         assert(insertPointCount >= 1, "Parameter insertPointCount invalid.")
         val angleMax = math.acos(fromPoint.toIVector3.innerProduct(toPoint.toIVector3))
@@ -92,6 +100,14 @@ object GeoUtil {
         VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, (0 to (insertPointCount + 1)).map(_ * dAngle)).map(vector3ToGeoPoint)
     }
 
+    /**
+      * "linear" interpolation in two gps points with insert count with
+      * @param fromPoint
+      * @param toPoint
+      * @param ratio
+      * @tparam T
+      * @return
+      */
     def interp[T <: IGeoPoint](fromPoint: T, toPoint: T, ratio: Double): IGeoPoint = {
         assert(ratio <= 1 && ratio >= 0, "Parameter ratio invalid.")
         vector3ToGeoPoint(VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, ratio * math.acos(fromPoint.toIVector3.innerProduct(toPoint.toIVector3))))

@@ -9,15 +9,23 @@ import scala.sys.process.stdout
 
 /**
   * DB Scan algorithm on geo points
-  *
+  * @author tsingjyujing@163.com
+  * @since 2.5
+  * @version 1.1
   */
 class DBScan[V <: IGeoPoint](
                                 val searchRadius: Double = 0.5,
                                 val isMergeClass: Boolean = false
                             ) {
 
+    /**
+      * Geo points storage
+      */
     private val data = new GeoPointTree[LabeledPoint[Int, V]]
 
+    /**
+      * the keys
+      */
     private val keySet: mutable.HashSet[Int] = mutable.HashSet[Int]()
 
     private def getNewClassId: Int = if (keySet.isEmpty) {
@@ -29,7 +37,7 @@ class DBScan[V <: IGeoPoint](
     /**
       * Add a point to clusters
       *
-      * @param point
+      * @param point Geo point
       * @return
       */
     def append(point: V): Int = if (isMergeClass) {
@@ -38,6 +46,11 @@ class DBScan[V <: IGeoPoint](
         appendWithoutMerge(point)
     }
 
+    /**
+      * Add a point into cluster by the nearest class
+      * @param point the point to insert
+      * @return class id
+      */
     private def appendWithoutMerge(point: V): Int = {
         val searchResult = data.geoNear(point, searchRadius)
         if (searchResult.isDefined) {
@@ -52,6 +65,12 @@ class DBScan[V <: IGeoPoint](
         }
     }
 
+    /**
+      * Add a point into cluster
+      * Merge class if this point connected many classes
+      * @param point the point to insert
+      * @return class id
+      */
     private def appendWithMerge(point: V): Int = {
         val searchResult = data.geoWithinRing(point, -1.0, searchRadius)
         if (searchResult.isEmpty) {
@@ -90,6 +109,14 @@ class DBScan[V <: IGeoPoint](
 }
 
 object DBScan {
+    /**
+      * create cluster result
+      * @param points
+      * @param searchRadius
+      * @param isMergeClass
+      * @tparam V
+      * @return
+      */
     def apply[V <: IGeoPoint](
                                  points: Iterable[V],
                                  searchRadius: Double = 0.5,
