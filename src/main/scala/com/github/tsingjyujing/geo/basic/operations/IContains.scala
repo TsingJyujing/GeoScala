@@ -1,13 +1,15 @@
 package com.github.tsingjyujing.geo.basic.operations
 
 /**
-  * for `Set` using, have a method to judge is an element contains in this
+  * @author tsingjyujing@163.com
+  *         for `Set` using, have a method to judge is an element contains in this
   * @tparam T element type
   */
 trait IContains[T] {
 
     /**
       * Is x contains in self
+      *
       * @param x
       * @return
       */
@@ -15,6 +17,7 @@ trait IContains[T] {
 
     /**
       * NOT contains
+      *
       * @param x
       * @return
       */

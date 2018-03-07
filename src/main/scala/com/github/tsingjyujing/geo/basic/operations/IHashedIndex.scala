@@ -4,6 +4,7 @@ package com.github.tsingjyujing.geo.basic.operations
   * Which class can get an indexed hash
   * the index code should be unique to avoid duplication in Set or other data structures
   *
+  * @author tsingjyujing@163.com
   * @tparam T should have a great randomly hashCode, recommend use Long, Int, avoid using String or Double
   */
 trait IHashedIndex[T] {

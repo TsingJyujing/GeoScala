@@ -5,6 +5,7 @@ import com.github.tsingjyujing.geo.basic.operations.IValue
 
 /**
   * Get a geo point with value
+  *
   * @param longitude
   * @param latitude
   * @param value

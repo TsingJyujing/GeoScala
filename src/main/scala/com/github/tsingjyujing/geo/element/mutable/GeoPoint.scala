@@ -1,10 +1,10 @@
 package com.github.tsingjyujing.geo.element.mutable
 
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
-import com.github.tsingjyujing.geo.element.immutable.Vector2
 
 /**
   * Mutable implementation of IGeoPoint
+  *
   * @param longitude
   * @param latitude
   */

@@ -2,8 +2,6 @@ package com.github.tsingjyujing.geo.basic
 
 import com.github.tsingjyujing.geo.basic.operations.GeoJSONable
 import com.github.tsingjyujing.geo.element.immutable.Vector2
-import com.github.tsingjyujing.geo.util.GeoUtil
-import com.github.tsingjyujing.geo.util.mathematical.SeqUtil
 
 import scala.util.parsing.json.JSONObject
 

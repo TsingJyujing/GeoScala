@@ -3,6 +3,7 @@ package com.github.tsingjyujing.geo.basic.operations
 /**
   * Which can get inner product to another object by given type T
   *
+  * @author tsingjyujing@163.com
   * @tparam T Type of the object to compare
   */
 trait InnerProductable[T] {

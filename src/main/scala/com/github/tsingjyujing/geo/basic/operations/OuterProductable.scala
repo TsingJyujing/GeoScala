@@ -7,9 +7,16 @@ package com.github.tsingjyujing.geo.basic.operations
   *
   * See <a href="https://en.wikipedia.org/wiki/Outer_product">Outer Product</a> for more details
   *
-  * @tparam TI
-  * @tparam TO
+  * @author tsingjyujing@163.com
+  * @tparam TI type to get TO
+  * @tparam TO result type
   */
 trait OuterProductable[TI <: OuterProductable[TI, TO], TO] {
+    /**
+      * Get out product to TI and output TO
+      *
+      * @param x value
+      * @return
+      */
     def outProduct(x: TI): TO
 }

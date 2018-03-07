@@ -2,6 +2,7 @@ package com.github.tsingjyujing.geo.basic
 
 import com.github.tsingjyujing.geo.basic.operations.{GeoDistanceMeasurable, GeoJSONable}
 import com.github.tsingjyujing.geo.util.mathematical.{MatrixUtil, VectorUtil}
+
 import scala.util.parsing.json.JSONObject
 
 /**
@@ -11,6 +12,7 @@ trait IGeoLine extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
 
     /**
       * get two points of the line
+      *
       * @return
       */
     def getTerminalPoints: (IGeoPoint, IGeoPoint)

@@ -1,7 +1,9 @@
 package com.github.tsingjyujing.geo.basic.operations
 
 /**
-  * Object which can get a norm N
+  *
+  * @author tsingjyujing@163.com
+  *         Object which can get a norm N
   */
 trait Normable {
     /**
@@ -25,6 +27,7 @@ object Normable {
       *
       * Common implementation of Norm pow 2
       * Faster than getNorm(_,2)
+      *
       * @param vector vector
       * @return
       */
@@ -33,6 +36,7 @@ object Normable {
     /**
       *
       * Common implementation of Norm pow n
+      *
       * @param vector vector
       * @param n      default in order 2
       * @return

@@ -1,12 +1,13 @@
 package com.github.tsingjyujing.geo.util
 
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector3}
-import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, TimeElement, Vector2, Vector3}
+import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, TimeElement, Vector2}
 import com.github.tsingjyujing.geo.util.mathematical.VectorUtil
 
 import scala.collection.parallel.ParIterable
 
 /**
+  * @author tsingjyujing@163.com
   * Some geographical utility methods
   */
 object GeoUtil {
@@ -47,6 +48,12 @@ object GeoUtil {
         )
     }
 
+    /**
+      * Convert a 3-d point into WGS84 format
+      *
+      * @param v vector input
+      * @return
+      */
     def vector3ToGeoPoint(v: IVector3): IGeoPoint = {
         val meanVector = v / v.norm2
         val latitude = math.asin(meanVector.getZ)
@@ -87,6 +94,7 @@ object GeoUtil {
 
     /**
       * "linear" interpolation in two gps points with insert count
+      *
       * @param fromPoint Start point
       * @param toPoint
       * @param insertPointCount
@@ -101,11 +109,12 @@ object GeoUtil {
     }
 
     /**
-      * "linear" interpolation in two gps points with insert count with
-      * @param fromPoint
-      * @param toPoint
-      * @param ratio
-      * @tparam T
+      * "linear" interpolation in two gps points with insert count with ratio
+      *
+      * @param fromPoint start point
+      * @param toPoint   end point
+      * @param ratio     the place ratio on geodesic of start-->end
+      * @tparam T Type of point
       * @return
       */
     def interp[T <: IGeoPoint](fromPoint: T, toPoint: T, ratio: Double): IGeoPoint = {
@@ -113,12 +122,29 @@ object GeoUtil {
         vector3ToGeoPoint(VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, ratio * math.acos(fromPoint.toIVector3.innerProduct(toPoint.toIVector3))))
     }
 
+    /**
+      * "linear" interpolation in two gps points with insert count with ratios
+      *
+      * @param fromPoint start point
+      * @param toPoint   end point
+      * @param ratios    the places ratios on geodesic of start-->end
+      * @tparam T Type of point
+      * @return
+      */
     def interp[T <: IGeoPoint](fromPoint: T, toPoint: T, ratios: TraversableOnce[Double]): TraversableOnce[IGeoPoint] = {
         assert(ratios.forall(ratio => ratio <= 1 && ratio >= 0), "Parameter ratios invalid.")
         val maxAngle = math.acos(fromPoint.toIVector3.innerProduct(toPoint.toIVector3))
         VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, ratios.map(_ * maxAngle)).map(vector3ToGeoPoint)
     }
 
+    /**
+      *
+      * @param fromPoint        start point
+      * @param toPoint          end point
+      * @param insertPointCount points to insert in
+      * @tparam T Type of point
+      * @return
+      */
     def interp[T <: IGeoPoint](fromPoint: TimeElement[T], toPoint: TimeElement[T], insertPointCount: Int): Iterable[TimeElement[IGeoPoint]] = {
         assert(insertPointCount >= 1, "Parameter insertPointCount invalid.")
         val angleMax = math.acos(fromPoint.value.toIVector3.innerProduct(toPoint.value.toIVector3))

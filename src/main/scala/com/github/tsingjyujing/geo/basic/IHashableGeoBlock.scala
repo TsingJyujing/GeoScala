@@ -16,12 +16,14 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
     /**
       * Accuracy to devide earth into N*N parts
+      *
       * @return
       */
     def getGeoHashAccuracy: Long
 
     /**
       * Get center point of the hash block
+      *
       * @return
       */
     def getCenterPoint: IGeoPoint = IHashableGeoBlock.revertFromCode(indexCode, getGeoHashAccuracy)
@@ -55,6 +57,7 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
     /**
       * Get points on boundary maybe the min/max distance
+      *
       * @param point reference points
       * @return
       */
@@ -81,6 +84,7 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
     /**
       * Get min distance from block to this block
+      *
       * @param x block info
       * @return
       */
@@ -88,6 +92,7 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
     /**
       * Get max distance from block to this block
+      *
       * @param x block info
       * @return
       */
@@ -156,6 +161,7 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
     /**
       * Get boundary box of hash block
+      *
       * @return
       */
     def toGeoBox: GeoBox = geoBox

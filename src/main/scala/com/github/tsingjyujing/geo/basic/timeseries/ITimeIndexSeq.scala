@@ -1,15 +1,16 @@
 package com.github.tsingjyujing.geo.basic.timeseries
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
 /**
   * A common time series trait contains some common methods
+  *
+  * @author tsingjyujing@163.com
   * @tparam T
   */
 trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
 
-    protected var data: ArrayBuffer[T] = mutable.ArrayBuffer[T]()
+    protected var data: mutable.ArrayBuffer[T] = mutable.ArrayBuffer[T]()
 
     /**
       * Sort time series by time
@@ -79,7 +80,7 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
       * Apply a status machine on timeseries
       *
       * @param statusFunction function to process element[T] and last (or initial) status[S], get result[R] and next status
-      * @param initialStatus initial status
+      * @param initialStatus  initial status
       * @tparam S Type of status
       * @tparam R Type of result
       * @return

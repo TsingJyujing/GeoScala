@@ -6,7 +6,7 @@ import com.github.tsingjyujing.geo.util.GeoUtil
 import com.github.tsingjyujing.geo.util.mathematical.Probability
 
 import scala.collection.mutable.ArrayBuffer
-import util.control.Breaks._
+import scala.util.control.Breaks._
 
 /**
   * Geo-K-Means++ will coming soon

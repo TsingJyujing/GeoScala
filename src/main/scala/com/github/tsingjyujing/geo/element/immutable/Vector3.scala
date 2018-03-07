@@ -4,6 +4,7 @@ import com.github.tsingjyujing.geo.basic.IVector3
 
 /**
   * Implementation of IVector3
+  *
   * @param x
   * @param y
   * @param z

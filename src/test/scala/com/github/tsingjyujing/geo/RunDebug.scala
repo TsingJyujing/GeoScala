@@ -2,11 +2,11 @@ package com.github.tsingjyujing.geo
 
 import com.github.tsingjyujing.geo.algorithm.cluster.DBScan
 import com.github.tsingjyujing.geo.algorithm.containers.LabeledPoint
-import com.github.tsingjyujing.geo.element.{GeoPointTimeSeries, GeoPointTree, GeoPolygon}
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, TimeElement, Vector2}
+import com.github.tsingjyujing.geo.element.{GeoPointTimeSeries, GeoPointTree, GeoPolygon}
 import com.github.tsingjyujing.geo.util.mathematical.ConvexHull2
-import com.github.tsingjyujing.geo.util.{FileIO, GeoUtil}
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
+import com.github.tsingjyujing.geo.util.{FileIO, GeoUtil}
 import com.google.gson.Gson
 
 object RunDebug {

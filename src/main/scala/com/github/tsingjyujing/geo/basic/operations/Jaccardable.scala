@@ -3,6 +3,7 @@ package com.github.tsingjyujing.geo.basic.operations
 /**
   * Object which can get jaccard similarity and distance
   *
+  * @author tsingjyujing@163.com
   * @tparam T Type to compare with
   */
 trait Jaccardable[T <: Jaccardable[T]] {

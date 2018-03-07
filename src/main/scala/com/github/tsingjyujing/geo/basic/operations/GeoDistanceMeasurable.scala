@@ -3,6 +3,7 @@ package com.github.tsingjyujing.geo.basic.operations
 /**
   * Distance between type T and this
   *
+  * @author tsingjyujing@163.com
   * @tparam T type of the object to compare
   */
 trait GeoDistanceMeasurable[T <: GeoDistanceMeasurable[T]] {

@@ -11,6 +11,10 @@ import com.github.tsingjyujing.geo.element.mutable.GeoPoint
   * 因为部分加密方法存在一定的信息损失，这些损失不一定能恢复
   * 在生效区域全局都是单射单变量复函数的加密方法在本函数面前都是渣渣
   * 如果坐标形式和经纬度差距太大可以采用线性回归变为近似线性以后再利用本方法
+  *
+  * @author tsingjyujing@163.com
+  * @since 2.3
+  * @version 1.0
   */
 trait GeoTransformable {
 

@@ -9,12 +9,16 @@ import com.github.tsingjyujing.geo.util.mathematical.SeqUtil
 import scala.util.control.Breaks
 
 /**
-  * TODO Extract this into a trait
-  *
   * A TimeSeries with GeoPoint as value
+  * @author tsingjyujing@163.com
   */
 class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
 
+    /**
+      * Query value by time
+      * @param time time to query
+      * @return
+      */
     override def getValue(time: Double): TimeElement[IGeoPoint] = {
         val indexInfo = query(time)
         if (indexInfo._1 == (-1) && indexInfo._2 == (-1)) {
@@ -33,22 +37,51 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
         }
     }
 
+    /**
+      * Get segmentationb by start and end time
+      * @param startTime
+      * @param endTime
+      * @return
+      */
     def sliceByTime(startTime: Double, endTime: Double): GeoPointTimeSeries = GeoPointTimeSeries(
         slice(query(startTime)._1, query(endTime)._2)
     )
 
+    /**
+      * Get indexes
+      * @return
+      */
     def indices: Range = data.indices
 
+    /**
+      * Get sum mileage of this route
+      * @return
+      */
     def mileage: Double = this.sliding(2).map(p2 => p2.head.getValue.geoTo(p2.last.getValue)).sum
 
+    /**
+      * Get speed by differential points
+      * @param ratio scale ratio of the speed
+      * @return
+      */
     def getSpeed(ratio: Double = 1.0D): DoubleTimeSeries = DoubleTimeSeries(this.sliding(2).map(p2 => {
         val ds = p2.last.getValue.geoTo(p2.head.getValue)
         val dt = p2.last.getTick - p2.head.getTick
         new TimeElement[Double]((p2.head.getTick + p2.last.getTick) / 2.0, ds * ratio / dt)
     }))
 
+    /**
+      * Clean data by sliding data
+      * @param cleanFunc
+      * @return
+      */
     private def cleanSliding(cleanFunc: (TimeElement[IGeoPoint], TimeElement[IGeoPoint]) => Boolean): GeoPointTimeSeries = GeoPointTimeSeries(sliding(2).filter(p2 => cleanFunc(p2.head, p2.last)).map(_.head))
 
+    /**
+      * Clean overspeed data
+      * @param speedLimit max speed allowed to appear
+      * @return
+      */
     def cleanOverSpeed(speedLimit: Double): GeoPointTimeSeries = this.cleanSliding(
         (p1, p2) => {
             val ds = p1.getValue geoTo p2.getValue
@@ -60,8 +93,9 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
     /**
       * ResultType: Iterable[TimeElement[IGeoPoint]]
       * StatusType: (lastValidPoint:TimeElement[IGeoPoint])
-      * @param marginDistance
-      * @param maxTolerance
+      *
+      * @param marginDistance standard margin distance
+      * @param maxTolerance do resample if d>maxTolerance*marginDistance
       * @return
       */
     def isometricallyResample(marginDistance: Double, maxTolerance: Double = 3.0): GeoPointTimeSeries = GeoPointTimeSeries(statusMachine[TimeElement[IGeoPoint], Iterable[TimeElement[IGeoPoint]]](
@@ -78,6 +112,12 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
     ).flatten)
 
 
+    /**
+      * Sparse route
+      * @param sparsityParam sparsity max distance to line
+      * @param sparsitySearchParam how many points to search in range
+      * @return
+      */
     def toSparse(
                     sparsityParam: Double,
                     sparsitySearchParam: Int
@@ -89,6 +129,12 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
         ).map(apply)
     )
 
+    /**
+      * Sparse route and get it's indexes
+      * @param sparsityParam sparsity max distance to line
+      * @param sparsitySearchParam how many points to search in range
+      * @return
+      */
     def toSparseIndex(
                          sparsityParam: Double,
                          sparsitySearchParam: Int
@@ -97,14 +143,29 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
     )
 }
 
+/**
+  * Apply and Utils
+  */
 object GeoPointTimeSeries {
 
+    /**
+      * Create TimeSeries by time-elements
+      * @param data
+      * @return
+      */
     def apply(data: TraversableOnce[TimeElement[IGeoPoint]]): GeoPointTimeSeries = {
         val result = new GeoPointTimeSeries()
         result.appendAll(data)
         result
     }
 
+    /**
+      * Get sparse points'
+      * @param gpsArray gps points
+      * @param sparsityParam sparsity max distance to line
+      * @param sparsitySearchParam how many points to search in range
+      * @return
+      */
     def sparsifyGPS(
                        gpsArray: GeoPointTimeSeries,
                        sparsityParam: Double,
@@ -117,6 +178,13 @@ object GeoPointTimeSeries {
         )
     )
 
+    /**
+      * Get sparse points' index in seq
+      * @param gpsArray gps points
+      * @param sparsityParam sparsity max distance to line
+      * @param sparsitySearchParam how many points to search in range
+      * @return
+      */
     def sparsifyGPSIndexed(
                               gpsArray: GeoPointTimeSeries,
                               sparsityParam: Double,

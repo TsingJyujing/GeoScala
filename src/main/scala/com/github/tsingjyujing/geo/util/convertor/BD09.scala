@@ -11,7 +11,7 @@ import com.github.tsingjyujing.geo.element.immutable.GeoPoint
   * 还嫌GCJ02丢人丢的不够吗？
   *
   * 经过测试，所有的坐标点都可以完美的和WGS84相互转换
-  *
+  * @author tsingjyujing@163.com
   */
 object BD09 extends GeoTransformable {
     /**

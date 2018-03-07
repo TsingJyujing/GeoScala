@@ -7,9 +7,10 @@ import java.lang.reflect.Array;
 
 /**
  * Matrix and linear algebra utils
+ *
  * @author tsingjyujing@163.com
- * @since 1.0
  * @version 2.0
+ * @since 1.0
  */
 public class MatrixUtil {
 
@@ -67,6 +68,7 @@ public class MatrixUtil {
 
     /**
      * Reshape T array into matrix
+     *
      * @param rawData   data input
      * @param dimension an array has two value, row size and column size
      * @param type      data type
@@ -99,11 +101,12 @@ public class MatrixUtil {
 
     /**
      * Reshape double array into matrix
+     *
      * @param rawData   data input
      * @param dimension an array has two value, row size and column size
      * @return a double matrix
      */
-    public static double[][] reshape(double[] rawData, int[] dimension){
+    public static double[][] reshape(double[] rawData, int[] dimension) {
         if (dimension.length != 2) {
             throw new ParameterException("Error dimension parameters.");
         }
@@ -126,6 +129,7 @@ public class MatrixUtil {
 
     /**
      * Reshape int array into matrix
+     *
      * @param rawData   data input
      * @param dimension an array has two value, row size and column size
      * @return an int matrix
@@ -154,6 +158,7 @@ public class MatrixUtil {
 
     /**
      * inverse a 3×3 matrix
+     *
      * @param x 3×3 Matrix
      * @return inv(x)->3×3 Matrix
      */

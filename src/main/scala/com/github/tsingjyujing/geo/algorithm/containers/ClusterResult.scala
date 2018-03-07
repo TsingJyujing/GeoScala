@@ -6,8 +6,9 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  * Data struct to describe
+  * Data structure to describe
   *
+  * @author tsingjyujing@163.com
   * @tparam K Type of label
   * @tparam V Type of point
   */

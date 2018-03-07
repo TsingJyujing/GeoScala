@@ -1,6 +1,6 @@
 package com.github.tsingjyujing.geo.element.immutable
 
-import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
+import com.github.tsingjyujing.geo.basic.IGeoPoint
 
 /**
   * Get a immutable geo point

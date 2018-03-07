@@ -4,6 +4,7 @@ import com.github.tsingjyujing.geo.basic.timeseries.ITick
 
 /**
   * An simple implementation of ITick
+  *
   * @param tick
   */
 class TickImpl(var tick: Double) extends ITick {

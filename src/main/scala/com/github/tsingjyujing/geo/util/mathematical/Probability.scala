@@ -5,6 +5,10 @@ import com.github.tsingjyujing.geo.element.immutable.GeoPoint
 
 import scala.util.Random
 
+/**
+  * Probability utility
+  * @author tsingjyujing@163.com
+  */
 object Probability {
     val random = new Random(
         System.currentTimeMillis()
@@ -39,6 +43,7 @@ object Probability {
 
     /**
       * Get point distribute on 2d-sphere uniformly
+      *
       * @return
       */
     def sphereUniform: IGeoPoint = GeoPoint(U(-180, 180), {

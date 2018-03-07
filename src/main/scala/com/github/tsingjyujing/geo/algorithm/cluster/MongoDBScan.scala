@@ -4,6 +4,7 @@ import com.github.tsingjyujing.geo.basic.IGeoPoint
 import com.mongodb.client.MongoCollection
 import org.bson.Document
 import org.bson.types.ObjectId
+
 import scala.collection.JavaConverters._
 
 class MongoDBScan(

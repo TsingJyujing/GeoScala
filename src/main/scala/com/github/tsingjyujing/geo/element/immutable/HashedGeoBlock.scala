@@ -4,6 +4,7 @@ import com.github.tsingjyujing.geo.basic.{IGeoPoint, IHashableGeoBlock}
 
 /**
   * Get a hashed geo block
+  *
   * @param code
   * @param accuracy
   */

@@ -5,6 +5,7 @@ import com.github.tsingjyujing.geo.util.BeCarefulWhileUsing
 
 /**
   * Common methods of vectors
+  * @author tsingjyujing@163.com
   */
 object VectorUtil {
     def outerProduct(v1: Array[Double], v2: Array[Double]): Array[Double] = if ((v1.length == 3) && (v2.length == 3)) {
@@ -24,8 +25,9 @@ object VectorUtil {
 
     /**
       * see visualize/solve_rotate_equation.m for implementation
-      * @param v1 Vector 1
-      * @param v2 Vector 2
+      *
+      * @param v1        Vector 1
+      * @param v2        Vector 2
       * @param angleToV1 angle to Vector 1
       * @return
       */
@@ -41,8 +43,8 @@ object VectorUtil {
 
     /**
       *
-      * @param v1 Vector 1
-      * @param v2 Vector 2
+      * @param v1              Vector 1
+      * @param v2              Vector 2
       * @param angleToV1Values angles to Vector 1
       * @return
       */
@@ -61,8 +63,8 @@ object VectorUtil {
     /**
       * see visualize/solve_rotate_equation.m for implementation
       *
-      * @param v1 Vector 1
-      * @param v2 Vector 2
+      * @param v1        Vector 1
+      * @param v2        Vector 2
       * @param angleToV1 angle to Vector 1
       * @return
       */
@@ -80,8 +82,8 @@ object VectorUtil {
 
     /**
       *
-      * @param v1 Vector 1
-      * @param v2 Vector 2
+      * @param v1              Vector 1
+      * @param v2              Vector 2
       * @param angleToV1Values angles to Vector 1
       * @return
       */

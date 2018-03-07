@@ -9,6 +9,7 @@ import scala.util.parsing.json.JSONObject
 
 /**
   * Mutable implementation of polygon
+  *
   * @author tsingjyujing@163.com
   * @param polygonPoints polygon points with out first point in the last position
   *                      For example: p0,p1,p2 represents polygon of p0->p1->p2->p0

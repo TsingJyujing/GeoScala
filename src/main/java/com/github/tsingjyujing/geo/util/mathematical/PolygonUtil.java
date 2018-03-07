@@ -1,18 +1,21 @@
 package com.github.tsingjyujing.geo.util.mathematical;
+
 import com.github.tsingjyujing.geo.basic.IGeoPoint;
 import scala.collection.IndexedSeq;
 
 /**
  * Polygon common methods
+ *
  * @author tsingjyujing@163.com
- * @since 2.0
  * @version 1.0
+ * @since 2.0
  */
 public class PolygonUtil {
 
     /**
      * Ray-Casting algorithm: http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-     * @param point point to judge
+     *
+     * @param point   point to judge
      * @param polygon polygon data
      * @return is on polygon
      */

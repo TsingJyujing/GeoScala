@@ -15,8 +15,9 @@ import com.github.tsingjyujing.geo.basic.IGeoPoint
 trait CommonFilter {
     /**
       * From raw point Seq to another point Seq
+      *
       * @param points
       * @return
       */
-    def filter(points:TraversableOnce[IGeoPoint]):TraversableOnce[IGeoPoint]
+    def filter(points: TraversableOnce[IGeoPoint]): TraversableOnce[IGeoPoint]
 }

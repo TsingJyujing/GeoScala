@@ -9,23 +9,25 @@ import scala.util.parsing.json.JSONObject
 /**
   * Any type which can get longitude and latitude (on earth)
   */
-trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with Serializable{
-    def -(x: IVector2):IGeoPoint = GeoPoint(getLongitude - x.getX, getLatitude - x.getY)
+trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with Serializable {
+    def -(x: IVector2): IGeoPoint = GeoPoint(getLongitude - x.getX, getLatitude - x.getY)
 
-    def -(x: IGeoPoint):IVector2 = Vector2(getLongitude - x.getLongitude, getLatitude - x.getLatitude)
+    def -(x: IGeoPoint): IVector2 = Vector2(getLongitude - x.getLongitude, getLatitude - x.getLatitude)
 
-    def +(x: IVector2):IGeoPoint = GeoPoint(getLongitude + x.getX, getLatitude * x.getY)
+    def +(x: IVector2): IGeoPoint = GeoPoint(getLongitude + x.getX, getLatitude * x.getY)
 
     override def toGeoJSON: JSONObject = GeoJSONable.createPoint(this)
 
     /**
       * Get longitude recommended in WGS84 format
+      *
       * @return Longitude in degree
       */
     def getLongitude: Double
 
     /**
       * Get latitude recommended in WGS84 format
+      *
       * @return Latitude in degree
       */
     def getLatitude: Double
@@ -40,6 +42,7 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
 
     /**
       * Get vector3 in R3 on 2d sphere
+      *
       * @return
       */
     final def toIVector3: IVector3 = Vector3(
@@ -50,6 +53,7 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
 
     /**
       * Get Mercator projection potision as vector2
+      *
       * @return
       */
     final def toIVector2: IVector2 = Vector2(

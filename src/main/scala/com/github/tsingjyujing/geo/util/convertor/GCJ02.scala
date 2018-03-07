@@ -13,6 +13,7 @@ import com.github.tsingjyujing.geo.element.immutable.GeoPoint
   *
   * 本类适用于WGS84坐标系和GCJ02加密坐标系的互相转换
   * GSJ02坐标系适用于大部分的地图，例如高德地图
+  * @author tsingjyujing@163.com
   */
 object GCJ02 extends GeoTransformable {
     /**

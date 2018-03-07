@@ -6,6 +6,7 @@ import com.github.tsingjyujing.geo.element.mutable.GeoPoint
 
 /**
   * Return a new object which extends IGeoPoint and has same longitude and latitude
+  * @author tsingjyujing@163.com
   */
 object WGS84 extends GeoTransformable {
     /**

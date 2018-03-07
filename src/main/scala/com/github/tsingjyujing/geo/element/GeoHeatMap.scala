@@ -15,9 +15,9 @@ import scala.collection.JavaConverters._
   * Heatmap of geo points
   */
 class GeoHeatMap[T <: Addable[T]](
-                                           val baseValue: T,
-                                           val accuracy: Long = 0x10000
-                                       )
+                                     val baseValue: T,
+                                     val accuracy: Long = 0x10000
+                                 )
     extends Jaccardable[GeoHeatMap[T]]
         with Iterable[(Long, T)] {
 
@@ -25,6 +25,7 @@ class GeoHeatMap[T <: Addable[T]](
 
     /**
       * Append a point into heatmap
+      *
       * @param k
       * @param v
       */
@@ -37,6 +38,7 @@ class GeoHeatMap[T <: Addable[T]](
     /**
       * Append a point into heatmap by hash code
       * Not recommend to using
+      *
       * @param k
       * @param v
       */
@@ -53,6 +55,7 @@ class GeoHeatMap[T <: Addable[T]](
 
     /**
       * Remove block data in heatmap
+      *
       * @param key block info
       */
     def remove(key: IHashableGeoBlock): Option[T] = if (key.getGeoHashAccuracy == accuracy) {
@@ -64,6 +67,7 @@ class GeoHeatMap[T <: Addable[T]](
     /**
       * Remove a block data by code
       * Not recommend to using
+      *
       * @param key
       * @return
       */
@@ -89,6 +93,7 @@ class GeoHeatMap[T <: Addable[T]](
 
     /**
       * Add two heatmap into one
+      *
       * @param heatMap
       * @return
       */
@@ -107,6 +112,7 @@ class GeoHeatMap[T <: Addable[T]](
 
     /**
       * += operation
+      *
       * @param heatMap
       */
     def +=(heatMap: GeoHeatMap[T]): Unit = if (heatMap.accuracy == accuracy) {
@@ -117,6 +123,7 @@ class GeoHeatMap[T <: Addable[T]](
 
     /**
       * Calculate jaccard similarity
+      *
       * @param x
       * @return
       */
@@ -128,6 +135,7 @@ class GeoHeatMap[T <: Addable[T]](
 
     /**
       * Do operation on value
+      *
       * @param f
       */
     def valueFix(f: T => T): Unit = data.foreach(kv => {
@@ -138,6 +146,7 @@ class GeoHeatMap[T <: Addable[T]](
 
     /**
       * Get points with value (for visualization)
+      *
       * @param coordinateType
       * @return
       */

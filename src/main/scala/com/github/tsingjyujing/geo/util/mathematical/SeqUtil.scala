@@ -12,6 +12,14 @@ import scala.util.control.Breaks
   */
 object SeqUtil {
 
+    /**
+      * Search index in sorted
+      * @param f from index to value
+      * @param targetValue the value aim to
+      * @param indexStart index start to search
+      * @param indexEnd index end to search
+      * @return
+      */
     def searchInSorted(f: Int => Double,
                        targetValue: Double,
                        indexStart: Int,
@@ -41,6 +49,13 @@ object SeqUtil {
         (lowerBound, upperBound)
     }
 
+    /**
+      * Split data into segments
+      * @param objs split data by function
+      * @param func data in class or not
+      * @tparam T type to return
+      * @return
+      */
     def segmentation[T](objs: Iterable[T], func: T => Boolean): List[List[T]] = {
         val segmentedValues = new mutable.MutableList[List[T]]
         val iter = objs.iterator
@@ -67,7 +82,11 @@ object SeqUtil {
         segmentedValues.toList
     }
 
-
+    /**
+      * Get mean value
+      * @param values
+      * @return
+      */
     def getMean(values: TraversableOnce[Double]): Double = {
         val result = values.map(x => Vector2(x, 1.0)).reduce(_ + _)
         result.getX / result.getY

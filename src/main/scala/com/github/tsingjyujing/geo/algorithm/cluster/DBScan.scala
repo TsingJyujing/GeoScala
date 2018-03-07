@@ -9,6 +9,7 @@ import scala.sys.process.stdout
 
 /**
   * DB Scan algorithm on geo points
+  *
   * @author tsingjyujing@163.com
   * @since 2.5
   * @version 1.1
@@ -48,6 +49,7 @@ class DBScan[V <: IGeoPoint](
 
     /**
       * Add a point into cluster by the nearest class
+      *
       * @param point the point to insert
       * @return class id
       */
@@ -68,6 +70,7 @@ class DBScan[V <: IGeoPoint](
     /**
       * Add a point into cluster
       * Merge class if this point connected many classes
+      *
       * @param point the point to insert
       * @return class id
       */
@@ -111,6 +114,7 @@ class DBScan[V <: IGeoPoint](
 object DBScan {
     /**
       * create cluster result
+      *
       * @param points
       * @param searchRadius
       * @param isMergeClass

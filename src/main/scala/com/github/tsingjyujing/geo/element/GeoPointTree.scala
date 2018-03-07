@@ -6,10 +6,10 @@ import com.github.tsingjyujing.geo.element.immutable.HashedGeoBlock
 /**
   * Layered Geo points index as an TreeSet
   *
-  * @param currentDepth
-  * @param currentCode
-  * @param maxDepth
-  * @param depthStep
+  * @param currentDepth current depth or init depth
+  * @param currentCode current geo-hash code
+  * @param maxDepth max depth
+  * @param depthStep next depth = currentDepth + depthStep
   * @tparam T Type to save geo points, any type extends IGeoPoint
   */
 class GeoPointTree[T <: IGeoPoint](
@@ -22,6 +22,7 @@ class GeoPointTree[T <: IGeoPoint](
     private val isLastLevel = currentDepth >= maxDepth
 
     override def getGeoHashAccuracy: Long = 2L << currentDepth
+
 
     val nextLayer: scala.collection.mutable.Map[IHashableGeoBlock, GeoPointTree[T]] = if (!isLastLevel) {
         new scala.collection.mutable.HashMap[IHashableGeoBlock, GeoPointTree[T]]()
@@ -112,6 +113,13 @@ class GeoPointTree[T <: IGeoPoint](
 
     }
 
+    /**
+      * Search point within ring
+      * @param point       center point
+      * @param minDistance ring inside radius
+      * @param maxDistance ring outside radius
+      * @return
+      */
     override def geoWithinRing(point: IGeoPoint, minDistance: Double, maxDistance: Double): Iterable[T] = if (isLastLevel) {
         dataList.filter(
             p => {
@@ -133,6 +141,10 @@ class GeoPointTree[T <: IGeoPoint](
         )
     }
 
+    /**
+      * Append point to set
+      * @param point point value
+      */
     override def appendPoint(point: T): Unit = if (isLastLevel) {
         dataList.append(point)
     } else {
