@@ -8,7 +8,7 @@ import scala.collection.mutable
 import scala.sys.process.stdout
 
 /**
-  * DB Scan algorithm on geo points
+  * DB Scan algorithm for geo points
   *
   * @author tsingjyujing@163.com
   * @since 2.5

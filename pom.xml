@@ -14,6 +14,12 @@
         </project.reporting.outputEncoding>
     </properties>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <groupId>com.github.tsingjyujing</groupId>
     <artifactId>geo-library-${scala.version.main}</artifactId>
     <version>2.7</version>
@@ -41,11 +47,13 @@
 
     <licenses>
         <license>
-
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
-    <dependencies>
 
+    <dependencies>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
@@ -72,7 +80,6 @@
             <version>2.8.2</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 
@@ -213,7 +220,6 @@
                 <version>2.7</version>
                 <configuration>
                     <updateReleaseInfo>true</updateReleaseInfo>
-
                 </configuration>
             </plugin>
 

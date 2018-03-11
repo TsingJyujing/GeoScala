@@ -9,15 +9,18 @@ import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
   * @param latitude
   */
 final case class GeoPoint(private var longitude: Double, private var latitude: Double) extends IGeoPoint {
+
     override def getLongitude: Double = longitude
 
     override def getLatitude: Double = latitude
 
     def setLongitude(value: Double): Unit = {
+        verifyLongitude
         this.longitude = value
     }
 
     def setLatitude(value: Double): Unit = {
+        verifyLatitude
         this.latitude = value
     }
 
@@ -30,4 +33,6 @@ final case class GeoPoint(private var longitude: Double, private var latitude: D
         setLongitude(getLongitude - x.getX)
         setLatitude(getLatitude - x.getY)
     }
+
+    verifyValues
 }

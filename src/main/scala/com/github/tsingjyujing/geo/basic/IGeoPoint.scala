@@ -63,6 +63,39 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
 
     override def toString: String = "Longitude:%3.6f,Latitude:%3.6f".format(getLongitude, getLatitude)
 
+    /**
+      * Verify is longitude value is legal
+      * @throws AssertionError verify failed
+      */
+    @throws[AssertionError]
+    protected def verifyLongitude: Unit = {
+        assert(
+            getLongitude >= (-180.0) && getLongitude <= 180.0,
+            "Longitude %3.6f is an illegal value (should in [-180,180]).".format(getLongitude)
+        )
+    }
+
+    /**
+      * Verify is latitude value is legal
+      * @throws AssertionError verify failed
+      */
+    @throws[AssertionError]
+    protected def verifyLatitude: Unit = {
+        assert(
+            getLatitude >= (-180.0) && getLatitude <= 180.0,
+            "Latitude %3.6f is an illegal value (should in [-90,90]).".format(getLatitude)
+        )
+    }
+
+    /**
+      * Verify is latitude & longitude values are legal
+      * @throws AssertionError verify failed
+      */
+    @throws[AssertionError]
+    protected def verifyValues: Unit = {
+        verifyLatitude
+        verifyLongitude
+    }
 }
 
 
