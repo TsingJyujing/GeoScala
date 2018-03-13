@@ -49,3 +49,6 @@ class GeoPolygon(polygonPoints: Iterable[IGeoPoint]) extends Iterable[IGeoPoint]
     override def toGeoJSON: JSONObject = GeoJSONable.createRingPolygon(polygon)
 }
 
+object GeoPolygon{
+    def apply(polygonPoints: Iterable[IGeoPoint]): GeoPolygon = new GeoPolygon(polygonPoints)
+}

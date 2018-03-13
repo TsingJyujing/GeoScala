@@ -20,7 +20,6 @@ trait GeoJSONable {
 
     def toGeoJSONString: String = toGeoJSON.toString()
 
-
 }
 
 /**
@@ -146,4 +145,12 @@ object GeoJSONable {
         )
     }
 
+
+    /**
+      * Generate object from json string
+      *
+      * @param json
+      * @return
+      */
+    def parseGeoJSON(json: String): GeoJSONable = ???
 }

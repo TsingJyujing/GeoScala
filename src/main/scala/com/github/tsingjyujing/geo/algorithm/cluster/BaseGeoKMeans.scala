@@ -15,19 +15,37 @@ import scala.util.control.Breaks._
   */
 trait BaseGeoKMeans[V <: IGeoPoint] {
 
+    /**
+      * Get initialized k center points
+      * @param points sample point
+      * @param k k centers
+      * @return
+      */
     def initializePoints(points: Iterable[V], k: Int): Iterable[IGeoPoint]
 
+    /**
+      * Print loss and step information to console, override it to output to another place
+      * @param currentStep current step
+      * @param lossValue loss value: sum distance for each point to it's center
+      * @param pointCount the count of the point
+      */
     def lossOutput(currentStep: Int, lossValue: Double, pointCount: Int): Unit = {
         stdout.print("\rLoss[%d] := %f\t\tMean(loss) = %f km".format(currentStep, lossValue, lossValue / pointCount))
         stdout.flush()
     }
 
+    /**
+      * Do k-means training algorithm
+      * @param points sample point
+      * @param k k centers
+      * @param maxStepCount max training iter limitation
+      * @return
+      */
     def apply(
                  points: Iterable[V],
                  k: Int,
                  maxStepCount: Int = 100
              ): ClusterResult[Int, V] = {
-        // TODO Create new algorithm k-means++ to initialize points with geo-optimized k-means++ algorithm
 
         var centerPoints: Iterable[IGeoPoint] = initializePoints(points, k)
         var lossValue = Double.MaxValue

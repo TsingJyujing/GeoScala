@@ -24,15 +24,18 @@ Set the scala version you wanna to use in properties:
 </properties>
 ```
 
-And set dependency:
+And set dependency like this:
 
 ```xml
 <dependencies>
     <dependency>
         <groupId>com.github.tsingjyujing</groupId>
-        <artifactId>geo-library-${scala.version.main}</artifactId>
-        <version>RELEASE</version>
+        <artifactId>geo-library</artifactId>
+        <version>2.8.0-${scala.version.main}-SNAPSHOT</version>
     </dependency>
 </dependencies>
 ```
 
+## TODO
+- Create new algorithm k-means++ & kmeans || to initialize points with geo-optimized algorithm
+- parse GeoJSON object from string

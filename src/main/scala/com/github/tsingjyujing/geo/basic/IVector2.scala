@@ -80,6 +80,9 @@ trait IVector2
 }
 
 object IVector2 {
+
+    def apply(x: Double, y: Double): IVector2 = Vector2(x, y)
+
     def getPow2Sum(x: Double, y: Double): Double = x * x + y * y
 
     def innerProduct2(point1: IVector2, point2: IVector2): Double = point1.getX * point2.getX + point1.getY * point2.getY

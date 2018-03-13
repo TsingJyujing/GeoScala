@@ -17,8 +17,8 @@ trait Jaccardable[T <: Jaccardable[T]] {
       * @return
       */
     def jaccardDistance(x: T): Double = {
-        val simVal = jaccardSimilarity(x)
-        math.exp(-simVal * simVal)
+        val similarity = jaccardSimilarity(x)
+        math.exp(-similarity * similarity)
     }
 }
 

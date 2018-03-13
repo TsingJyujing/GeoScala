@@ -12,10 +12,12 @@ import com.github.tsingjyujing.geo.basic.IVector2
 object ConvexHull2 {
     /**
       * Convhull 2-d points in euclid space
-      * @param points
+      *
+      * @param points points to create polygon
       * @return
       */
     def apply(points: IndexedSeq[IVector2]): IndexedSeq[IVector2] = {
+        assert(points.size>=3, "Less than 3 points, can't create polygon of convex hull.")
         val pointsSorted = points.sortWith((a, b) => if (a.getX != b.getX) {
             a.getX > b.getX
         } else {
@@ -41,6 +43,7 @@ object ConvexHull2 {
 
     /**
       * Is point c in left of a-->b
+      *
       * @param a a
       * @param b b
       * @param c c
@@ -54,6 +57,7 @@ object ConvexHull2 {
 
     /**
       * Get cross of 3 vectors
+      *
       * @param a
       * @param b
       * @param c
