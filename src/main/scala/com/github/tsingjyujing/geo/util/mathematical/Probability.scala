@@ -7,6 +7,7 @@ import scala.util.Random
 
 /**
   * Probability utility
+  *
   * @author tsingjyujing@163.com
   */
 object Probability {
@@ -54,5 +55,46 @@ object Probability {
             -math.acos(math.abs(randVal))
         }
     }.toDegrees)
+
+    /**
+      *
+      * Select a data randomly from a set
+      *
+      * @param data samples to select
+      * @tparam T type of sample
+      * @return
+      */
+    def selectUniformly[T](data: IndexedSeq[T]): T = data(random.nextInt(data.size))
+
+    /**
+      *
+      * @param data              samples to select
+      * @param probabilityWeight probability weight of the samples
+      * @tparam T type of sample
+      * @return
+      */
+    def selectByProbability[T](data: Iterable[T], probabilityWeight: Iterable[Double]): T = {
+
+        assert(data.size == probabilityWeight.size)
+
+        val sumProb: Double = probabilityWeight.sum
+        var currentProb: Double = 1.0
+
+        val selectedData: Option[(T, Double)] = data.zip(probabilityWeight).find(x => {
+            val p = x._2 / sumProb
+            val m = p / currentProb
+            val isSelect = random.nextDouble() <= (p / m)
+            currentProb -= p
+            isSelect
+        })
+
+        if (selectedData.isDefined) {
+            selectedData.get._1
+        } else {
+            data.last
+        }
+
+    }
+
 
 }

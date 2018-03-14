@@ -1,6 +1,8 @@
 package com.github.tsingjyujing.geo.algorithm.containers
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint
+import com.github.tsingjyujing.geo.exceptions.ParameterException
+import com.github.tsingjyujing.geo.util.GeoUtil
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -60,6 +62,17 @@ class ClusterResult[K, V <: IGeoPoint] {
 
     def classes: collection.Set[K] = data.keySet
 
+    /**
+      * Get indicators by string type
+      * @param indicatorType indicator type
+      * @return
+      */
+    def getIndicator(indicatorType: String): Double = indicatorType match {
+        case "DB" =>
+            ClusterResult.clusterIndicateDaviesBouldin(this)
+        case _ =>
+            throw new ParameterException("Unsupport indicator")
+    }
 }
 
 
@@ -79,4 +92,33 @@ object ClusterResult {
         })
         cluster
     }
+
+    /**
+      * Davies Bouldin indicator to describe the performance of cluster result
+      * @param result cluster result
+      * @tparam K type of key
+      * @tparam V type of point
+      * @return
+      */
+    private def clusterIndicateDaviesBouldin[K, V <: IGeoPoint](result: ClusterResult[K, V]): Double = {
+        val classes: collection.Set[K] = result.classes
+        val k: Int = classes.size
+        assert(k > 1, "DaviesBouldin(1) is not defined")
+        val centers: mutable.Map[K, IGeoPoint] = result.data.map(kv => (kv._1, GeoUtil.mean(kv._2)))
+        classes.map(
+            i => {
+                classes.filter(_ != i).map(
+                    j => {
+                        val Ci = centers(i)
+                        val Cj = centers(j)
+                        val Cij = Ci geoTo Cj
+                        val Wis = result.data(i).map(p => p.geoTo(Ci))
+                        val Wjs = result.data(i).map(p => p.geoTo(Cj))
+                        (Wis.sum / Wis.size + Wjs.sum / Wjs.size) / Cij
+                    }
+                ).max
+            }
+        ).sum / k
+    }
+
 }

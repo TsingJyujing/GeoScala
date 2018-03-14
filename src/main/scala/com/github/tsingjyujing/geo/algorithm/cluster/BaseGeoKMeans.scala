@@ -2,6 +2,7 @@ package com.github.tsingjyujing.geo.algorithm.cluster
 
 import com.github.tsingjyujing.geo.algorithm.containers.{ClusterResult, LabeledPoint}
 import com.github.tsingjyujing.geo.basic.IGeoPoint
+import com.github.tsingjyujing.geo.exceptions.ParameterException
 import com.github.tsingjyujing.geo.util.GeoUtil
 
 import scala.sys.process.stdout
@@ -17,17 +18,19 @@ trait BaseGeoKMeans[V <: IGeoPoint] {
 
     /**
       * Get initialized k center points
+      *
       * @param points sample point
-      * @param k k centers
+      * @param k      k centers
       * @return
       */
     def initializePoints(points: Iterable[V], k: Int): Iterable[IGeoPoint]
 
     /**
       * Print loss and step information to console, override it to output to another place
+      *
       * @param currentStep current step
-      * @param lossValue loss value: sum distance for each point to it's center
-      * @param pointCount the count of the point
+      * @param lossValue   loss value: sum distance for each point to it's center
+      * @param pointCount  the count of the point
       */
     def lossOutput(currentStep: Int, lossValue: Double, pointCount: Int): Unit = {
         stdout.print("\rLoss[%d] := %f\t\tMean(loss) = %f km".format(currentStep, lossValue, lossValue / pointCount))
@@ -35,9 +38,21 @@ trait BaseGeoKMeans[V <: IGeoPoint] {
     }
 
     /**
+      * Happened if K has changed while iteration
+      *
+      * @param currentK current K value
+      * @param lastK
+      */
+    def kChangedEvent(currentK: Int, lastK: Int): Unit = {
+        // Print warning information if K-changed
+        System.err.println("Warning: K changed in iteration! From %d to %d".format(lastK, currentK))
+    }
+
+    /**
       * Do k-means training algorithm
-      * @param points sample point
-      * @param k k centers
+      *
+      * @param points       sample point
+      * @param k            k centers
       * @param maxStepCount max training iter limitation
       * @return
       */
@@ -45,15 +60,22 @@ trait BaseGeoKMeans[V <: IGeoPoint] {
                  points: Iterable[V],
                  k: Int,
                  maxStepCount: Int = 100
-             ): ClusterResult[Int, V] = {
+             ): ClusterResult[Int, V] = if (k > 1) {
 
         var centerPoints: Iterable[IGeoPoint] = initializePoints(points, k)
         var lossValue = Double.MaxValue
         val pointCount = points.size
+        var lastK = k
 
         breakable(
 
             (0 until maxStepCount).foreach(currentStep => {
+
+                val currentK = centerPoints.size
+                if (currentK != lastK) {
+                    kChangedEvent(currentK, lastK)
+                    lastK = currentK
+                }
                 // For each step while decreasing
 
                 val expectationStep = points.map(
@@ -93,5 +115,9 @@ trait BaseGeoKMeans[V <: IGeoPoint] {
             val classId = centerPoints.zipWithIndex.minBy(_._1.geoTo(point))._2
             LabeledPoint(classId, point)
         }))
+    } else if (k == 1) {
+        ClusterResult(points.map(LabeledPoint(0, _)))
+    } else {
+        throw new ParameterException("Wrong K: K should greater than 0")
     }
 }

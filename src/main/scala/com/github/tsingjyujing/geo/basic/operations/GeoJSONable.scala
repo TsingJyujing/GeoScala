@@ -1,6 +1,8 @@
 package com.github.tsingjyujing.geo.basic.operations
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint
+import com.github.tsingjyujing.geo.element.GeoPolygon
+import com.github.tsingjyujing.geo.element.immutable.GeoPoint
 import com.github.tsingjyujing.geo.model.{GeoJsonPoint, GeoJsonPolygon}
 import com.google.gson.Gson
 
@@ -163,12 +165,15 @@ object GeoJSONable {
         }
         mapDecode.get("type") match {
             case "Point" =>
-                gson.fromJson(json, classOf[GeoJsonPoint]).getPoint
+                parseGeoPoint(json)
             case "Polygon" =>
-                gson.fromJson(json, classOf[GeoJsonPolygon]).getPolygon
+                parseGeoPolygon(json)
             case _ =>
                 throw new RuntimeException("Unimplemented/unsupport type.")
         }
     }
 
+    def parseGeoPoint(json: String): GeoPoint = gson.fromJson(json, classOf[GeoJsonPoint]).getPoint
+
+    def parseGeoPolygon(json: String): GeoPolygon = gson.fromJson(json, classOf[GeoJsonPolygon]).getPolygon
 }

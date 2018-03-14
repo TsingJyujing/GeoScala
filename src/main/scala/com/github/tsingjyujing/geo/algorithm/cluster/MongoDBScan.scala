@@ -1,6 +1,8 @@
 package com.github.tsingjyujing.geo.algorithm.cluster
 
+import com.github.tsingjyujing.geo.algorithm.containers.{ClusterResult, LabeledPoint}
 import com.github.tsingjyujing.geo.basic.IGeoPoint
+import com.github.tsingjyujing.geo.basic.operations.GeoJSONable
 import com.github.tsingjyujing.geo.element.GeoPolygon
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, Vector2}
 import com.github.tsingjyujing.geo.util.mathematical.ConvexHull2
@@ -226,6 +228,14 @@ class MongoDBScan(
         })
     }
 
+    def getClusterResult: ClusterResult[Int, GeoPoint] = ClusterResult(
+        pointCollection.find().asScala.map(
+            doc => LabeledPoint(
+                doc.getInteger(MongoDBScan.classIdFieldName).toInt,
+                GeoJSONable.parseGeoPoint(doc.get(MongoDBScan.pointFieldName, classOf[Document]).toJson())
+            )
+        )
+    )
 }
 
 object MongoDBScan {
