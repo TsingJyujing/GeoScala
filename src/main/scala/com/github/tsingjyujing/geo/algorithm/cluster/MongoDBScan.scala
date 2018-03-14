@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 
 /**
   * @author tsingjyujing@163.com
-  * @param collection        mongodb collection to save points
+  * @param pointCollection   mongodb collection to save points
   * @param polygonCollection mongo collection to save polygons
   * @param searchRadius      db-scan algorithm parameters to search points in radius
   * @param needInit          need to initialize collection while start
@@ -21,7 +21,7 @@ import scala.collection.JavaConverters._
   * @param extendedIndexes   other indexes to set as Map: field name -> index type
   */
 class MongoDBScan(
-                     val collection: MongoCollection[Document],
+                     val pointCollection: MongoCollection[Document],
                      val polygonCollection: MongoCollection[Document] = null,
                      val searchRadius: Double = 0.5,
                      val needInit: Boolean = false,
@@ -30,15 +30,15 @@ class MongoDBScan(
                      val extendedIndexes: Map[String, Object] = Map.empty
                  ) {
 
-    private val withPolygon: Boolean = polygonCollection == null
+    private val withPolygon: Boolean = polygonCollection != null
 
     if (needInit) {
         try {
-            collection.createIndex(new Document(MongoDBScan.pointFieldName, "2dsphere"))
-            collection.createIndex(new Document(MongoDBScan.classIdFieldName, "hashed"))
+            pointCollection.createIndex(new Document(MongoDBScan.pointFieldName, "2dsphere"))
+            pointCollection.createIndex(new Document(MongoDBScan.classIdFieldName, "hashed"))
             extendedIndexes.foreach(
                 kv => {
-                    collection.createIndex(new Document(kv._1, kv._2))
+                    pointCollection.createIndex(new Document(kv._1, kv._2))
                 }
             )
         } catch {
@@ -77,7 +77,7 @@ class MongoDBScan(
     private def appendPointWithoutMerge(point: IGeoPoint, appendInfo: Document): Int = {
 
         try {
-            val nearPoint = collection.find(
+            val nearPoint = pointCollection.find(
                 new Document(MongoDBScan.pointFieldName, MongoDBScan.getGeoSearchCondition(point, searchRadius))
             ).first()
             val classId = nearPoint.getInteger(MongoDBScan.classIdFieldName)
@@ -99,11 +99,13 @@ class MongoDBScan(
       * @return
       */
     private def appendPointWithMerge(point: IGeoPoint, appendInfo: Document): Int = {
-        val nearCursor = collection.find(
-            new Document(MongoDBScan.pointFieldName, MongoDBScan.getGeoSearchCondition(point, searchRadius))
-        )
+        val nearestDocument = pointCollection.distinct(
+            "classId",
+            new Document(MongoDBScan.pointFieldName, MongoDBScan.getGeoSearchCondition(point, searchRadius)),
+            classOf[java.lang.Integer]
+        ).asScala.toSet
+
         try {
-            val nearestDocument: Set[Integer] = nearCursor.asScala.map(_.getInteger(MongoDBScan.classIdFieldName)).toSet
             if (nearestDocument.size <= 0) {
                 throw new RuntimeException("Can't query data")
             } else if (nearestDocument.size == 1) {
@@ -112,7 +114,7 @@ class MongoDBScan(
                 classId
             } else {
                 val classId = nearestDocument.min
-                collection.updateMany(
+                pointCollection.updateMany(
                     new Document(MongoDBScan.pointFieldName, MongoDBScan.getGeoSearchCondition(point, searchRadius)),
                     new Document("$set", new Document(MongoDBScan.classIdFieldName, classId))
                 )
@@ -143,7 +145,7 @@ class MongoDBScan(
         ).append(
             MongoDBScan.pointFieldName, Document.parse(point.toGeoJSONString)
         )
-        collection.insertOne(document)
+        pointCollection.insertOne(document)
         document.getObjectId("_id")
     }
 
@@ -153,10 +155,10 @@ class MongoDBScan(
       * @return
       */
     private def getNewClassId: Int = {
-        if (collection.count() == 0) {
+        if (pointCollection.count() == 0) {
             0
         } else {
-            collection.aggregate(
+            pointCollection.aggregate(
                 IndexedSeq(
                     new Document(
                         "$group", new Document(
@@ -182,21 +184,23 @@ class MongoDBScan(
 
         removePolygon(classId)
 
-        val points: IndexedSeq[Vector2] = collection.find(new Document(MongoDBScan.classIdFieldName, classId)).asScala.map(doc => {
+        val points: IndexedSeq[Vector2] = pointCollection.find(new Document(MongoDBScan.classIdFieldName, classId)).asScala.map(doc => {
             val point = doc.get(MongoDBScan.pointFieldName, classOf[Document]).get("coordinates", classOf[java.util.ArrayList[Double]])
             Vector2(point.get(0), point.get(1))
         }).toIndexedSeq
 
         if (points.size >= 3) {
-            val polygon = GeoPolygon(ConvexHull2(points).map(p => {
+            val convexData = ConvexHull2(points).map(p => {
                 GeoPoint(p.getX, p.getY)
-            }))
-
-            collection.insertOne(new Document("_id", classId).append("area", Document.parse(polygon.toGeoJSONString)))
-
+            })
+            if (convexData.size >= 3) {
+                val polygon = GeoPolygon(convexData)
+                polygonCollection.insertOne(new Document("_id", classId).append("area", Document.parse(polygon.toGeoJSONString)))
+            } else {
+                throw new RuntimeException("Less than 3 points got in polygon")
+            }
         } else {
-            collection.insertOne(new Document("_id", classId).append("area",new java.util.ArrayList[Document]()))
-
+            throw new RuntimeException("Less than 3 points got in raw data")
         }
     }
 
@@ -212,7 +216,14 @@ class MongoDBScan(
       */
     def regenerateAllPolygons(): Unit = if (withPolygon) {
         polygonCollection.deleteMany(new Document())
-        polygonCollection.distinct(MongoDBScan.classIdFieldName, classOf[Int]).asScala.foreach(generatePolygon)
+        val classSet = pointCollection.distinct(MongoDBScan.classIdFieldName, classOf[java.lang.Integer]).asScala.toSet
+        classSet.foreach(x => try {
+            generatePolygon(x.toInt)
+        } catch {
+            case ex: Throwable =>
+                System.err.println("Error while processing polygon of class %d.".format(x.toInt))
+                ex.printStackTrace()
+        })
     }
 
 }

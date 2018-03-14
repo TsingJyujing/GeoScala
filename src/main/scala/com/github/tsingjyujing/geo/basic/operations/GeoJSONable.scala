@@ -1,6 +1,8 @@
 package com.github.tsingjyujing.geo.basic.operations
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint
+import com.github.tsingjyujing.geo.model.{GeoJsonPoint, GeoJsonPolygon}
+import com.google.gson.Gson
 
 import scala.util.parsing.json._
 
@@ -11,7 +13,7 @@ import scala.util.parsing.json._
 trait GeoJSONable {
 
     /**
-      * Get scala orignal JSON object,
+      * Get scala original JSON object,
       * JSON object deprecated in Scala 2.12 but still using in 2.10
       *
       * @return
@@ -26,6 +28,8 @@ trait GeoJSONable {
   * Common utils of generating GeoJSON object
   */
 object GeoJSONable {
+
+    private val gson: Gson = new Gson()
 
     private def JSONSeq[T](elems: T*): JSONArray = JSONArray(List(elems: _*))
 
@@ -147,10 +151,24 @@ object GeoJSONable {
 
 
     /**
-      * Generate object from json string
+      * Generate object from json string "{\"type\":\"Point\","coordinates":[100,20]}"
       *
       * @param json
       * @return
       */
-    def parseGeoJSON(json: String): GeoJSONable = ???
+    def parseGeoJSON(json: String): GeoJSONable = {
+        val mapDecode = gson.fromJson(json, classOf[java.util.HashMap[String, Object]])
+        if (!mapDecode.containsKey("type")) {
+            throw new RuntimeException("Not GeoJSON object.")
+        }
+        mapDecode.get("type") match {
+            case "Point" =>
+                gson.fromJson(json, classOf[GeoJsonPoint]).getPoint
+            case "Polygon" =>
+                gson.fromJson(json, classOf[GeoJsonPolygon]).getPolygon
+            case _ =>
+                throw new RuntimeException("Unimplemented/unsupport type.")
+        }
+    }
+
 }

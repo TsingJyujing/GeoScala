@@ -4,7 +4,7 @@ import com.github.tsingjyujing.geo.algorithm.containers.{ClusterResult, LabeledP
 import com.github.tsingjyujing.geo.basic.IGeoPoint
 import com.github.tsingjyujing.geo.element.GeoPointTree
 
-import scala.collection.mutable
+import scala.collection.{TraversableOnce, mutable}
 import scala.sys.process.stdout
 
 /**
@@ -16,14 +16,15 @@ import scala.sys.process.stdout
   */
 class DBScan[V <: IGeoPoint](
                                 val searchRadius: Double = 0.5,
-                                val isMergeClass: Boolean = false
+                                val isMergeClass: Boolean = false,
+                                val initializePoints: TraversableOnce[LabeledPoint[Int, V]] = IndexedSeq.empty
                             ) {
 
     /**
       * Geo points storage
       */
     private val data = new GeoPointTree[LabeledPoint[Int, V]]
-
+    data.appendPoints(initializePoints)
     /**
       * the keys
       */
@@ -124,10 +125,11 @@ object DBScan {
     def apply[V <: IGeoPoint](
                                  points: Iterable[V],
                                  searchRadius: Double = 0.5,
-                                 isMergeClass: Boolean = false
+                                 isMergeClass: Boolean = false,
+                                 initializePoints: TraversableOnce[LabeledPoint[Int, V]] = IndexedSeq.empty
                              ): ClusterResult[Int, V] = {
         val startTime = System.currentTimeMillis()
-        val cr = new DBScan[V](searchRadius, isMergeClass)
+        val cr = new DBScan[V](searchRadius, isMergeClass, initializePoints)
         val pointCount = points.size
         val printMargin = math.max(math.min(300, math.floor(pointCount / 100.0)), 10)
         points.zipWithIndex.foreach(pid => {
