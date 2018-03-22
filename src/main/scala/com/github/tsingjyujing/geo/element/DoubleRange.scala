@@ -13,6 +13,7 @@ case class DoubleRange(min: Double, max: Double) extends IContains[Double] {
 
     /**
       * Value in range
+      *
       * @param x
       * @return
       */
@@ -22,6 +23,7 @@ case class DoubleRange(min: Double, max: Double) extends IContains[Double] {
 
     /**
       * is r has common area with this
+      *
       * @param r another range
       * @return
       */
@@ -29,6 +31,7 @@ case class DoubleRange(min: Double, max: Double) extends IContains[Double] {
 
     /**
       * Merge range, if not intersect return none
+      *
       * @param r another range
       * @return
       */
@@ -36,6 +39,17 @@ case class DoubleRange(min: Double, max: Double) extends IContains[Double] {
         Option(DoubleRange(math.max(min, r.min), math.min(max, r.max)))
     } else {
         None
+    }
+
+    /**
+      * Do OR operation of two ranges
+      * @param r another range
+      * @return
+      */
+    def |(r: DoubleRange): Iterable[DoubleRange] = if (isIntersect(r)) {
+        IndexedSeq(DoubleRange(math.min(min, r.min), math.max(max, r.max)))
+    } else {
+        IndexedSeq(this, r)
     }
 
 

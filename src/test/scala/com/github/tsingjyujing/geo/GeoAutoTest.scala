@@ -5,13 +5,14 @@ import java.io.{File, PrintWriter}
 import com.github.tsingjyujing.geo.basic.IHashableGeoBlock.{createCodeFromGps, revertFromCode}
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, HashedGeoBlock, Vector2}
-import com.github.tsingjyujing.geo.element.{GeoHeatMap, GeoPointTree}
+import com.github.tsingjyujing.geo.element.{GeoCircleArea, GeoHeatMap, GeoPointTree}
 import com.github.tsingjyujing.geo.util.GeoUtil
 import com.github.tsingjyujing.geo.util.convertor.{BD09, GCJ02}
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
 import org.scalatest._
 
 class GeoAutoTest extends FlatSpec with Matchers {
+
 
     "Elements" should "GeoHash" in {
         val block = HashedGeoBlock(120, 30, 0x10000)
@@ -89,6 +90,7 @@ class GeoAutoTest extends FlatSpec with Matchers {
         )
         val radius: Double = 4.0
 
+        // 随机生成10000个点
         (1 to 10000).foreach(_ => {
             centers.foreach(center => {
                 val newPoint = GeoPoint(center.getLongitude + rand(0, 0.5), center.getLatitude + rand(0, 0.5))
@@ -96,6 +98,9 @@ class GeoAutoTest extends FlatSpec with Matchers {
             })
         })
 
+        /**
+          *
+          */
         centers.foreach(center => {
             val withInPoints = points.geoWithinRing(center, 0, radius)
             val count1 = withInPoints.size
@@ -124,6 +129,10 @@ class GeoAutoTest extends FlatSpec with Matchers {
                 assert(point.geoTo(ipoint) <= 0.1, "Convert failed.")
             })
         })
+    }
+
+    it should "Circle object works normally" in {
+
     }
 
     "China encrypt convertor" should "BD09" in {

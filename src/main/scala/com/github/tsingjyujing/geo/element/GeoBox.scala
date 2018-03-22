@@ -65,6 +65,12 @@ case class GeoBox(
       * @return
       */
     def area: Double = IGeoPoint.EARTH_RADIUS * IGeoPoint.EARTH_RADIUS * (maxLongitude - minLongitude).toRadians * (math.sin(maxLatitude.toRadians) - math.sin(minLatitude.toRadians))
+
+    /**
+      * Get polygon of this block
+      * @return
+      */
+    def toPolygon:GeoPolygon = GeoPolygon(anglePoints)
 }
 
 object GeoBox {

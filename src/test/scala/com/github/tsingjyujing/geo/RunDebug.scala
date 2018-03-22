@@ -3,7 +3,7 @@ package com.github.tsingjyujing.geo
 import com.github.tsingjyujing.geo.algorithm.cluster.DBScan
 import com.github.tsingjyujing.geo.algorithm.containers.LabeledPoint
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, TimeElement, Vector2}
-import com.github.tsingjyujing.geo.element.{GeoPointTimeSeries, GeoPointTree, GeoPolygon}
+import com.github.tsingjyujing.geo.element.{GeoCircleArea, GeoPointTimeSeries, GeoPointTree, GeoPolygon}
 import com.github.tsingjyujing.geo.util.mathematical.ConvexHull2
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
 import com.github.tsingjyujing.geo.util.{FileIO, GeoUtil}
@@ -11,7 +11,7 @@ import com.google.gson.Gson
 
 object RunDebug {
 
-    def main(args: Array[String]): Unit = testConvHull()
+    def main(args: Array[String]): Unit = testGeoCircle()
 
     def GeoPointTreeDebug(): Unit = {
         val points = new GeoPointTree[GeoPoint]()
@@ -149,4 +149,9 @@ object RunDebug {
         })).toGeoJSONString)
     }
 
+    def testGeoCircle(): Unit = {
+        val points = GeoCircleArea(GeoPoint(108, 89), 300).toPolygon(20)
+        FileIO.writePoints("visualize/circle_area.csv", points)
+        FileIO.writePoints3D("visualize/circle_area_3d.csv", points)
+    }
 }

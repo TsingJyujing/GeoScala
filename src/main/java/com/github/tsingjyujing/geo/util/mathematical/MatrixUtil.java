@@ -76,6 +76,7 @@ public class MatrixUtil {
      * @return matrix reshaped
      * @throws Exception some error
      */
+    @SuppressWarnings("unchecked")
     public static <T> T[][] reshape(T[] rawData, int[] dimension, Class<T> type) throws Exception {
         if (dimension.length != 2) {
             throw new Exception("Error dimension parameter.");

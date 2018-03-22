@@ -115,12 +115,20 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
             0
         } else {
             val distanceToCenter = x.geoTo(getCenterPoint)
-            if (distanceToCenter > circumradius) {
+            if (distanceToCenter >= circumradius) {
                 distanceToCenter - circumradius
-            } else if (distanceToCenter > inradius) {
+            } else if (distanceToCenter >= inradius) {
                 getBoundaryPoints(x).map(_.geoTo(x)).min
             } else {
-                throw new RuntimeException("InternalError: Distance less than inradius but not in block.")
+                // Output detail debug info
+                val sb = new mutable.StringBuilder()
+                sb.append("InternalError: Distance less than inradius but not in block.\n")
+                sb.append("\tblock info: HashCode:%d, Accuracy:%d\n".format(getGeoHashAccuracy, getGeoHashAccuracy))
+                sb.append("\tblock center: (%3.6f, %3.6f)\n".format(getLongitude, getLatitude))
+                sb.append("\tblock radius: (%f, %f)\n".format(inradius, circumradius))
+                sb.append("\tblock geoBox: %s\n".format(toGeoBox.toString))
+                sb.append("\tblock distance center: (%3.6f, %3.6f)\n".format(x.getLongitude, x.getLatitude))
+                throw new RuntimeException(sb.toString())
             }
         }
     }
