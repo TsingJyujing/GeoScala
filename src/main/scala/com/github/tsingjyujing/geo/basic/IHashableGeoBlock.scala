@@ -39,20 +39,30 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
     /**
       * Get an inner circle in hash block
+      *
+      * **For why we use this design:**
+      *     Get an inradius less than closedFormInradius to solve the value error of IEEE Float
       */
     lazy val inradius: Double = {
-        //Calculate tow distance to longitude and latitude boundary
-        val centerLatitude = getCenterPoint.getLatitude
-        val centerLongitude = getCenterPoint.getLongitude
-        val latitudeDirectionalDistance = math.min(
-            math.abs(centerLatitude - geoBox.minLatitude),
-            math.abs(centerLatitude - geoBox.maxLatitude)
-        ).toRadians * IGeoPoint.EARTH_RADIUS
-        val longitudeDirectionalDistance = math.min(
-            math.abs(centerLongitude - geoBox.minLongitude),
-            math.abs(centerLongitude - geoBox.maxLongitude)
-        ).toRadians * IGeoPoint.EARTH_RADIUS * math.cos(centerLatitude.toRadians)
-        math.min(longitudeDirectionalDistance, latitudeDirectionalDistance)
+        val closedFormInradius = {
+            //Calculate tow distance to longitude and latitude boundary
+            val centerLatitude = getCenterPoint.getLatitude
+            val centerLongitude = getCenterPoint.getLongitude
+            val latitudeDirectionalDistance = math.min(
+                math.abs(centerLatitude - geoBox.minLatitude),
+                math.abs(centerLatitude - geoBox.maxLatitude)
+            ).toRadians * IGeoPoint.EARTH_RADIUS
+            val longitudeDirectionalDistance = math.min(
+                math.abs(centerLongitude - geoBox.minLongitude),
+                math.abs(centerLongitude - geoBox.maxLongitude)
+            ).toRadians * IGeoPoint.EARTH_RADIUS * math.cos(centerLatitude.toRadians)
+            math.min(longitudeDirectionalDistance, latitudeDirectionalDistance)
+        }
+        if (closedFormInradius <= 10) {
+            closedFormInradius * 0.95
+        } else {
+            closedFormInradius - 0.5
+        }
     }
 
     /**
@@ -123,7 +133,7 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
                 // Output detail debug info
                 val sb = new mutable.StringBuilder()
                 sb.append("InternalError: Distance less than inradius but not in block.\n")
-                sb.append("\tblock info: HashCode:%d, Accuracy:%d\n".format(getGeoHashAccuracy, getGeoHashAccuracy))
+                sb.append("\tblock info: HashCode:%d, Accuracy:%d\n".format(indexCode, getGeoHashAccuracy))
                 sb.append("\tblock center: (%3.6f, %3.6f)\n".format(getLongitude, getLatitude))
                 sb.append("\tblock radius: (%f, %f)\n".format(inradius, circumradius))
                 sb.append("\tblock geoBox: %s\n".format(toGeoBox.toString))
