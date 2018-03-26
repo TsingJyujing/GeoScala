@@ -55,7 +55,7 @@ class GeoAutoTest extends FlatSpec with Matchers {
         val maxError = math.abs(maxDistance - outRadius) / maxDistance
 
         assert(maxError < 0.05, "Max distance error too large")
-        assert(minError < 0.05, "Min distance error too large")
+        assert(minError < 0.06, "Min distance error too large")
 
 
     }

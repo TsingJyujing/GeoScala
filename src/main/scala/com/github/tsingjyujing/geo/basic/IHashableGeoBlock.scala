@@ -41,7 +41,7 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
       * Get an inner circle in hash block
       *
       * **For why we use this design:**
-      *     Get an inradius less than closedFormInradius to solve the value error of IEEE Float
+      * Get an inradius less than closedFormInradius to solve the value error of IEEE Float
       */
     lazy val inradius: Double = {
         val closedFormInradius = {
