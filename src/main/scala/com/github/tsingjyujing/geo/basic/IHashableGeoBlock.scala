@@ -26,11 +26,30 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
       *
       * @return
       */
-    def getCenterPoint: IGeoPoint = IHashableGeoBlock.revertFromCode(indexCode, getGeoHashAccuracy)
+    def getCenterPoint: IGeoPoint = IHashableGeoBlock.revertGpsFromCode(getIndexCode, getGeoHashAccuracy)
 
     override def getLongitude: Double = getCenterPoint.getLongitude
 
     override def getLatitude: Double = getCenterPoint.getLatitude
+
+    /**
+      * decompose code tuple from code
+      * @return
+      */
+    def getIndexCodeTuple: (Long, Long) = IHashableGeoBlock.revertCodeTupleFromCode(getIndexCode)
+
+    /**
+      * Get longitude part of decomposed code
+      * @return
+      */
+    def getLongitudeTuple: Long = getIndexCodeTuple._1
+
+    /**
+      * Get latitude part of decomposed code
+      * @return
+      */
+    def getLatitudeTuple: Long = getIndexCodeTuple._2
+
 
     /**
       * Get a spherical crown to hash block
@@ -121,7 +140,7 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
       */
     def getMinDistance(x: IGeoPoint): Double = {
         val currentPointHash = IHashableGeoBlock.createCodeFromGps(x, getGeoHashAccuracy)
-        if (currentPointHash == indexCode) {
+        if (currentPointHash == getIndexCode) {
             0
         } else {
             val distanceToCenter = x.geoTo(getCenterPoint)
@@ -133,7 +152,7 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
                 // Output detail debug info
                 val sb = new mutable.StringBuilder()
                 sb.append("InternalError: Distance less than inradius but not in block.\n")
-                sb.append("\tblock info: HashCode:%d, Accuracy:%d\n".format(indexCode, getGeoHashAccuracy))
+                sb.append("\tblock info: HashCode:%d, Accuracy:%d\n".format(getIndexCode, getGeoHashAccuracy))
                 sb.append("\tblock center: (%3.6f, %3.6f)\n".format(getLongitude, getLatitude))
                 sb.append("\tblock radius: (%f, %f)\n".format(inradius, circumradius))
                 sb.append("\tblock geoBox: %s\n".format(toGeoBox.toString))
@@ -154,7 +173,7 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
     override def equals(o: Any): Boolean = o match {
         case ob: IHashableGeoBlock =>
             if (ob.getGeoHashAccuracy == getGeoHashAccuracy) {
-                ob.indexCode == indexCode
+                ob.getIndexCode == getIndexCode
             } else {
                 false
             }
@@ -162,11 +181,14 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
             false
     }
 
-    override def hashCode(): Int = indexCode.hashCode()
+    override def hashCode(): Int = getIndexCode.hashCode()
 
+    /**
+      * Get bound box of this block
+      */
     val geoBox: GeoBox = {
         val accuracy = getGeoHashAccuracy
-        val code = indexCode
+        val code = getIndexCode
         val latCode = code & (POW2E31 - 1)
         val lngCode = (code - latCode) / POW2E31
         GeoBox(
@@ -199,20 +221,69 @@ object IHashableGeoBlock {
     val MAX_INNER_PRODUCT_FOR_UNIT_VECTOR: Double = 1.0
     val EARTH_RADIUS: Double = 6378.5
 
-    def createCodeFromGps(point: IGeoPoint, accuracy: Long): Long = {
+    /**
+      * Get combined code from point
+      *
+      * @param point
+      * @param accuracy
+      * @return
+      */
+    def createCodeFromGps(point: IGeoPoint, accuracy: Long): Long = createCodeFromCodeTuple(createCodeTupleFromGps(point, accuracy))
+
+    /**
+      * Get code tuple from point
+      *
+      * @param point
+      * @param accuracy
+      * @return
+      */
+    def createCodeTupleFromGps(point: IGeoPoint, accuracy: Long): (Long, Long) = {
         val lngCode = math.round((point.getLongitude + 180.0d) / 180.0d * accuracy)
         val latCode = math.round((point.getLatitude + 90.00d) / 180.0d * accuracy)
-        lngCode * IHashableGeoBlock.POW2E31 + latCode
+        (lngCode, latCode)
     }
 
+    /**
+      * Convert long tuple into a long value
+      *
+      * @param code
+      * @return
+      */
+    def createCodeFromCodeTuple(code: (Long, Long)): Long = code._1 * IHashableGeoBlock.POW2E31 + code._2
 
-    def revertFromCode(code: Long, accuracy: Long): IGeoPoint = {
+    /**
+      * Convert code into tuple
+      *
+      * @param code
+      * @return
+      */
+    def revertCodeTupleFromCode(code: Long): (Long, Long) = {
         val latCode = code & (POW2E31 - 1)
         val lngCode = (code - latCode) / POW2E31
-        val lng = lngCode * 180.0 / accuracy - 180.0
-        val lat = latCode * 180.0 / accuracy - 90.0
+        (lngCode, latCode)
+    }
+
+    /**
+      * Convert code tuple into point
+      *
+      * @param code
+      * @param accuracy
+      * @return
+      */
+    def revertGpsFromCodeTuple(code: (Long, Long), accuracy: Long): IGeoPoint = {
+        val lng = code._1 * 180.0 / accuracy - 180.0
+        val lat = code._2 * 180.0 / accuracy - 90.0
         GeoPoint(lng, lat)
     }
+
+    /**
+      * Convert code into point
+      *
+      * @param code
+      * @param accuracy
+      * @return
+      */
+    def revertGpsFromCode(code: Long, accuracy: Long): IGeoPoint = revertGpsFromCodeTuple(revertCodeTupleFromCode(code), accuracy)
 
 
     /**

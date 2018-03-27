@@ -10,7 +10,7 @@ import com.github.tsingjyujing.geo.basic.{IGeoPoint, IHashableGeoBlock}
   */
 final class HashedGeoBlock(code: Long, accuracy: Long = 12000) extends IHashableGeoBlock {
 
-    private val centerPoint = IHashableGeoBlock.revertFromCode(indexCode, getGeoHashAccuracy)
+    private val centerPoint = IHashableGeoBlock.revertGpsFromCode(getIndexCode, getGeoHashAccuracy)
 
     override def getGeoHashAccuracy: Long = accuracy
 
@@ -19,7 +19,7 @@ final class HashedGeoBlock(code: Long, accuracy: Long = 12000) extends IHashable
       *
       * @return
       */
-    override def indexCode: Long = code
+    override def getIndexCode: Long = code
 
     override def getCenterPoint: IGeoPoint = centerPoint
 

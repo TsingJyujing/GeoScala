@@ -2,7 +2,7 @@ package com.github.tsingjyujing.geo
 
 import java.io.{File, PrintWriter}
 
-import com.github.tsingjyujing.geo.basic.IHashableGeoBlock.{createCodeFromGps, revertFromCode}
+import com.github.tsingjyujing.geo.basic.IHashableGeoBlock.{createCodeFromGps, revertGpsFromCode}
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, HashedGeoBlock, Vector2}
 import com.github.tsingjyujing.geo.element.{GeoCircleArea, GeoHeatMap, GeoPointTree}
@@ -22,7 +22,7 @@ class GeoAutoTest extends FlatSpec with Matchers {
         1 to 100 foreach (_ => {
             val pointX = GeoPoint(121.0 + rand(20), 25.6 + rand(20))
             val code = createCodeFromGps(pointX, accuracy)
-            val revertPoint = revertFromCode(code, accuracy)
+            val revertPoint = revertGpsFromCode(code, accuracy)
             val maxDistance = 2 * math.Pi / accuracy * IGeoPoint.EARTH_RADIUS * math.sqrt(2)
             assert((pointX geoTo revertPoint) < maxDistance)
         })

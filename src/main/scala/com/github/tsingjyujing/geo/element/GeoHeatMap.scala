@@ -30,7 +30,7 @@ class GeoHeatMap[T <: Addable[T]](
       * @param v
       */
     def append(k: IHashableGeoBlock, v: T): Unit = if (k.getGeoHashAccuracy == accuracy) {
-        this appendByCode(k.indexCode, v)
+        this appendByCode(k.getIndexCode, v)
     } else {
         throw new RuntimeException("Accuracy not same")
     }
@@ -59,7 +59,7 @@ class GeoHeatMap[T <: Addable[T]](
       * @param key block info
       */
     def remove(key: IHashableGeoBlock): Option[T] = if (key.getGeoHashAccuracy == accuracy) {
-        this removeByCode key.indexCode
+        this removeByCode key.getIndexCode
     } else {
         throw new RuntimeException("Accuracy not same")
     }
@@ -86,7 +86,7 @@ class GeoHeatMap[T <: Addable[T]](
     }
 
     def apply(key: IHashableGeoBlock): T = if (key.getGeoHashAccuracy == accuracy) {
-        this (key.indexCode)
+        this (key.getIndexCode)
     } else {
         throw new RuntimeException("Accuracy not same")
     }
@@ -153,7 +153,7 @@ class GeoHeatMap[T <: Addable[T]](
     def getGeoPoints(coordinateType: String = "wgs84"): Iterable[GeoPointValued[T]] = {
         val convertor = ConvertorFactory(coordinateType)
         this.map(kv => {
-            val geoInfo = convertor.transform(IHashableGeoBlock.revertFromCode(kv._1, accuracy))
+            val geoInfo = convertor.transform(IHashableGeoBlock.revertGpsFromCode(kv._1, accuracy))
             new GeoPointValued[T](geoInfo.getLongitude, geoInfo.getLatitude, kv._2)
         })
     }

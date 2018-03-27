@@ -15,14 +15,14 @@ trait IHashedIndex[T] {
       * @param x
       * @return
       */
-    def isEqual(x: IHashedIndex[T]): Boolean = x.indexCode.equals(indexCode)
+    def isEqual(x: IHashedIndex[T]): Boolean = x.getIndexCode.equals(getIndexCode)
 
     /**
       * Get a unique indexCode as type T
       *
       * @return
       */
-    def indexCode: T
+    def getIndexCode: T
 
     /**
       * Avoid duplication in Set or key of the Map
@@ -40,5 +40,5 @@ trait IHashedIndex[T] {
       *
       * @return
       */
-    override def hashCode(): Int = indexCode.hashCode()
+    override def hashCode(): Int = getIndexCode.hashCode()
 }

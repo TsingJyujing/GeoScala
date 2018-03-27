@@ -45,7 +45,7 @@ class GeoPointTree[T <: IGeoPoint](
     /**
       * center point of the block for immutable index code and faster performance
       */
-    private lazy val centerPoint = IHashableGeoBlock.revertFromCode(indexCode, getGeoHashAccuracy)
+    private lazy val centerPoint = IHashableGeoBlock.revertGpsFromCode(getIndexCode, getGeoHashAccuracy)
 
     override def getCenterPoint: IGeoPoint = centerPoint
 
@@ -54,7 +54,7 @@ class GeoPointTree[T <: IGeoPoint](
       *
       * @return
       */
-    override def indexCode: Long = currentCode
+    override def getIndexCode: Long = currentCode
 
     /**
       * 草稿：
@@ -153,7 +153,7 @@ class GeoPointTree[T <: IGeoPoint](
         if (!(nextLayer contains currentPointHash)) {
             nextLayer(currentPointHash) = new GeoPointTree[T](
                 currentDepth = currentDepth + depthStep,
-                currentCode = currentPointHash.indexCode,
+                currentCode = currentPointHash.getIndexCode,
                 maxDepth = maxDepth,
                 depthStep = depthStep
             )
