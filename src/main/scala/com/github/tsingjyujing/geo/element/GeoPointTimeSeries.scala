@@ -10,12 +10,14 @@ import scala.util.control.Breaks
 
 /**
   * A TimeSeries with GeoPoint as value
+  *
   * @author tsingjyujing@163.com
   */
 class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
 
     /**
       * Query value by time
+      *
       * @param time time to query
       * @return
       */
@@ -38,7 +40,8 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
     }
 
     /**
-      * Get segmentationb by start and end time
+      * Get segmentation by start and end time
+      *
       * @param startTime
       * @param endTime
       * @return
@@ -49,18 +52,21 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
 
     /**
       * Get indexes
+      *
       * @return
       */
     def indices: Range = data.indices
 
     /**
       * Get sum mileage of this route
+      *
       * @return
       */
     def mileage: Double = this.sliding(2).map(p2 => p2.head.getValue.geoTo(p2.last.getValue)).sum
 
     /**
       * Get speed by differential points
+      *
       * @param ratio scale ratio of the speed
       * @return
       */
@@ -72,6 +78,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
 
     /**
       * Clean data by sliding data
+      *
       * @param cleanFunc
       * @return
       */
@@ -79,23 +86,36 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
 
     /**
       * Clean overspeed data
+      *
       * @param speedLimit max speed allowed to appear
       * @return
       */
-    def cleanOverSpeed(speedLimit: Double): GeoPointTimeSeries = this.cleanSliding(
-        (p1, p2) => {
-            val ds = p1.getValue geoTo p2.getValue
-            val dt = p2.getTick - p1.getTick
-            (ds / dt) > speedLimit
-        }
-    )
+    def cleanOverSpeed(speedLimit: Double): GeoPointTimeSeries = {
+        var lastValidPoint = this.head
+        val dataStack = scala.collection.mutable.ArrayBuffer.empty[TimeElement[IGeoPoint]]
+        dataStack.append(lastValidPoint)
+        dataStack.appendAll(this.tail.flatMap(
+            x => {
+                val ds = lastValidPoint.getValue.geoTo(x.getValue)
+                val dt = x.getTick - lastValidPoint.getTick
+                val speed = ds / dt
+                if (speed >= speedLimit) {
+                    None
+                } else {
+                    lastValidPoint = x
+                    Some(x)
+                }
+            }
+        ))
+        GeoPointTimeSeries(dataStack)
+    }
 
     /**
       * ResultType: Iterable[TimeElement[IGeoPoint]]
       * StatusType: (lastValidPoint:TimeElement[IGeoPoint])
       *
       * @param marginDistance standard margin distance
-      * @param maxTolerance do resample if d>maxTolerance*marginDistance
+      * @param maxTolerance   do resample if d>maxTolerance*marginDistance
       * @return
       */
     def isometricallyResample(marginDistance: Double, maxTolerance: Double = 3.0): GeoPointTimeSeries = GeoPointTimeSeries(statusMachine[TimeElement[IGeoPoint], Iterable[TimeElement[IGeoPoint]]](
@@ -114,7 +134,8 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
 
     /**
       * Sparse route
-      * @param sparsityParam sparsity max distance to line
+      *
+      * @param sparsityParam       sparsity max distance to line
       * @param sparsitySearchParam how many points to search in range
       * @return
       */
@@ -131,7 +152,8 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
 
     /**
       * Sparse route and get it's indexes
-      * @param sparsityParam sparsity max distance to line
+      *
+      * @param sparsityParam       sparsity max distance to line
       * @param sparsitySearchParam how many points to search in range
       * @return
       */
@@ -150,6 +172,7 @@ object GeoPointTimeSeries {
 
     /**
       * Create TimeSeries by time-elements
+      *
       * @param data
       * @return
       */
@@ -161,8 +184,9 @@ object GeoPointTimeSeries {
 
     /**
       * Get sparse points'
-      * @param gpsArray gps points
-      * @param sparsityParam sparsity max distance to line
+      *
+      * @param gpsArray            gps points
+      * @param sparsityParam       sparsity max distance to line
       * @param sparsitySearchParam how many points to search in range
       * @return
       */
@@ -180,8 +204,9 @@ object GeoPointTimeSeries {
 
     /**
       * Get sparse points' index in seq
-      * @param gpsArray gps points
-      * @param sparsityParam sparsity max distance to line
+      *
+      * @param gpsArray            gps points
+      * @param sparsityParam       sparsity max distance to line
       * @param sparsitySearchParam how many points to search in range
       * @return
       */
