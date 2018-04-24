@@ -30,7 +30,9 @@ public class PolygonUtil {
             final double xi = polygon.apply(i).getLongitude(), yi = polygon.apply(i).getLatitude();
             final double xj = polygon.apply(j).getLongitude(), yj = polygon.apply(j).getLatitude();
             final boolean intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-            if (intersect) inside = !inside;
+            if (intersect) {
+                inside = !inside;
+            }
         }
         return inside;
     }

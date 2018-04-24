@@ -22,8 +22,8 @@ object BD09 extends GeoTransformable {
       */
     override def transform(x: IGeoPoint): IGeoPoint = if (GCJ02.needTransform(x)) {
         val gcjPoint = GCJ02.transform(x)
-        val radius = math.sqrt(x.getLatitude * x.getLatitude + x.getLongitude * x.getLongitude)
-        val phase = math.atan2(x.getLatitude, x.getLongitude)
+        val radius = math.sqrt(gcjPoint.getLatitude * gcjPoint.getLatitude + gcjPoint.getLongitude * gcjPoint.getLongitude)
+        val phase = math.atan2(gcjPoint.getLatitude, gcjPoint.getLongitude)
         val fixedRadius = radius + 2e-5 * math.sin(gcjPoint.getLatitude * math.Pi * 3000 / 180)
         val fixedPhase = phase + 3e-6 * math.cos(gcjPoint.getLongitude * math.Pi * 3000 / 180)
         val turnBackX = fixedRadius * math.cos(fixedPhase) + 0.0065

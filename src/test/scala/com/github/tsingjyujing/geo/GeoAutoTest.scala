@@ -5,7 +5,7 @@ import java.io.{File, PrintWriter}
 import com.github.tsingjyujing.geo.basic.IHashableGeoBlock.{createCodeFromGps, revertGpsFromCode}
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
 import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, HashedGeoBlock, Vector2}
-import com.github.tsingjyujing.geo.element.{GeoCircleArea, GeoHeatMap, GeoPointTree}
+import com.github.tsingjyujing.geo.element.{GeoHeatMap, GeoPointTree}
 import com.github.tsingjyujing.geo.util.GeoUtil
 import com.github.tsingjyujing.geo.util.convertor.{BD09, GCJ02}
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
@@ -173,5 +173,30 @@ class GeoAutoTest extends FlatSpec with Matchers {
             })
         })
         writer.close()
+    }
+
+    it should "GCJ02 ensure" in {
+        val pointsPairs = IndexedSeq(
+            (GeoPoint(116.481499, 39.990475), GeoPoint(116.487585177952, 39.991754014757)),
+            (GeoPoint(116.481499, 39.990375), GeoPoint(116.487585177952, 39.991653917101))
+        )
+        val T = GCJ02
+        pointsPairs.foreach(
+            ps => {
+                assert(T.transform(ps._1).geoTo(ps._2) < 0.01)
+            }
+        )
+    }
+
+    it should "BD09 ensure" in {
+        val pointsPairs = IndexedSeq(
+            (GeoPoint(114.21892734521, 29.575429778924), GeoPoint(114.2307519546763, 29.57908428837437))
+        )
+        val T = BD09
+        pointsPairs.foreach(
+            ps => {
+                assert(T.transform(ps._1).geoTo(ps._2) < 0.01)
+            }
+        )
     }
 }

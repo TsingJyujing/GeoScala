@@ -31,8 +31,8 @@ object GCJ02 extends GeoTransformable {
         var magic = math.sin(radLat)
         magic = 1 - ee * magic * magic
         val sqrtMagic = math.sqrt(magic)
-        val dx = (dLat * 180.0) / ((a * (1 - ee)) / (magic * sqrtMagic) * math.Pi)
-        val dy = (dLng * 180.0) / (a / sqrtMagic * math.cos(radLat) * math.Pi)
+        val dy = (dLat * 180.0) / ((a * (1 - ee)) / (magic * sqrtMagic) * math.Pi)
+        val dx = (dLng * 180.0) / (a / sqrtMagic * math.cos(radLat) * math.Pi)
         GeoPoint(x.getLongitude + dx, x.getLatitude + dy)
     } else {
         GeoPoint(x.getLongitude, x.getLatitude)
