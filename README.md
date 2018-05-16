@@ -1,7 +1,7 @@
 ```
-   _____                 _____              _        
-  / ____|               / ____|            | |       
- | |  __   ___   ___   | (___    ___  __ _ | |  __ _ 
+   _____                 _____              _
+  / ____|               / ____|            | |
+ | |  __   ___   ___   | (___    ___  __ _ | |  __ _
  | | |_ | / _ \ / _ \   \___ \  / __|/ _` || | / _` |
  | |__| ||  __/| (_) |  ____) || (__| (_| || || (_| |
   \_____| \___| \___/  |_____/  \___|\__,_||_| \__,_|
@@ -31,7 +31,7 @@ And set dependency like this:
     <dependency>
         <groupId>com.github.tsingjyujing</groupId>
         <artifactId>geo-library</artifactId>
-        <version>2.8.2-${scala.version.main}-SNAPSHOT</version>
+        <version>2.8.4-${scala.version.main}</version>
     </dependency>
 </dependencies>
 ```
@@ -39,3 +39,4 @@ And set dependency like this:
 ## TODO
 - Create new algorithm k-means++ & kmeans || to initialize points with geo-optimized algorithm
 - parse GeoJSON object from string
+- Now support scala 2.10 only, for 2.11 or higher version should download source and `mvn clean package`

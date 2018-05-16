@@ -75,12 +75,39 @@ trait IVector2
 
     override def iterator: Iterator[Double] = getVector.iterator
 
+    /**
+      * Get direction angle (unit is rad)
+      *
+      * @return
+      */
     def direction: Double = math.atan2(getY, getX)
 
+    /**
+      *
+      * Rotate a certain angle along the counter clockwise
+      *
+      * @param theta angle (in rad) to rotate clockwise
+      * @return
+      */
+    def rotate(theta: Double): IVector2 = {
+        val sinTheta = math.sin(theta)
+        val cosTheta = math.cos(theta)
+        IVector2(
+            cosTheta * getX + sinTheta * getY,
+            -sinTheta * getX + cosTheta * getY
+        )
+    }
 }
 
 object IVector2 {
 
+    /**
+      * Get a new vector which immutable
+      *
+      * @param x x
+      * @param y y
+      * @return new vector
+      */
     def apply(x: Double, y: Double): IVector2 = Vector2(x, y)
 
     def getPow2Sum(x: Double, y: Double): Double = x * x + y * y
