@@ -160,9 +160,14 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
     def toSparseIndex(
                          sparsityParam: Double,
                          sparsitySearchParam: Int
-                     ): IndexedSeq[Int] = GeoPointTimeSeries.sparsifyGPSIndexed(
-        this, sparsityParam, sparsitySearchParam
-    )
+                     ): IndexedSeq[Int] = {
+        val remainIndexes = GeoPointTimeSeries.removeStayPoints(this)
+        val newGeoTimeSeries = GeoPointTimeSeries(remainIndexes.map(this.data))
+        val sparsedIndex = GeoPointTimeSeries.sparsifyGPSIndexed(
+            newGeoTimeSeries, sparsityParam, sparsitySearchParam
+        )
+        sparsedIndex map remainIndexes
+    }
 }
 
 /**
@@ -245,6 +250,32 @@ object GeoPointTimeSeries {
                 } else {
                     returnList += indexFound
                     nowIndex = indexFound
+                }
+            }
+        )
+        returnList.toIndexedSeq
+    }
+
+    /**
+      * Remove stay points and get remain indexes
+      *
+      * @param gpsArray         gps time series
+      * @param allowMinDistance min distance allow to margin
+      * @return which points should remain after cleaning
+      */
+    def removeStayPoints(
+                            gpsArray: GeoPointTimeSeries,
+                            allowMinDistance: Double = 0.005
+                        ): IndexedSeq[Int] = {
+        var currentPoint = gpsArray(0)
+        val returnList = new scala.collection.mutable.MutableList[Int]
+        returnList += 0
+        gpsArray.tail.zipWithIndex.foreach(
+            pi => {
+                val distance = pi._1.getValue.geoTo(currentPoint.getValue)
+                if (distance >= allowMinDistance) {
+                    currentPoint = pi._1
+                    returnList += pi._2
                 }
             }
         )

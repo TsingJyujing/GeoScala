@@ -11,6 +11,20 @@ import scala.util.parsing.json.JSONObject
 trait IGeoLine extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
 
     /**
+      * The length of line should over 1 meter in current accuracy of GPS sensors
+      *
+      * @return is this line valid
+      */
+    protected def dataValid: Boolean = lineLength > 0.001
+
+    /**
+      * Get the distance of start point to end point as length of the line
+      *
+      * @return length of the line in kilometer
+      */
+    def lineLength: Double = getTerminalPoints._1.geoTo(getTerminalPoints._2)
+
+    /**
       * get two points of the line
       *
       * @return

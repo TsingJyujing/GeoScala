@@ -11,7 +11,13 @@ import com.google.gson.Gson
 
 object RunDebug {
 
-    def main(args: Array[String]): Unit = testGeoCircle()
+    def main(args: Array[String]): Unit = GeoCompressTest()
+
+    def GeoCompressTest(): Unit = {
+        val points = (1 to 1000).map(t => TimeElement(t, GeoPoint(121, 30)))
+        val result = GeoPointTimeSeries(points).toSparse(1, 1000)
+        result.foreach(println)
+    }
 
     def GeoPointTreeDebug(): Unit = {
         val points = new GeoPointTree[GeoPoint]()
