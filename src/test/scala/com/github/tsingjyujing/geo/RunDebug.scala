@@ -8,6 +8,10 @@ import com.github.tsingjyujing.geo.util.mathematical.ConvexHull2
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
 import com.github.tsingjyujing.geo.util.{FileIO, GeoUtil}
 import com.google.gson.Gson
+import org.bson.Document
+
+import scala.collection.JavaConverters._
+import scala.io.Source
 
 object RunDebug {
 
@@ -17,6 +21,19 @@ object RunDebug {
         val points = (1 to 1000).map(t => TimeElement(t, GeoPoint(121, 30)))
         val result = GeoPointTimeSeries(points).toSparse(1, 1000)
         result.foreach(println)
+
+        val data: Iterable[TimeElement[GeoPoint]] = Document.parse(
+            Source.fromFile("gps_points.json").getLines().mkString("\n")
+        ).get("data", classOf[Document]).get("tracks").asInstanceOf[java.util.List[Document]].asScala.map(
+            x => TimeElement(
+                x.getString("gpsTime").toDouble,
+                GeoPoint(
+                    x.getString("lng").toDouble,
+                    x.getString("lat").toDouble
+                )
+            )
+        )
+        GeoPointTimeSeries(data).toSparse(0.1, 1000).foreach(println)
     }
 
     def GeoPointTreeDebug(): Unit = {

@@ -35,7 +35,7 @@ trait IGeoLine extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
       * normal vector of two vectors
       * for each vector, is the O->point on sphere in R3
       */
-    val n: Array[Double] = {
+    lazy val n: Array[Double] = {
         val v1 = getTerminalPoints._1
         val v2 = getTerminalPoints._2
         VectorUtil.norm2Vector(v1.toIVector3.outProduct(v2.toIVector3).getVector)
@@ -44,7 +44,7 @@ trait IGeoLine extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
     /**
       * Get inversed matrix of {v1,v2,n} which can do decomposition of any vector
       */
-    val iM: Array[Array[Double]] = {
+    lazy val iM: Array[Array[Double]] = {
         val v1 = getTerminalPoints._1
         val v2 = getTerminalPoints._2
         val M = Array(v1.toIVector3.getVector, v2.toIVector3.getVector, n)
