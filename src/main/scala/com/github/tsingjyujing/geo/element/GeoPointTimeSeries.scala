@@ -225,18 +225,11 @@ object GeoPointTimeSeries {
         returnList += 0
         var nowIndex = 0
         val getDistance = (startIndex: Int, endIndex: Int) => {
-            try {
-                val line = GeoLine(
-                    gpsArray(startIndex).value,
-                    gpsArray(endIndex).value
-                )
-                gpsArray.slice(startIndex + 1, endIndex).map((point) => line.geoTo(point.value)).max
-            } catch {
-                case ex: Throwable => {
-                    ex.printStackTrace()
-                    0
-                }
-            }
+            val line = GeoLine(
+                gpsArray(startIndex).value,
+                gpsArray(endIndex).value
+            )
+            gpsArray.slice(startIndex + 1, endIndex).map((point) => line.geoTo(point.value)).max
         }
 
         val loop = Breaks

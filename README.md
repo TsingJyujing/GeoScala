@@ -31,7 +31,7 @@ And set dependency like this:
     <dependency>
         <groupId>com.github.tsingjyujing</groupId>
         <artifactId>geo-library</artifactId>
-        <version>2.8.4-${scala.version.main}</version>
+        <version>2.8.6-${scala.version.main}</version>
     </dependency>
 </dependencies>
 ```
