@@ -5,6 +5,8 @@ import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
 /**
   * Mutable implementation of IGeoPoint
   *
+  * **Attention**: Avoid using mutable point in algorithms because it may break precomputed data
+  *
   * @param longitude
   * @param latitude
   */

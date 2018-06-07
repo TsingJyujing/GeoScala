@@ -111,7 +111,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
     }
 
     /**
-      * ResultType: Iterable[TimeElement[IGeoPoint]]
+      * ResultType: Iterable<TimeElement<IGeoPoint>>
       * StatusType: (lastValidPoint:TimeElement[IGeoPoint])
       *
       * @param marginDistance standard margin distance
@@ -161,12 +161,9 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
                          sparsityParam: Double,
                          sparsitySearchParam: Int
                      ): IndexedSeq[Int] = {
-        val remainIndexes = GeoPointTimeSeries.removeStayPoints(this)
-        val newGeoTimeSeries = GeoPointTimeSeries(remainIndexes.map(this.data))
-        val sparsedIndex = GeoPointTimeSeries.sparsifyGPSIndexed(
-            newGeoTimeSeries, sparsityParam, sparsitySearchParam
+        GeoPointTimeSeries.sparsifyGPSIndexed(
+            this, sparsityParam, sparsitySearchParam
         )
-        sparsedIndex map remainIndexes
     }
 }
 
@@ -263,6 +260,7 @@ object GeoPointTimeSeries {
       * @param allowMinDistance min distance allow to margin
       * @return which points should remain after cleaning
       */
+    @deprecated("May cause some unknown bug about high frequency data.")
     def removeStayPoints(
                             gpsArray: GeoPointTimeSeries,
                             allowMinDistance: Double = 0.005
