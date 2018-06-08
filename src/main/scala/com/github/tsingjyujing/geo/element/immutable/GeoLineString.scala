@@ -20,11 +20,27 @@ case class GeoLineString(points: IndexedSeq[IGeoPoint]) extends GeoDistanceMeasu
       */
     val geoLineString: IndexedSeq[GeoLine] = points.sliding(2).map(x => GeoLine(x.head, x.last)).toIndexedSeq
 
+    val lineStringLength: Double = geoLineString.map(_.lineLength).sum
+
+    /**
+      * Get the start point
+      *
+      * @return
+      */
+    def getStartPoint: IGeoPoint = points.head
+
+    /**
+      * Get the end point
+      *
+      * @return
+      */
+    def getEndPoint: IGeoPoint = points.last
+
     /**
       * Fetch result of the line string
       *
       * @param offsetStart start point index
-      * @param offsetEnd   end point indedx
+      * @param offsetEnd   end point index
       * @param distance    distance to line
       */
     case class FetchResult(offsetStart: Int, offsetEnd: Int, distance: Double) {

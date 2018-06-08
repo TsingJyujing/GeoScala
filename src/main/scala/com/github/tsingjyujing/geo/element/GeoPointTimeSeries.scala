@@ -161,9 +161,12 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
                          sparsityParam: Double,
                          sparsitySearchParam: Int
                      ): IndexedSeq[Int] = {
-        GeoPointTimeSeries.sparsifyGPSIndexed(
-            this, sparsityParam, sparsitySearchParam
+        val remainIndexes = GeoPointTimeSeries.removeStayPoints(this)
+        val newGeoTimeSeries = GeoPointTimeSeries(remainIndexes.map(this.data))
+        val sparsedIndex = GeoPointTimeSeries.sparsifyGPSIndexed(
+            newGeoTimeSeries, sparsityParam, sparsitySearchParam
         )
+        sparsedIndex map remainIndexes
     }
 }
 
@@ -192,6 +195,7 @@ object GeoPointTimeSeries {
       * @param sparsitySearchParam how many points to search in range
       * @return
       */
+    @deprecated
     def sparsifyGPS(
                        gpsArray: GeoPointTimeSeries,
                        sparsityParam: Double,
@@ -226,7 +230,13 @@ object GeoPointTimeSeries {
                 gpsArray(startIndex).value,
                 gpsArray(endIndex).value
             )
-            gpsArray.slice(startIndex + 1, endIndex).map((point) => line.geoTo(point.value)).max
+            val distance = gpsArray.slice(
+                startIndex,
+                endIndex
+            ).map(
+                point => line.geoTo(point.getValue)
+            ).max
+            distance
         }
 
         val loop = Breaks
@@ -235,12 +245,13 @@ object GeoPointTimeSeries {
                 val indexFound = SeqUtil.searchInSorted(
                     (i) => getDistance(nowIndex, i),
                     sparsityParam,
-                    nowIndex + 2,
+                    nowIndex + 1,
                     math.min(
                         nowIndex + sparsitySearchParam,
                         gpsArray.size - 2
                     )
                 )._1
+
                 if (indexFound >= gpsArray.size - 4) {
                     returnList += gpsArray.size - 1
                     loop.break
@@ -266,17 +277,18 @@ object GeoPointTimeSeries {
                             allowMinDistance: Double = 0.005
                         ): IndexedSeq[Int] = {
         var currentPoint = gpsArray(0)
-        val returnList = new scala.collection.mutable.MutableList[Int]
-        returnList += 0
-        gpsArray.tail.zipWithIndex.foreach(
+
+        val N = gpsArray.size
+        gpsArray.zipWithIndex.flatMap(
             pi => {
                 val distance = pi._1.getValue.geoTo(currentPoint.getValue)
-                if (distance >= allowMinDistance) {
+                if (pi._2 == 0 || pi._2 == (N - 1) || distance >= allowMinDistance) {
                     currentPoint = pi._1
-                    returnList += (pi._2 + 1)
+                    Some(pi._2)
+                } else {
+                    None
                 }
             }
-        )
-        returnList.toIndexedSeq
+        ).toIndexedSeq
     }
 }

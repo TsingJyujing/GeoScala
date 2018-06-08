@@ -18,12 +18,12 @@ object RunDebug {
     def main(args: Array[String]): Unit = GeoCompressTest()
 
     def GeoCompressTest(): Unit = {
-        val points = (1 to 1000).map(t => TimeElement(t, GeoPoint(121, 30)))
-        val result = GeoPointTimeSeries(points).toSparse(1, 1000)
-        result.foreach(println)
+        //        val points = (1 to 1000).map(t => TimeElement(t, GeoPoint(121, 30)))
+        //        val result = GeoPointTimeSeries(points).toSparse(1, 1000)
+        //        result.foreach(println)
 
         val data: Iterable[TimeElement[GeoPoint]] = Document.parse(
-            Source.fromFile("gps_points.json").getLines().mkString("\n")
+            Source.fromFile("gps_raw.json").getLines().mkString("\n")
         ).get("data", classOf[Document]).get("tracks").asInstanceOf[java.util.List[Document]].asScala.map(
             x => TimeElement(
                 x.getString("gpsTime").toDouble,
@@ -33,7 +33,15 @@ object RunDebug {
                 )
             )
         )
-        GeoPointTimeSeries(data).toSparse(0.1, 1000).foreach(println)
+        GeoPointTimeSeries(data).toSparse(0.1, 100)
+        FileIO.writePoints("visualize/dzy_raw.csv", data.map(_.getValue))
+        IndexedSeq(0.01, 0.1, 0.5, 1).foreach(
+            compressParam => {
+                FileIO.writePoints(
+                    s"visualize/dzy_compress_$compressParam.csv",
+                    GeoPointTimeSeries(data).toSparse(compressParam, 1000).map(_.getValue))
+            }
+        )
     }
 
     def GeoPointTreeDebug(): Unit = {
