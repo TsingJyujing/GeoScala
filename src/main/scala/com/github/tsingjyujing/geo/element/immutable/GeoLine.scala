@@ -83,5 +83,4 @@ final case class GeoLine(pointStart: IGeoPoint, pointEnd: IGeoPoint) extends Geo
         new LUDecomposition(M).getSolver.getInverse
     }
 
-
 }
