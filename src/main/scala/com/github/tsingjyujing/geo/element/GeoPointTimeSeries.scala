@@ -47,7 +47,10 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
       * @return
       */
     def sliceByTime(startTime: Double, endTime: Double): GeoPointTimeSeries = GeoPointTimeSeries(
-        slice(query(startTime)._1, query(endTime)._2)
+        slice(
+            query(startTime)._1,
+            query(endTime)._2
+        )
     )
 
     /**
@@ -85,7 +88,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
     private def cleanSliding(cleanFunc: (TimeElement[IGeoPoint], TimeElement[IGeoPoint]) => Boolean): GeoPointTimeSeries = GeoPointTimeSeries(sliding(2).filter(p2 => cleanFunc(p2.head, p2.last)).map(_.head))
 
     /**
-      * Clean overspeed data
+      * Clean over speed data
       *
       * @param speedLimit max speed allowed to appear
       * @return
@@ -163,10 +166,10 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
                      ): IndexedSeq[Int] = {
         val remainIndexes = GeoPointTimeSeries.removeStayPoints(this)
         val newGeoTimeSeries = GeoPointTimeSeries(remainIndexes.map(this.data))
-        val sparsedIndex = GeoPointTimeSeries.sparsifyGPSIndexed(
+        val sparse = GeoPointTimeSeries.sparsifyGPSIndexed(
             newGeoTimeSeries, sparsityParam, sparsitySearchParam
         )
-        sparsedIndex map remainIndexes
+        sparse map remainIndexes
     }
 }
 

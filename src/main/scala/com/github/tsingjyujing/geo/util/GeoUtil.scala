@@ -8,9 +8,11 @@ import scala.collection.parallel.ParIterable
 
 /**
   * @author tsingjyujing@163.com
-  * Some geographical utility methods
+  *         Some geographical utility methods
   */
 object GeoUtil {
+
+    private val MAX_DISTANCE_USE_LINEAR_ALGORITHM: Double = 1.0
 
     /**
       * Get steering angle by GPS info
@@ -102,10 +104,8 @@ object GeoUtil {
       * @return
       */
     def interp[T <: IGeoPoint](fromPoint: T, toPoint: T, insertPointCount: Int): TraversableOnce[IGeoPoint] = {
-        assert(insertPointCount >= 1, "Parameter insertPointCount invalid.")
-        val angleMax = math.acos(fromPoint.toIVector3.innerProduct(toPoint.toIVector3))
-        val dAngle = angleMax / (1 + insertPointCount)
-        VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, (0 to (insertPointCount + 1)).map(_ * dAngle)).map(vector3ToGeoPoint)
+        val ratios = (0 to (insertPointCount + 1)).map(_ / (insertPointCount + 1.0))
+        interp(fromPoint, toPoint, ratios)
     }
 
     /**
@@ -119,7 +119,18 @@ object GeoUtil {
       */
     def interp[T <: IGeoPoint](fromPoint: T, toPoint: T, ratio: Double): IGeoPoint = {
         assert(ratio <= 1 && ratio >= 0, "Parameter ratio invalid.")
-        vector3ToGeoPoint(VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, ratio * math.acos(fromPoint.toIVector3.innerProduct(toPoint.toIVector3))))
+        if (fromPoint.geoTo(toPoint) < 1.0) {
+            // If the distance is short enough
+            // linear interpolation will be used instead of sphere interpolation
+            val out = VectorUtil.linearInterpolation2(
+                fromPoint.toIVector2,
+                toPoint.toIVector2,
+                ratio
+            )
+            GeoPoint(out.getX, out.getY)
+        } else {
+            vector3ToGeoPoint(VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, ratio * math.acos(fromPoint.toIVector3.innerProduct(toPoint.toIVector3))))
+        }
     }
 
     /**
@@ -134,7 +145,17 @@ object GeoUtil {
     def interp[T <: IGeoPoint](fromPoint: T, toPoint: T, ratios: TraversableOnce[Double]): TraversableOnce[IGeoPoint] = {
         assert(ratios.forall(ratio => ratio <= 1 && ratio >= 0), "Parameter ratios invalid.")
         val maxAngle = math.acos(fromPoint.toIVector3.innerProduct(toPoint.toIVector3))
-        VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, ratios.map(_ * maxAngle)).map(vector3ToGeoPoint)
+        if (fromPoint.geoTo(toPoint) < MAX_DISTANCE_USE_LINEAR_ALGORITHM) {
+            VectorUtil.linearInterpolation2(
+                fromPoint.toIVector2,
+                toPoint.toIVector2,
+                ratios
+            ).toIterable.map(
+                v => GeoPoint(v.getX, v.getY)
+            )
+        } else {
+            VectorUtil.sphereInterpFast(fromPoint.toIVector3, toPoint.toIVector3, ratios.map(_ * maxAngle)).map(vector3ToGeoPoint)
+        }
     }
 
     /**
@@ -147,11 +168,29 @@ object GeoUtil {
       */
     def interp[T <: IGeoPoint](fromPoint: TimeElement[T], toPoint: TimeElement[T], insertPointCount: Int): Iterable[TimeElement[IGeoPoint]] = {
         assert(insertPointCount >= 1, "Parameter insertPointCount invalid.")
-        val angleMax = math.acos(fromPoint.value.toIVector3.innerProduct(toPoint.value.toIVector3))
-        val dAngle = angleMax / (1 + insertPointCount)
+        val ratios: IndexedSeq[Double] = (0 to (insertPointCount + 1)).map(_ / (insertPointCount + 1.0))
         val dt = (toPoint.getTick - fromPoint.getTick) / (1 + insertPointCount)
-        VectorUtil.sphereInterpFast(fromPoint.getValue.toIVector3, toPoint.getValue.toIVector3, (0 to (insertPointCount + 1)).map(_ * dAngle)).toIterable.zipWithIndex.map(xi => {
-            TimeElement(fromPoint.getTick + dt * xi._2, vector3ToGeoPoint(xi._1))
+        val geoSeq: Iterable[IGeoPoint] = if (fromPoint.getValue.geoTo(toPoint.getValue) < MAX_DISTANCE_USE_LINEAR_ALGORITHM) {
+            VectorUtil.linearInterpolation2(
+                fromPoint.getValue.toIVector2,
+                toPoint.getValue.toIVector2,
+                ratios
+            ).toIterable.map(
+                v => GeoPoint(v.getX, v.getY)
+            )
+        } else {
+            val angleMax = math.acos(fromPoint.value.toIVector3.innerProduct(toPoint.value.toIVector3))
+
+            // If points too closed (less than 1km) use linear interp for more robust
+            VectorUtil.sphereInterpFast(
+                fromPoint.getValue.toIVector3,
+                toPoint.getValue.toIVector3,
+                ratios.map(_ * angleMax)
+            ).toIterable.map(vector3ToGeoPoint)
+        }
+        geoSeq.zipWithIndex.map(xi => {
+            TimeElement(fromPoint.getTick + dt * xi._2, xi._1)
         })
     }
+
 }

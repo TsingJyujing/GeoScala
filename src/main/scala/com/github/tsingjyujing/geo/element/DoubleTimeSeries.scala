@@ -17,6 +17,8 @@ class DoubleTimeSeries extends ITimeIndexSeq[TimeElement[Double]] {
             apply(indexInfo._2)
         } else if (indexInfo._2 == (-1)) {
             apply(indexInfo._1)
+        } else if (indexInfo._1 == indexInfo._2) {
+            apply(indexInfo._1)
         } else {
             val dv = apply(indexInfo._2).getValue - apply(indexInfo._1).getValue
             val dt = apply(indexInfo._2).getTick - apply(indexInfo._1).getTick

@@ -10,7 +10,7 @@ import com.github.tsingjyujing.geo.basic.timeseries.ITick
   * @param value
   * @tparam T value type
   */
-final case class TimeElement[+T](time: Double, value: T) extends ITick with IValue[T] {
+case class TimeElement[+T](time: Double, value: T) extends ITick with IValue[T] {
     override def getTick: Double = time
 
     override def setTick(tick: Double): Unit = throw new Exception("Unsupported method")

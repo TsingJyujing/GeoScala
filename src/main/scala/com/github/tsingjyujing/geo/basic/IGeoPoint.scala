@@ -10,6 +10,7 @@ import scala.util.parsing.json.JSONObject
   * Any type which can get longitude and latitude (on earth)
   */
 trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with Serializable {
+
     def -(x: IVector2): IGeoPoint = GeoPoint(getLongitude - x.getX, getLatitude - x.getY)
 
     def -(x: IGeoPoint): IVector2 = Vector2(getLongitude - x.getLongitude, getLatitude - x.getLatitude)
@@ -41,7 +42,10 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
     override final def geoTo(point: IGeoPoint): Double = {
         val dx = math.abs(point.getLongitude - getLongitude)
         val dy = math.abs(point.getLatitude - getLatitude)
-        if (dx < 1e-5 && dy < 1e-5) {
+
+        if (dx < 0.02 && dy < 0.02) {
+            // If points are closed, use localEuclidDistance
+            // for faster and more accuracy while points are too close (such as less than 1m)
             IGeoPoint.localEuclidDistance(this, point)
         } else {
             IGeoPoint.geodesicDistance(this, point)
@@ -69,7 +73,7 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
         getLatitude
     )
 
-    override def toString: String = "Longitude:%3.6f,Latitude:%3.6f".format(getLongitude, getLatitude)
+    override def toString: String = "IGeoPoint(%3.6f,%3.6f)".format(getLongitude, getLatitude)
 
     /**
       * Verify is longitude value is legal
