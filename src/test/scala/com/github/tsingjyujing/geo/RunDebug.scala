@@ -23,7 +23,7 @@ object RunDebug {
         //        result.foreach(println)
 
         val data: Iterable[TimeElement[GeoPoint]] = Document.parse(
-            Source.fromFile("gps_raw.json").getLines().mkString("\n")
+            Source.fromFile("dzy.json").getLines().mkString("\n")
         ).get("data", classOf[Document]).get("tracks").asInstanceOf[java.util.List[Document]].asScala.map(
             x => TimeElement(
                 x.getString("gpsTime").toDouble,

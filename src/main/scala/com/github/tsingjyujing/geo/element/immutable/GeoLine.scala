@@ -36,7 +36,7 @@ final case class GeoLine(pointStart: IGeoPoint, pointEnd: IGeoPoint) extends Geo
       *
       * @return is this line valid
       */
-    protected def dataValid: Boolean = lineLength > 0.001
+    protected def dataValid: Boolean = lineLength > 0.0
 
     /**
       * Get distance from this to point or point to this (should be same)

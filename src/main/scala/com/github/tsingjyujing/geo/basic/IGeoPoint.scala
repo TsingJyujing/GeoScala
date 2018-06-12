@@ -38,7 +38,15 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
       * @param point geo point
       * @return
       */
-    override final def geoTo(point: IGeoPoint): Double = IGeoPoint.geodesicDistance(this, point)
+    override final def geoTo(point: IGeoPoint): Double = {
+        val dx = math.abs(point.getLongitude - getLongitude)
+        val dy = math.abs(point.getLatitude - getLatitude)
+        if (dx < 1e-5 && dy < 1e-5) {
+            IGeoPoint.localEuclidDistance(this, point)
+        } else {
+            IGeoPoint.geodesicDistance(this, point)
+        }
+    }
 
     /**
       * Get vector3 in R3 on 2d sphere
@@ -65,6 +73,7 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
 
     /**
       * Verify is longitude value is legal
+      *
       * @throws AssertionError verify failed
       */
     @throws[AssertionError]
@@ -77,6 +86,7 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
 
     /**
       * Verify is latitude value is legal
+      *
       * @throws AssertionError verify failed
       */
     @throws[AssertionError]
@@ -89,6 +99,7 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
 
     /**
       * Verify is latitude & longitude values are legal
+      *
       * @throws AssertionError verify failed
       */
     @throws[AssertionError]
@@ -100,8 +111,17 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
 
 
 object IGeoPoint {
-    val MAX_INNER_PRODUCT_FOR_UNIT_VECTOR: Double = 1.0
+    val MAX_INNER_PRODUCT_FOR_UNIT_VECTOR: Double = 1.0000
     val EARTH_RADIUS: Double = 6378.5
+
+    /**
+      * Create a mutable data
+      *
+      * @param longitude
+      * @param latitude
+      * @return
+      */
+    def apply(longitude: Double, latitude: Double): IGeoPoint = GeoPoint(longitude, latitude)
 
     /**
       * Get inner product of two points
@@ -128,6 +148,22 @@ object IGeoPoint {
         } else {
             math.acos(alpha) * EARTH_RADIUS
         }
+    }
+
+    /**
+      * Distance use local Euclid for more accuracy while two points are closed enough
+      *
+      * @param point1 point1
+      * @param point2 point2
+      * @return
+      */
+    def localEuclidDistance(point1: IGeoPoint, point2: IGeoPoint): Double = {
+        val meanLatitude = (point1.getLatitude + point2.getLatitude) / 2.0
+        val deltaLatitude = math.abs(point1.getLatitude - point2.getLatitude)
+        val deltaLongitude = math.abs(point1.getLongitude - point2.getLongitude)
+        val dx = EARTH_RADIUS * math.cos(meanLatitude.toRadians) * deltaLongitude.toRadians
+        val dy = EARTH_RADIUS * deltaLatitude.toRadians
+        math.sqrt(dx * dx + dy * dy)
     }
 
 }
