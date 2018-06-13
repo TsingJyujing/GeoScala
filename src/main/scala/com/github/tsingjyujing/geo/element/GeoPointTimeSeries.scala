@@ -29,6 +29,8 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
             apply(indexInfo._2)
         } else if (indexInfo._2 == (-1)) {
             apply(indexInfo._1)
+        } else if (indexInfo._1 == indexInfo._2) {
+            apply(indexInfo._1)
         } else {
             val dt = apply(indexInfo._2).getTick - apply(indexInfo._1).getTick
             val tickRatio = (time - apply(indexInfo._1).getTick) / dt
