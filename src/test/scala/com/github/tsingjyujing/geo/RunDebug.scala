@@ -2,7 +2,8 @@ package com.github.tsingjyujing.geo
 
 import com.github.tsingjyujing.geo.algorithm.cluster.DBScan
 import com.github.tsingjyujing.geo.algorithm.containers.LabeledPoint
-import com.github.tsingjyujing.geo.element.immutable.{GeoPoint, TimeElement, Vector2}
+import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
+import com.github.tsingjyujing.geo.element.immutable.{GeoLineString, GeoPoint, TimeElement, Vector2}
 import com.github.tsingjyujing.geo.element.{GeoCircleArea, GeoPointTimeSeries, GeoPointTree, GeoPolygon}
 import com.github.tsingjyujing.geo.util.mathematical.ConvexHull2
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
@@ -15,13 +16,72 @@ import scala.io.Source
 
 object RunDebug {
 
-    def main(args: Array[String]): Unit = GeoCompressTest()
+    def main(args: Array[String]): Unit = GeoLineStringMatch
 
+    /**
+      * 折线匹配
+      */
+    def GeoLineStringMatch: Unit = {
+        val points = IndexedSeq(
+            GeoPoint(121.346323, 31.220872), GeoPoint(121.346572, 31.220858), GeoPoint(121.347075, 31.220817),
+            GeoPoint(121.347076, 31.220817), GeoPoint(121.347403, 31.220789), GeoPoint(121.347504, 31.220784),
+            GeoPoint(121.347566, 31.220784), GeoPoint(121.347611, 31.220786), GeoPoint(121.347645, 31.220793),
+            GeoPoint(121.347683, 31.220805), GeoPoint(121.347717, 31.22082), GeoPoint(121.347754, 31.22084),
+            GeoPoint(121.347782, 31.220867), GeoPoint(121.347812, 31.220901), GeoPoint(121.347829, 31.220926),
+            GeoPoint(121.347846, 31.220957), GeoPoint(121.347862, 31.22098), GeoPoint(121.34788, 31.221002),
+            GeoPoint(121.3479, 31.221028), GeoPoint(121.347925, 31.221051), GeoPoint(121.347935, 31.221059),
+            GeoPoint(121.347946, 31.221066), GeoPoint(121.347962, 31.221075), GeoPoint(121.34797, 31.221078),
+            GeoPoint(121.347981, 31.221082), GeoPoint(121.348002, 31.221087), GeoPoint(121.348018, 31.221091),
+            GeoPoint(121.348032, 31.221092), GeoPoint(121.348049, 31.221095), GeoPoint(121.348069, 31.221094),
+            GeoPoint(121.348093, 31.221091), GeoPoint(121.348133, 31.221084), GeoPoint(121.348151, 31.221078),
+            GeoPoint(121.348167, 31.221073), GeoPoint(121.348178, 31.221066), GeoPoint(121.3482, 31.221049),
+            GeoPoint(121.348222, 31.22103), GeoPoint(121.348239, 31.221011), GeoPoint(121.348251, 31.220994),
+            GeoPoint(121.34826, 31.22098), GeoPoint(121.348267, 31.220963), GeoPoint(121.348271, 31.220949),
+            GeoPoint(121.348273, 31.220932), GeoPoint(121.348274, 31.220916), GeoPoint(121.348274, 31.220902),
+            GeoPoint(121.348292, 31.220608)
+        )
+        val line = GeoLineString(points)
+
+        val pointsResample = IndexedSeq(
+            GeoPoint(121.346323, 31.220872),
+            GeoPoint(121.347076, 31.220817),
+            GeoPoint(121.347566, 31.220784),
+            GeoPoint(121.347683, 31.220805),
+            GeoPoint(121.347782, 31.220867),
+            GeoPoint(121.347846, 31.220957),
+            GeoPoint(121.3479, 31.221028),
+            GeoPoint(121.347946, 31.221066),
+            GeoPoint(121.347981, 31.221082),
+            GeoPoint(121.348032, 31.221092),
+            GeoPoint(121.348093, 31.221091),
+            GeoPoint(121.348167, 31.221073),
+            GeoPoint(121.348222, 31.22103),
+            GeoPoint(121.34826, 31.22098),
+            GeoPoint(121.348273, 31.220932),
+            GeoPoint(121.348292, 31.220608)
+        )
+
+        var sumDistance = 0.0
+        var sumMileage = 0.0
+        pointsResample.sliding(2).foreach(
+            ps => {
+                val p = (ps.head.toIVector2 + ps.last.toIVector2) / 2 + IVector2(0.0001, 0.0001)
+                val d = ps.head.geoTo(ps.last)
+                val newPoint = IGeoPoint(p.getX, p.getY)
+                val fetchedResult = line.fetchLineString(newPoint)
+                sumMileage += d
+                sumDistance += fetchedResult.distance * d
+                println(fetchedResult)
+            }
+        )
+        println(s"Frechet result (average) = ${sumDistance / sumMileage}")
+
+    }
+
+    /**
+      * GPS路线数据压缩算法
+      */
     def GeoCompressTest(): Unit = {
-        //        val points = (1 to 1000).map(t => TimeElement(t, GeoPoint(121, 30)))
-        //        val result = GeoPointTimeSeries(points).toSparse(1, 1000)
-        //        result.foreach(println)
-
         val data: Iterable[TimeElement[GeoPoint]] = Document.parse(
             Source.fromFile("dzy.json").getLines().mkString("\n")
         ).get("data", classOf[Document]).get("tracks").asInstanceOf[java.util.List[Document]].asScala.map(

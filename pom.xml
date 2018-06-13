@@ -23,7 +23,7 @@
 
     <groupId>com.github.tsingjyujing</groupId>
     <artifactId>geo-library</artifactId>
-    <version>${geoscala.version}-${scala.version.main}-SNAPSHOT</version>
+    <version>${geoscala.version}-${scala.version.main}</version>
     <packaging>jar</packaging>
 
     <developers>
@@ -93,11 +93,12 @@
     </dependencies>
 
     <build>
+
         <finalName>${project.artifactId}</finalName>
         <outputDirectory>target/classes</outputDirectory>
+
         <testOutputDirectory>target/test-classes</testOutputDirectory>
-        <pluginManagement>
-        </pluginManagement>
+
         <plugins>
 
             <plugin>

@@ -1,6 +1,6 @@
 package com.github.tsingjyujing.geo.element.immutable
 
-import com.github.tsingjyujing.geo.basic.IGeoPoint
+import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
 
 /**
   * Get a immutable geo point
@@ -8,7 +8,7 @@ import com.github.tsingjyujing.geo.basic.IGeoPoint
   * @param longitude
   * @param latitude
   */
-final case class GeoPoint(longitude: Double, latitude: Double) extends IGeoPoint {
+case class GeoPoint(longitude: Double, latitude: Double) extends IGeoPoint {
 
     override def getLongitude: Double = longitude
 
@@ -16,4 +16,14 @@ final case class GeoPoint(longitude: Double, latitude: Double) extends IGeoPoint
 
     verifyValues
 
+}
+
+object GeoPoint {
+    /**
+      * Create point from IVector2
+      *
+      * @param data x=longitude y=latitude
+      * @return
+      */
+    def apply(data: IVector2): GeoPoint = new GeoPoint(data.getX, data.getY)
 }

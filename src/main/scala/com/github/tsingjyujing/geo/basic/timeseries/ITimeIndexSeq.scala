@@ -32,7 +32,7 @@ trait ITimeIndexSeq[T <: ITick] extends mutable.Iterable[T] {
         if (head.getTick > time) {
             (-1, 0)
         } else if (last.getTick < time) {
-            (size - 1, size)
+            (size - 1, -1)
         } else {
             var startIndex: Int = 0
             var endIndex: Int = size - 1
