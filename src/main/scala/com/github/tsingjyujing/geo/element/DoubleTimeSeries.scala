@@ -9,7 +9,7 @@ import com.github.tsingjyujing.geo.element.immutable.TimeElement
   */
 class DoubleTimeSeries extends ITimeIndexSeq[TimeElement[Double]] {
 
-    override def getValue(time: Double): TimeElement[Double] = {
+    override def getValue(time: Double): TimeElement[Double] = if (this.size > 1) {
         val indexInfo = query(time)
         if (indexInfo._1 == (-1) && indexInfo._2 == (-1)) {
             throw new RuntimeException("Error while querying value")
@@ -27,6 +27,8 @@ class DoubleTimeSeries extends ITimeIndexSeq[TimeElement[Double]] {
                 apply(indexInfo._1).getValue + (time - apply(indexInfo._1).getTick) * dv / dt
             )
         }
+    } else {
+        this.apply(0)
     }
 
 }

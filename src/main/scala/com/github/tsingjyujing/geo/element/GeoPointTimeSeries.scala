@@ -92,7 +92,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
     /**
       * Clean over speed data
       *
-      * @param speedLimit max speed allowed to appear
+      * @param speedLimit max speed allowed to appear,  unit of speed = km/unit of time
       * @return
       */
     def cleanOverSpeed(speedLimit: Double): GeoPointTimeSeries = {
@@ -113,6 +113,20 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
             }
         ))
         GeoPointTimeSeries(dataStack)
+    }
+
+    /**
+      * Clean gps data at 0,0 and use speed limit to clean jump points
+      *
+      * @param speedLimit max speed allowed to appear, unit of speed = km/unit of time
+      * @return
+      */
+    def cleanGpsData(speedLimit: Double): GeoPointTimeSeries = {
+        GeoPointTimeSeries(filter(point => {
+            val lng = point.getValue.getLongitude
+            val lat = point.getValue.getLatitude
+            math.abs(lng) < 1e-4 && math.abs(lat) < 1e-4
+        })).cleanOverSpeed(speedLimit)
     }
 
     /**
