@@ -49,7 +49,7 @@ object ConvexHull2 {
       * @param c c
       * @return
       */
-    private def isNotRightTurn(a: IVector2, b: IVector2, c: IVector2) = {
+    private def isNotRightTurn(a: IVector2, b: IVector2, c: IVector2): Boolean = {
         val cross = (a.getX - b.getX) * (c.getY - b.getY) - (a.getY - b.getY) * (c.getX - b.getX)
         val dot = (a.getX - b.getX) * (c.getX - b.getX) + (a.getY - b.getY) * (c.getY - b.getY)
         cross < 0 || cross == 0 && dot <= 0
@@ -63,5 +63,5 @@ object ConvexHull2 {
       * @param c
       * @return
       */
-    private def cross(a: IVector2, b: IVector2, c: IVector2) = (b.getX - a.getX) * (c.getY - a.getY) - (b.getY - a.getY) * (c.getX - a.getX)
+    private def cross(a: IVector2, b: IVector2, c: IVector2): Double = (b.getX - a.getX) * (c.getY - a.getY) - (b.getY - a.getY) * (c.getX - a.getX)
 }

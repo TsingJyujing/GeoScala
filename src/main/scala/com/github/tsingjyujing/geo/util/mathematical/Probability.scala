@@ -48,7 +48,7 @@ object Probability {
       * @return
       */
     def sphereUniform: IGeoPoint = GeoPoint(U(-180, 180), {
-        val randVal = U(0, 1)
+        val randVal = uniform(0, 2)
         if (randVal >= 0) {
             math.acos(math.abs(randVal))
         } else {

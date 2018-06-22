@@ -84,14 +84,20 @@ trait IVector2
 
     /**
       *
-      * Rotate a certain angle along the counter clockwise
+      * Rotate vector a certain angle
       *
-      * @param theta angle (in rad) to rotate clockwise
+      * @param theta       angle (in rad) to rotate
+      * @param isClockwise along the clockwise (default is counter clockwise)
       * @return
       */
-    def rotate(theta: Double): IVector2 = {
-        val sinTheta = math.sin(theta)
-        val cosTheta = math.cos(theta)
+    def rotate(theta: Double, isClockwise: Boolean = false): IVector2 = {
+        val _theta = if (isClockwise) {
+            -theta
+        } else {
+            theta
+        }
+        val sinTheta = math.sin(_theta)
+        val cosTheta = math.cos(_theta)
         IVector2(
             cosTheta * getX + sinTheta * getY,
             -sinTheta * getX + cosTheta * getY
