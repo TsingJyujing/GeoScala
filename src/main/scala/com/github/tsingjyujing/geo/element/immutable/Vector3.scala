@@ -9,7 +9,7 @@ import com.github.tsingjyujing.geo.basic.IVector3
   * @param y
   * @param z
   */
-final case class Vector3(x: Double, y: Double, z: Double) extends IVector3 {
+case class Vector3(x: Double, y: Double, z: Double) extends IVector3 {
     override def getX: Double = x
 
     override def getY: Double = y

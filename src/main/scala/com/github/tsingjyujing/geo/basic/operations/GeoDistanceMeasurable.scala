@@ -15,4 +15,12 @@ trait GeoDistanceMeasurable[T <: GeoDistanceMeasurable[T]] {
       * @return
       */
     def geoTo(point: T): Double
+
+    /**
+      * Alias of geoTo
+      *
+      * @param point
+      * @return
+      */
+    final def -->(point: T): Double = geoTo(point)
 }

@@ -11,7 +11,7 @@ import com.github.tsingjyujing.geo.basic.operations.IValue
   * @param value
   * @tparam T value type
   */
-final case class GeoPointValued[T](longitude: Double, latitude: Double, value: T) extends IGeoPoint with IValue[T] {
+case class GeoPointValued[T](longitude: Double, latitude: Double, value: T) extends IGeoPoint with IValue[T] {
     override def getLongitude: Double = longitude
 
     override def getLatitude: Double = latitude

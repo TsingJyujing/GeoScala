@@ -9,7 +9,7 @@ import scala.language.implicitConversions
   *
   * @param value
   */
-final case class DoubleValue(var value: Double) extends Addable[DoubleValue] with Productable[DoubleValue] {
+case class DoubleValue(var value: Double) extends Addable[DoubleValue] with Productable[DoubleValue] {
 
     override def +(v: DoubleValue) = DoubleValue(value + v.value)
 

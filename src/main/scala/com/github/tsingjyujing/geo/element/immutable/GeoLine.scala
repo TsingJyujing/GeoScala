@@ -13,7 +13,7 @@ import scala.util.parsing.json.JSONObject
   * @param pointStart
   * @param pointEnd
   */
-final case class GeoLine(pointStart: IGeoPoint, pointEnd: IGeoPoint) extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
+case class GeoLine(pointStart: IGeoPoint, pointEnd: IGeoPoint) extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
 
     val pointTuple: (IGeoPoint, IGeoPoint) = (pointStart, pointEnd)
 

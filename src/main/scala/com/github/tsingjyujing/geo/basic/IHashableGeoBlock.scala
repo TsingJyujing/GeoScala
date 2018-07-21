@@ -15,7 +15,7 @@ import scala.collection.mutable
 trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
 
     /**
-      * Accuracy to devide earth into N*N parts
+      * Accuracy to mesh earth into N*N parts
       *
       * @return
       */

@@ -16,7 +16,7 @@ import scala.io.Source
 
 object RunDebug {
 
-    def main(args: Array[String]): Unit = GeoLineStringMatch
+    def main(args: Array[String]): Unit = GeoCompressTest()
 
     /**
       * 折线匹配
@@ -83,7 +83,7 @@ object RunDebug {
       */
     def GeoCompressTest(): Unit = {
         val data: Iterable[TimeElement[GeoPoint]] = Document.parse(
-            Source.fromFile("dzy.json").getLines().mkString("\n")
+            Source.fromFile("dzy_3.json").getLines().mkString("\n")
         ).get("data", classOf[Document]).get("tracks").asInstanceOf[java.util.List[Document]].asScala.map(
             x => TimeElement(
                 x.getString("gpsTime").toDouble,
@@ -93,7 +93,7 @@ object RunDebug {
                 )
             )
         )
-        GeoPointTimeSeries(data).toSparse(0.1, 100)
+        GeoPointTimeSeries(data).toSparse(0.01, 1000)
         FileIO.writePoints("visualize/dzy_raw.csv", data.map(_.getValue))
         IndexedSeq(0.01, 0.1, 0.5, 1).foreach(
             compressParam => {

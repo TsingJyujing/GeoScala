@@ -15,4 +15,12 @@ trait DistanceMeasurable[T <: DistanceMeasurable[T]] {
       * @return
       */
     def to(x: T): Double
+
+    /**
+      * Alias of to
+      *
+      * @param x
+      * @return
+      */
+    final def ->(x: T): Double = to(x)
 }
