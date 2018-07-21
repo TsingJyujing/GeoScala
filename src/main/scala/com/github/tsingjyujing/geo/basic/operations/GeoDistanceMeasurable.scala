@@ -22,5 +22,5 @@ trait GeoDistanceMeasurable[T <: GeoDistanceMeasurable[T]] {
       * @param point
       * @return
       */
-    final def -->(point: T): Double = geoTo(point)
+    final def ~>(point: T): Double = geoTo(point)
 }
