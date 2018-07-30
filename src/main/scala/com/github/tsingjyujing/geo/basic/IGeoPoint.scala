@@ -15,7 +15,7 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
 
     def -(x: IGeoPoint): IVector2 = Vector2(getLongitude - x.getLongitude, getLatitude - x.getLatitude)
 
-    def +(x: IVector2): IGeoPoint = GeoPoint(getLongitude + x.getX, getLatitude * x.getY)
+    def +(x: IVector2): IGeoPoint = GeoPoint(getLongitude + x.getX, getLatitude + x.getY)
 
     override def toGeoJSON: JSONObject = GeoJSONable.createPoint(this)
 

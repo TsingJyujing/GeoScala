@@ -3,8 +3,8 @@ package com.github.tsingjyujing.geo
 import com.github.tsingjyujing.geo.algorithm.cluster.DBScan
 import com.github.tsingjyujing.geo.algorithm.containers.LabeledPoint
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
+import com.github.tsingjyujing.geo.element._
 import com.github.tsingjyujing.geo.element.immutable.{GeoLineString, GeoPoint, TimeElement, Vector2}
-import com.github.tsingjyujing.geo.element.{GeoCircleArea, GeoPointTimeSeries, GeoPointTree, GeoPolygon}
 import com.github.tsingjyujing.geo.util.mathematical.ConvexHull2
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
 import com.github.tsingjyujing.geo.util.{FileIO, GeoUtil}
@@ -16,7 +16,7 @@ import scala.io.Source
 
 object RunDebug {
 
-    def main(args: Array[String]): Unit = GeoCompressTest()
+    def main(args: Array[String]): Unit = createPolygonWithHolesSamples()
 
     /**
       * 折线匹配
@@ -189,6 +189,39 @@ object RunDebug {
         })
         FileIO.writePoints("polygon.csv", polygonInfo)
         FileIO.writeLabeledPoints("test_polygon.csv", randomPoins)
+    }
+
+    def createPolygonWithHolesSamples(): Unit = {
+        val polygonAndHoles = IndexedSeq(
+            IndexedSeq(
+                Vector2(1, 0),
+                Vector2(2, 1),
+                Vector2(2, 2),
+                Vector2(1, 3),
+                Vector2(0, 1)
+            ),
+            IndexedSeq(
+                Vector2(0.5, 0.6),
+                Vector2(1.5, 0.6),
+                Vector2(1.5, 1.9),
+                Vector2(0.5, 1.9)
+            )
+        )
+        val pointO = GeoPoint(108, 36)
+        val pointss = polygonAndHoles.map(l => l.map(pointO + _))
+        val polygonInfo = GeoPolygonWithHoles(pointss)
+        val randomPoins = (1 to 3000).map(_ => {
+            val point = pointO + Vector2(rand(1.5, 5), rand(1.5, 5))
+            val isInPolygon = if (polygonInfo.contains(point)) {
+                1
+            } else {
+                0
+            }
+            LabeledPoint(isInPolygon, point)
+        })
+        FileIO.writePoints("visualize/polygon.polygon.csv", pointss.head)
+        FileIO.writePoints("visualize/polygon.hole.csv", pointss.last)
+        FileIO.writeLabeledPoints("visualize/polygon.test.data.csv", randomPoins)
     }
 
     def visualizeFrechetResult(): Unit = {

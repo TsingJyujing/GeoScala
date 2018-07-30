@@ -1,8 +1,8 @@
 package com.github.tsingjyujing.geo.basic.operations
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint
-import com.github.tsingjyujing.geo.element.GeoPolygon
 import com.github.tsingjyujing.geo.element.immutable.GeoPoint
+import com.github.tsingjyujing.geo.element.{GeoPolygon, GeoPolygonWithHoles}
 import com.github.tsingjyujing.geo.model.{GeoJsonPoint, GeoJsonPolygon}
 import com.google.gson.Gson
 
@@ -176,4 +176,6 @@ object GeoJSONable {
     def parseGeoPoint(json: String): GeoPoint = gson.fromJson(json, classOf[GeoJsonPoint]).getPoint
 
     def parseGeoPolygon(json: String): GeoPolygon = gson.fromJson(json, classOf[GeoJsonPolygon]).getPolygon
+
+    def parseGeoPolygonWithHoles(json: String): GeoPolygonWithHoles = gson.fromJson(json, classOf[GeoJsonPolygon]).getPolygonWithHoles
 }
