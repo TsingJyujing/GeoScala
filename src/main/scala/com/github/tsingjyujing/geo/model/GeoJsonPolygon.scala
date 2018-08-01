@@ -47,7 +47,7 @@ class GeoJsonPolygon {
     def getPolygonWithHoles: GeoPolygonWithHoles = {
         assert(verify, "type mismatch")
         assert(coordinates != null, "")
-        assert(coordinates.size() <= 1, "polygon area is greater than 1 (ring polygon will support in feature release)")
+        assert(coordinates.size() >= 1, "polygon area should greater than 1 (ring polygon will support in feature release)")
         coordinates.asScala.foreach(a => {
             a.asScala.foreach(
                 coordinatesList => {
