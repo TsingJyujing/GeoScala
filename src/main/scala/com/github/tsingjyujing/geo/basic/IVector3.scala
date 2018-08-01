@@ -48,7 +48,7 @@ trait IVector3
       * @param x compare unit
       * @return
       */
-    override def conAngle(x: IVector3): Double = IVector3.cosAngle(this, x)
+    override def cosAngle(x: IVector3): Double = IVector3.cosAngle(this, x)
 
     /**
       * Get array format value

@@ -111,6 +111,27 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
         verifyLatitude
         verifyLongitude
     }
+
+    /**
+      * Get the direction from this to target point in unit of Degree
+      *
+      * North: 0/360
+      * East:  90
+      * South: 180
+      * West:  270
+      *
+      * @param point target point
+      * @return
+      */
+    def directionTo(point: IGeoPoint): Double = {
+        val dV = point - this
+        val angle = math.atan2(dV.getX, dV.getY) % (math.Pi * 2)
+        if (angle >= 0) {
+            angle.toDegrees
+        } else {
+            angle.toDegrees + 360.0
+        }
+    }
 }
 
 

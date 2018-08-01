@@ -14,7 +14,7 @@ trait Angleable[T] {
       * @param x compare unit
       * @return
       */
-    def conAngle(x: T): Double
+    def cosAngle(x: T): Double
 
     /**
       * Get angle (in unit of rad) value of this and x
@@ -22,5 +22,5 @@ trait Angleable[T] {
       * @param x compare unit
       * @return
       */
-    def angle(x: T): Double = math.acos(conAngle(x))
+    def angle(x: T): Double = math.acos(cosAngle(x))
 }
