@@ -8,7 +8,10 @@ A robust geo library written by Java and Scala, contains:
 - Machine learning algorithms implemented on sphere
 
 ## Documents
+
 See <a href="https://github.com/TsingJyujing/GeoScala/wiki">GeoScala - wiki</a>
+
+See [Scala Doc](https://tsingjyujing.github.io/geo-scala-doc/) for more details about classes.
 
 ## Maven
 
