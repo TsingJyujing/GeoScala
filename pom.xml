@@ -6,7 +6,7 @@
         <!--Scala version = main.sub -->
         <scala.version.main>2.10</scala.version.main>
         <scala.version.sub>7</scala.version.sub>
-        <geoscala.version>2.8.8</geoscala.version>
+        <geoscala.version>2.8.9-SNAPSHOT</geoscala.version>
         <project.build.sourceEncoding>
             UTF-8
         </project.build.sourceEncoding>
