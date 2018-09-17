@@ -125,7 +125,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
         GeoPointTimeSeries(filter(point => {
             val lng = point.getValue.getLongitude
             val lat = point.getValue.getLatitude
-            math.abs(lng) < 1e-4 && math.abs(lat) < 1e-4
+            math.abs(lng) > 1e-4 && math.abs(lat) > 1e-4
         })).cleanOverSpeed(speedLimit)
     }
 
