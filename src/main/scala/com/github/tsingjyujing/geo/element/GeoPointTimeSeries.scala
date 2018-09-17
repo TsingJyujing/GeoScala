@@ -89,6 +89,35 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
       */
     private def cleanSliding(cleanFunc: (TimeElement[IGeoPoint], TimeElement[IGeoPoint]) => Boolean): GeoPointTimeSeries = GeoPointTimeSeries(sliding(2).filter(p2 => cleanFunc(p2.head, p2.last)).map(_.head))
 
+
+    /**
+      * Clean over speed data
+      *
+      * @param speedLimit max speed allowed to appear,  unit of speed = km/unit of time
+      * @return
+      */
+    def cleanOverSpeedIndex(speedLimit: Double): IndexedSeq[Int] = {
+        var lastValidPoint = head
+        val dataStack = scala.collection.mutable.ArrayBuffer.empty[Int]
+        dataStack.append(0)
+        dataStack.appendAll(this.tail.zipWithIndex.flatMap(
+            x => {
+                val te = x._1
+                val index = x._2
+                val ds = lastValidPoint.getValue.geoTo(te.getValue)
+                val dt = te.getTick - lastValidPoint.getTick
+                val speed = ds / dt
+                if (speed >= speedLimit) {
+                    None
+                } else {
+                    lastValidPoint = te
+                    Some(index)
+                }
+            }
+        ))
+        dataStack
+    }
+
     /**
       * Clean over speed data
       *
@@ -96,23 +125,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
       * @return
       */
     def cleanOverSpeed(speedLimit: Double): GeoPointTimeSeries = {
-        var lastValidPoint = this.head
-        val dataStack = scala.collection.mutable.ArrayBuffer.empty[TimeElement[IGeoPoint]]
-        dataStack.append(lastValidPoint)
-        dataStack.appendAll(this.tail.flatMap(
-            x => {
-                val ds = lastValidPoint.getValue.geoTo(x.getValue)
-                val dt = x.getTick - lastValidPoint.getTick
-                val speed = ds / dt
-                if (speed >= speedLimit) {
-                    None
-                } else {
-                    lastValidPoint = x
-                    Some(x)
-                }
-            }
-        ))
-        GeoPointTimeSeries(dataStack)
+        GeoPointTimeSeries(cleanOverSpeedIndex(speedLimit).map(apply))
     }
 
     /**
