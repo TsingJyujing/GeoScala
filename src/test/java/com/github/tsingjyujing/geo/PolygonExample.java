@@ -2,7 +2,7 @@ package com.github.tsingjyujing.geo;
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint;
 import com.github.tsingjyujing.geo.element.GeoPolygon;
-import com.github.tsingjyujing.geo.element.immutable.GeoPoint;
+import com.github.tsingjyujing.geo.element.mutable.GeoPoint$;
 import scala.collection.JavaConverters;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class PolygonExample {
 
         boolean result = polygon.contains(
                 // Point need to query
-                GeoPoint.apply(121, 30)
+                GeoPoint$.MODULE$.apply(121, 30)
         );
         System.out.printf("Point is %sin the polygon", result ? "" : "not ");
     }
