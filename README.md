@@ -1,5 +1,7 @@
-
 ![geo-scala](icon.png)
+# Geo Scala
+
+[![CircleCI](https://circleci.com/gh/TsingJyujing/GeoScala.svg?style=svg)](https://circleci.com/gh/TsingJyujing/GeoScala)
 
 A robust geo library written by Java and Scala, contains:
 - GPS 2d-spherical geometry
