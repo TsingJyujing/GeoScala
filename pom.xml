@@ -54,6 +54,8 @@
         </license>
     </licenses>
 
+    <!--OFFICE DEPLOY SETTING-->
+
     <dependencies>
 
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
