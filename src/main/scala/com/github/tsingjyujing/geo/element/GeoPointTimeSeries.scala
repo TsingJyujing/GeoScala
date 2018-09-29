@@ -13,7 +13,7 @@ import scala.util.control.Breaks
   *
   * @author tsingjyujing@163.com
   */
-class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
+class GeoPointTimeSeries[T <: IGeoPoint] extends ITimeIndexSeq[TimeElement[T]] {
 
     /**
       * Query value by time
@@ -21,7 +21,34 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
       * @param time time to query
       * @return
       */
-    override def getValue(time: Double): TimeElement[IGeoPoint] = {
+    override def getValue(time: Double): TimeElement[T] = {
+        val indexInfo = query(time)
+        if (indexInfo._1 == (-1) && indexInfo._2 == (-1)) {
+            throw new RuntimeException("Error while querying value")
+        } else if (indexInfo._1 == (-1)) {
+            apply(indexInfo._2)
+        } else if (indexInfo._2 == (-1)) {
+            apply(indexInfo._1)
+        } else if (indexInfo._1 == indexInfo._2) {
+            apply(indexInfo._1)
+        } else {
+            val dtTo1 = math.abs(apply(indexInfo._1).getTick - time)
+            val dtTo2 = math.abs(apply(indexInfo._2).getTick - time)
+            if (dtTo1 < dtTo2) {
+                apply(indexInfo._1)
+            } else {
+                apply(indexInfo._2)
+            }
+        }
+    }
+
+    /**
+      * Query value by time
+      *
+      * @param time time to query
+      * @return
+      */
+    def getValueInterp(time: Double): TimeElement[IGeoPoint] = {
         val indexInfo = query(time)
         if (indexInfo._1 == (-1) && indexInfo._2 == (-1)) {
             throw new RuntimeException("Error while querying value")
@@ -48,7 +75,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
       * @param endTime
       * @return
       */
-    def sliceByTime(startTime: Double, endTime: Double): GeoPointTimeSeries = GeoPointTimeSeries(
+    def sliceByTime(startTime: Double, endTime: Double): GeoPointTimeSeries[T] = GeoPointTimeSeries[T](
         slice(
             query(startTime)._1,
             query(endTime)._2
@@ -87,7 +114,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
       * @param cleanFunc
       * @return
       */
-    private def cleanSliding(cleanFunc: (TimeElement[IGeoPoint], TimeElement[IGeoPoint]) => Boolean): GeoPointTimeSeries = GeoPointTimeSeries(sliding(2).filter(p2 => cleanFunc(p2.head, p2.last)).map(_.head))
+    private def cleanSliding(cleanFunc: (TimeElement[IGeoPoint], TimeElement[IGeoPoint]) => Boolean): GeoPointTimeSeries[T] = GeoPointTimeSeries[T](sliding(2).filter(p2 => cleanFunc(p2.head, p2.last)).map(_.head))
 
 
     /**
@@ -124,7 +151,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
       * @param speedLimit max speed allowed to appear,  unit of speed = km/unit of time
       * @return
       */
-    def cleanOverSpeed(speedLimit: Double): GeoPointTimeSeries = {
+    def cleanOverSpeed(speedLimit: Double): GeoPointTimeSeries[T] = {
         GeoPointTimeSeries(cleanOverSpeedIndex(speedLimit).map(apply))
     }
 
@@ -134,7 +161,7 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
       * @param speedLimit max speed allowed to appear, unit of speed = km/unit of time
       * @return
       */
-    def cleanGpsData(speedLimit: Double): GeoPointTimeSeries = {
+    def cleanGpsData(speedLimit: Double): GeoPointTimeSeries[T] = {
         GeoPointTimeSeries(filter(point => {
             val lng = point.getValue.getLongitude
             val lat = point.getValue.getLatitude
@@ -150,11 +177,11 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
       * @param maxTolerance   do resample if d>maxTolerance*marginDistance
       * @return
       */
-    def isometricallyResample(marginDistance: Double, maxTolerance: Double = 3.0): GeoPointTimeSeries = GeoPointTimeSeries(statusMachine[TimeElement[IGeoPoint], Iterable[TimeElement[IGeoPoint]]](
+    def isometricallyResample(marginDistance: Double, maxTolerance: Double = 3.0): GeoPointTimeSeries[IGeoPoint] = GeoPointTimeSeries[IGeoPoint](statusMachine[TimeElement[IGeoPoint], Iterable[TimeElement[IGeoPoint]]](
         (currentPoint, status) => {
             val d = currentPoint.value geoTo status.value
             if (d < marginDistance) {
-                (Array.empty[TimeElement[IGeoPoint]], status)
+                (Array.empty[TimeElement[T]], status)
             } else if (d <= marginDistance * maxTolerance) {
                 (Array(currentPoint), currentPoint)
             } else {
@@ -174,8 +201,8 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
     def toSparse(
                     sparsityParam: Double,
                     sparsitySearchParam: Int
-                ): GeoPointTimeSeries
-    = GeoPointTimeSeries(
+                ): GeoPointTimeSeries[T]
+    = GeoPointTimeSeries[T](
         toSparseIndex(
             sparsityParam,
             sparsitySearchParam
@@ -208,13 +235,13 @@ class GeoPointTimeSeries extends ITimeIndexSeq[TimeElement[IGeoPoint]] {
 object GeoPointTimeSeries {
 
     /**
-      * Create TimeSeries by time-elements
+      * //      * Create TimeSeries by time-elements
       *
       * @param data
       * @return
       */
-    def apply(data: TraversableOnce[TimeElement[IGeoPoint]]): GeoPointTimeSeries = {
-        val result = new GeoPointTimeSeries()
+    def apply[T <: IGeoPoint](data: TraversableOnce[TimeElement[T]]): GeoPointTimeSeries[T] = {
+        val result = new GeoPointTimeSeries[T]()
         result.appendAll(data)
         result
     }
@@ -228,11 +255,11 @@ object GeoPointTimeSeries {
       * @return
       */
     @deprecated
-    def sparsifyGPS(
-                       gpsArray: GeoPointTimeSeries,
-                       sparsityParam: Double,
-                       sparsitySearchParam: Int
-                   ): GeoPointTimeSeries = GeoPointTimeSeries(
+    def sparsifyGPS[T <: IGeoPoint](
+                                       gpsArray: GeoPointTimeSeries[T],
+                                       sparsityParam: Double,
+                                       sparsitySearchParam: Int
+                                   ): GeoPointTimeSeries[T] = GeoPointTimeSeries[T](
         sparsifyGPSIndexed(
             gpsArray, sparsityParam, sparsitySearchParam
         ).map(
@@ -248,11 +275,11 @@ object GeoPointTimeSeries {
       * @param sparsitySearchParam how many points to search in range
       * @return
       */
-    def sparsifyGPSIndexed(
-                              gpsArray: GeoPointTimeSeries,
-                              sparsityParam: Double,
-                              sparsitySearchParam: Int
-                          ): IndexedSeq[Int] = {
+    def sparsifyGPSIndexed[T <: IGeoPoint](
+                                              gpsArray: GeoPointTimeSeries[T],
+                                              sparsityParam: Double,
+                                              sparsitySearchParam: Int
+                                          ): IndexedSeq[Int] = {
         if (gpsArray.size < 10) return gpsArray.indices
         val returnList = new scala.collection.mutable.MutableList[Int]
         returnList += 0
@@ -304,10 +331,10 @@ object GeoPointTimeSeries {
       * @return which points should remain after cleaning
       */
     @deprecated("May cause some unknown bug about high frequency data.")
-    def removeStayPoints(
-                            gpsArray: GeoPointTimeSeries,
-                            allowMinDistance: Double = 0.005
-                        ): IndexedSeq[Int] = {
+    def removeStayPoints[T <: IGeoPoint](
+                                            gpsArray: GeoPointTimeSeries[T],
+                                            allowMinDistance: Double = 0.005
+                                        ): IndexedSeq[Int] = {
         var currentPoint = gpsArray(0)
 
         val N = gpsArray.size

@@ -14,7 +14,7 @@ import scala.util.parsing.json.JSONObject
   * @param polygonPoints polygon points with out first point in the last position
   *                      For example: p0,p1,p2 represents polygon of p0->p1->p2->p0
   */
-class GeoPolygon(polygonPoints: Iterable[IGeoPoint]) extends Iterable[IGeoPoint] with IContains[IGeoPoint] with GeoJSONable {
+case class GeoPolygon(polygonPoints: Iterable[IGeoPoint]) extends Iterable[IGeoPoint] with IContains[IGeoPoint] with GeoJSONable {
 
     override def iterator: Iterator[IGeoPoint] = polygon.iterator
 
@@ -47,8 +47,4 @@ class GeoPolygon(polygonPoints: Iterable[IGeoPoint]) extends Iterable[IGeoPoint]
     }
 
     override def toGeoJSON: JSONObject = GeoJSONable.createRingPolygon(polygon)
-}
-
-object GeoPolygon{
-    def apply(polygonPoints: Iterable[IGeoPoint]): GeoPolygon = new GeoPolygon(polygonPoints)
 }
