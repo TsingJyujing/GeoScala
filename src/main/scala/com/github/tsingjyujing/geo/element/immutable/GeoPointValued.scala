@@ -18,3 +18,19 @@ case class GeoPointValued[T](longitude: Double, latitude: Double, value: T) exte
 
     override def getValue: T = value
 }
+
+object GeoPointValued {
+    /**
+      * Create a new point with value
+      *
+      * @param point point
+      * @param value value
+      * @tparam T Type of value
+      * @return
+      */
+    def apply[T](point: IGeoPoint, value: T): GeoPointValued[T] = new GeoPointValued[T](
+        point.getLongitude,
+        point.getLatitude,
+        value
+    )
+}

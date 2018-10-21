@@ -4,8 +4,8 @@ import java.io.{File, PrintWriter}
 
 import com.github.tsingjyujing.geo.basic.IHashableGeoBlock.{createCodeFromGps, revertGpsFromCode}
 import com.github.tsingjyujing.geo.basic.{IGeoPoint, IVector2}
-import com.github.tsingjyujing.geo.element.immutable.{GeoLineString, GeoPoint, HashedGeoBlock, Vector2}
-import com.github.tsingjyujing.geo.element.{GeoHeatMap, GeoPointTree}
+import com.github.tsingjyujing.geo.element.immutable._
+import com.github.tsingjyujing.geo.element.{GeoHeatMap, GeoNativeIndexPointTree, GeoPointTree}
 import com.github.tsingjyujing.geo.util.GeoUtil
 import com.github.tsingjyujing.geo.util.convertor.{BD09, GCJ02}
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
@@ -101,6 +101,49 @@ class GeoAutoTest extends FlatSpec with Matchers {
         /**
           *
           */
+        centers.foreach(center => {
+            val withInPoints = points.geoWithinRing(center, 0, radius)
+            val count1 = withInPoints.size
+            val count2 = points.count(point => point.geoTo(center) <= radius)
+            withInPoints.foreach(p => {
+                assert(p.geoTo(center) <= radius, "Invalid point")
+            })
+            assert(count1 == count2, "Assert failed while test geo within")
+            if (count2 == 0) {
+                println("Warning: no point in radius")
+            }
+        })
+
+        centers.foreach(center => {
+            val count1 = points.geoNear(center, radius * 2).get.geoTo(center)
+            val count2 = points.map(_.geoTo(center)).min
+            assert(count1 == count2, "Assert failed while test geo within")
+        })
+    }
+
+
+    it should "GeoPoint Native TreeSet" in {
+        val points = new GeoNativeIndexPointTree[Int]()
+        // Generate test data set
+        val centers = IndexedSeq(
+            GeoPoint(121, 31),
+            GeoPoint(108, 36)
+        )
+        val radius: Double = 4.0
+
+        // 随机生成10000个点
+        (1 to 10000).foreach(_ => {
+            centers.foreach(center => {
+                val newPoint = GeoPoint(center.getLongitude + rand(0, 0.5), center.getLatitude + rand(0, 0.5))
+                points.appendPoint(
+                    GeoPointValued[Int](
+                        newPoint,
+                        0
+                    )
+                )
+            })
+        })
+
         centers.foreach(center => {
             val withInPoints = points.geoWithinRing(center, 0, radius)
             val count1 = withInPoints.size
