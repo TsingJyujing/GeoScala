@@ -33,10 +33,16 @@ class GeoNativeIndexPointTree[T](pointSearchLimit: Int = -1) extends IGeoPointSe
       */
     @BeCarefulWhileUsing(message = "Be careful while using this method and ensure data will not be use after free.")
     def free(): Unit = {
-        // FIXME Synchronize it
+
         if (!isReleased.get()) {
-            NativeS2PointIndex.deleteS2Index(s2IndexData)
-            isReleased.set(true)
+            writeLock.lock()
+            try {
+                NativeS2PointIndex.deleteS2Index(s2IndexData)
+                isReleased.set(true)
+            } catch {
+                case _: Throwable =>
+                    writeLock.unlock()
+            }
         }
     }
 
