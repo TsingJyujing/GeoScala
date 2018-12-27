@@ -28,7 +28,7 @@ public class NativeS2PointIndex {
                     System.getProperty("java.library.path"),
                     ex
             );
-            throw ex;
+            System.exit(-1);
         }
     }
 

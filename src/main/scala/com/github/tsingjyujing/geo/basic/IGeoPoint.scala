@@ -43,7 +43,7 @@ trait IGeoPoint extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with S
         val dx = math.abs(point.getLongitude - getLongitude)
         val dy = math.abs(point.getLatitude - getLatitude)
 
-        if (dx < 0.02 && dy < 0.02 && point.getLatitude < 60) {
+        if (dx < 0.001 && dy < 0.001 && point.getLatitude < 60) {
             // If points are closed, use localEuclidDistance
             // for faster and more accuracy while points are too close (such as less than 1m)
             IGeoPoint.localEuclidDistance(this, point)

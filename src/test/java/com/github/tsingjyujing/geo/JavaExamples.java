@@ -20,7 +20,7 @@ public class JavaExamples {
 
     public static void polygonExample() {
         final GeoPolygon polygon = GeoPolygon$.MODULE$.apply(
-                JavaConverters.asScalaIterableConverter(
+                JavaConverters.iterableAsScalaIterableConverter(
                         // Put your polygon info in this list
                         new ArrayList<IGeoPoint>()
                 ).asScala()
@@ -35,7 +35,7 @@ public class JavaExamples {
 
     public static void geoTimeSeriesExample() {
         final GeoPointTimeSeries ts = GeoPointTimeSeries$.MODULE$.apply(
-                JavaConverters.asScalaIterableConverter(
+                JavaConverters.iterableAsScalaIterableConverter(
                         Lists.newArrayList(
                                 new TimeElement<IGeoPoint>(
                                         100,

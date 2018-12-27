@@ -149,7 +149,7 @@ class GeoAutoTest extends FlatSpec with Matchers {
             val count1 = withInPoints.size
             val count2 = points.count(point => point.geoTo(center) <= radius)
             withInPoints.foreach(p => {
-                assert(p.geoTo(center) <= radius, "Invalid point")
+                assert(p.geoTo(center) <= radius * 1.01, "Invalid point")
             })
             assert(count1 == count2, "Assert failed while test geo within")
             if (count2 == 0) {
