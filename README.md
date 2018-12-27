@@ -25,7 +25,7 @@ Set the scala version you wanna to use in properties:
 
 ```xml
 <properties>
-    <scala.version.main>2.10</scala.version.main>
+    <scala.version.main>2.11</scala.version.main>
 </properties>
 ```
 
@@ -36,15 +36,16 @@ And set dependency like this:
     <dependency>
         <groupId>com.github.tsingjyujing</groupId>
         <artifactId>geo-library</artifactId>
+        <!--Add the version you prefer here-->
     </dependency>
 </dependencies>
 ```
 
 **Notice** 
-Scala 2.11 or newer version is **NOT** available on maven central, you may compile and install on local by executing `mvn clean install`
+Scala 2.10/2.12 or newer version is **NOT** available on maven central, you may compile and install on local by executing `mvn clean install`
 
 ## TODO
 - Create new algorithm k-means++ & k-means || to initialize points with geo-optimized algorithm
 - parse GeoJSON object from string
-- Now support scala 2.10 only, for 2.11 or higher version should download source and `mvn clean package`
+- Now support scala 2.11 only, for other scala version you should download source, modify `pom.xml` and `mvn clean package`
 

@@ -16,6 +16,9 @@ import scala.collection.mutable.ArrayBuffer
   * @param pointSearchLimit how many points to search
   * @tparam T Type to save geo points, any type extends IGeoPoint
   */
+@BeCarefulWhileUsing(
+    message = "Not prepared for all platform yet"
+)
 class GeoNativeIndexPointTree[T](pointSearchLimit: Int = -1) extends IGeoPointSet[GeoPointValued[T]] {
 
     private val pointDataBuffer: ArrayBuffer[GeoPointValued[T]] = ArrayBuffer[GeoPointValued[T]]()
