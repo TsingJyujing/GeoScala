@@ -10,7 +10,7 @@ import scala.util.parsing.json.JSONObject
   *
   * @param points points which contribute line string
   */
-case class GeoLineString(points: IndexedSeq[IGeoPoint]) extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
+case class GeoLineString[TGeoPoint <: IGeoPoint](points: IndexedSeq[TGeoPoint]) extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
 
 
     assert(points.size >= 2, "Points count can't less than 2.")
@@ -18,7 +18,7 @@ case class GeoLineString(points: IndexedSeq[IGeoPoint]) extends GeoDistanceMeasu
     /**
       * Geo line string data
       */
-    val geoLineString: IndexedSeq[GeoLine] = points.sliding(2).map(x => GeoLine(x.head, x.last)).toIndexedSeq
+    val geoLineString: IndexedSeq[GeoLine[TGeoPoint]] = points.sliding(2).map(x => GeoLine(x.head, x.last)).toIndexedSeq
 
     val lineStringLength: Double = geoLineString.map(_.lineLength).sum
 
@@ -49,7 +49,7 @@ case class GeoLineString(points: IndexedSeq[IGeoPoint]) extends GeoDistanceMeasu
           *
           * @return
           */
-        def getLine: GeoLine = geoLineString(offsetStart)
+        def getLine: GeoLine[TGeoPoint] = geoLineString(offsetStart)
 
         /**
           * Get line start point

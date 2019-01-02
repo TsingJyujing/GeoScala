@@ -12,17 +12,17 @@ import scala.util.parsing.json.JSONObject
   *
   * @param pointStart
   * @param pointEnd
+  * @tparam TGeoPoint Type of GeoPoint
   */
-case class GeoLine(pointStart: IGeoPoint, pointEnd: IGeoPoint) extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
+case class GeoLine[TGeoPoint <: IGeoPoint](pointStart: TGeoPoint, pointEnd: TGeoPoint) extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable {
 
-    val pointTuple: (IGeoPoint, IGeoPoint) = (pointStart, pointEnd)
 
     /**
       * get two points of the line
       *
       * @return
       */
-    def getTerminalPoints: (IGeoPoint, IGeoPoint) = pointTuple
+    def getTerminalPoints: (TGeoPoint, TGeoPoint) = (pointStart, pointEnd)
 
     /**
       * Get the distance of start point to end point as length of the line
@@ -57,7 +57,7 @@ case class GeoLine(pointStart: IGeoPoint, pointEnd: IGeoPoint) extends GeoDistan
         }
     }
 
-    override def toGeoJSON: JSONObject = GeoJSONable.createLineString(Array(getTerminalPoints._1, getTerminalPoints._2))
+    override def toGeoJSON: JSONObject = GeoJSONable.createLineString(Array[IGeoPoint](pointStart, pointEnd))
 
     assert(dataValid, "Data not valid")
 

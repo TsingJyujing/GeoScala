@@ -13,7 +13,7 @@ import scala.util.parsing.json.JSONObject
   * @param points       points which contribute line string
   * @param searchRadius radius to search
   */
-case class GeoFastLineString(points: IndexedSeq[IGeoPoint], searchRadius: Double) extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with IContains[IGeoPoint] {
+case class GeoFastLineString[TGeoPoint <: IGeoPoint](points: IndexedSeq[TGeoPoint], searchRadius: Double) extends GeoDistanceMeasurable[IGeoPoint] with GeoJSONable with IContains[IGeoPoint] {
 
 
     assert(points.size >= 2, "Points count can't less than 2.")
@@ -21,12 +21,12 @@ case class GeoFastLineString(points: IndexedSeq[IGeoPoint], searchRadius: Double
     /**
       * Interpolated points
       */
-    private val pointsTree: GeoPointTree[GeoPointValued[GeoLine]] = {
-        val geoPointTree = new GeoPointTree[GeoPointValued[GeoLine]]()
+    private val pointsTree: GeoPointTree[GeoPointValued[GeoLine[TGeoPoint]]] = {
+        val geoPointTree = new GeoPointTree[GeoPointValued[GeoLine[TGeoPoint]]]()
         geoPointTree.appendPoint(
-            GeoPointValued[GeoLine](
+            GeoPointValued[GeoLine[TGeoPoint]](
                 points(0),
-                GeoLine(points(0), points(1))
+                GeoLine[TGeoPoint](points(0), points(1))
             )
         )
         geoPointTree.appendPoints(
@@ -41,7 +41,7 @@ case class GeoFastLineString(points: IndexedSeq[IGeoPoint], searchRadius: Double
                         lineData.tail
                     }
                     pointsProcessed.map(p => {
-                        GeoPointValued[GeoLine](
+                        GeoPointValued[GeoLine[TGeoPoint]](
                             p, line
                         )
                     })
