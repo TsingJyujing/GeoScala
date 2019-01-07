@@ -1,8 +1,11 @@
 package com.github.tsingjyujing.geo.util.convertor
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint
-import com.github.tsingjyujing.geo.basic.operations.GeoTransformable
+import com.github.tsingjyujing.geo.basic.operations.{GeoJSONable, GeoTransformable}
+import com.github.tsingjyujing.geo.element.GeoPolygonWithHoles
 import com.github.tsingjyujing.geo.element.immutable.GeoPoint
+
+import scala.io.Source
 
 /**
   * GCJ02是中国国家测绘局提出的坐标加密系统
@@ -13,9 +16,17 @@ import com.github.tsingjyujing.geo.element.immutable.GeoPoint
   *
   * 本类适用于WGS84坐标系和GCJ02加密坐标系的互相转换
   * GSJ02坐标系适用于大部分的地图，例如高德地图
+  *
   * @author tsingjyujing@163.com
   */
 object GCJ02 extends GeoTransformable {
+
+    val polygonOfChina: IndexedSeq[GeoPolygonWithHoles] = {
+        Source.fromInputStream(GCJ02.getClass.getResourceAsStream("/polygons.json.txt")).getLines().map(
+            GeoJSONable.parseGeoPolygonWithHoles
+        ).toIndexedSeq
+    }
+
     /**
       * Encrypt WGS84 location to other format
       *
@@ -45,7 +56,24 @@ object GCJ02 extends GeoTransformable {
       * @param point
       * @return
       */
-    def needTransform(point: IGeoPoint): Boolean = point.getLongitude > 72.004 && point.getLongitude < 137.8347 && point.getLatitude > 0.8293 && point.getLatitude < 55.8271
+    @deprecated(message = "Fast but not accuracy near China like India/Vietnam/...")
+    def needTransformFast(point: IGeoPoint): Boolean = point.getLongitude > 72.004 && point.getLongitude < 137.8347 && point.getLatitude > 0.8293 && point.getLatitude < 55.8271
+
+    /**
+      * is point in china and need to transform
+      *
+      * @param point
+      * @return
+      */
+    def needTransformAccuracy(point: IGeoPoint): Boolean = polygonOfChina.exists(_.contains(point))
+
+    /**
+      * is point in china and need to transform
+      *
+      * @param point
+      * @return
+      */
+    def needTransform(point: IGeoPoint): Boolean = needTransformAccuracy(point)
 
     private def transformLat(x: Double, y: Double): Double = {
         -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y +

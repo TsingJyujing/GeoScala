@@ -185,8 +185,8 @@ class GeoAutoTest extends FlatSpec with Matchers {
         val writer = new PrintWriter(new File("bd09_error.csv"))
         val eps = 0.001
         val T = BD09
-        70.0D.to(150, 0.1).foreach(lng => {
-            15.0D.to(55, 0.1).foreach(lat => {
+        105.0D.to(111, 0.1).foreach(lng => {
+            32.0D.to(40, 0.1).foreach(lat => {
                 val rawPoint = GeoPoint(lng, lat)
                 val transformedPoint = T.inverseTransform(T.transform(rawPoint), eps = eps)
                 val err = rawPoint geoTo transformedPoint
@@ -205,8 +205,8 @@ class GeoAutoTest extends FlatSpec with Matchers {
         val writer = new PrintWriter(new File("gcj02_error.csv"))
         val eps = 0.001
         val T = GCJ02
-        70.0D.to(150, 0.1).foreach(lng => {
-            15.0D.to(55, 0.1).foreach(lat => {
+        105.0D.to(111, 0.1).foreach(lng => {
+            32.0D.to(40, 0.1).foreach(lat => {
                 val rawPoint = GeoPoint(lng, lat)
                 val transformedPoint = T.inverseTransform(T.transform(rawPoint), eps = eps)
                 val err = rawPoint geoTo transformedPoint
