@@ -16,7 +16,7 @@ import scala.io.Source
 
 object RunDebug {
 
-    def main(args: Array[String]): Unit = createPolygonWithHolesSamples()
+    def main(args: Array[String]): Unit = cleanGeoData()
 
     /**
       * 折线匹配
@@ -277,5 +277,12 @@ object RunDebug {
         val points = GeoCircleArea(GeoPoint(108, 89), 300).toPolygon(20)
         FileIO.writePoints("visualize/circle_area.csv", points)
         FileIO.writePoints3D("visualize/circle_area_3d.csv", points)
+    }
+
+    def cleanGeoData(): Unit = {
+        val points = FileIO.readGeoPointTimeSeries("track.csv")
+        val cleanedPoints = points.cleanGpsData(150 / 3600.0 / 1000)
+        print(cleanedPoints.size)
+        FileIO.writeGeoPointTimeSeries("track-clean.csv", cleanedPoints)
     }
 }

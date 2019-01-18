@@ -130,7 +130,7 @@ class GeoPointTimeSeries[T <: IGeoPoint] extends ITimeIndexSeq[TimeElement[T]] {
         dataStack.appendAll(this.tail.zipWithIndex.flatMap(
             x => {
                 val te = x._1
-                val index = x._2
+                val index = x._2 + 1
                 val ds = lastValidPoint.getValue.geoTo(te.getValue)
                 val dt = te.getTick - lastValidPoint.getTick
                 val speed = ds / dt
@@ -162,11 +162,12 @@ class GeoPointTimeSeries[T <: IGeoPoint] extends ITimeIndexSeq[TimeElement[T]] {
       * @return
       */
     def cleanGpsData(speedLimit: Double): GeoPointTimeSeries[T] = {
-        GeoPointTimeSeries(filter(point => {
+        val validPoints = GeoPointTimeSeries(filter(point => {
             val lng = point.getValue.getLongitude
             val lat = point.getValue.getLatitude
-            math.abs(lng) > 1e-4 && math.abs(lat) > 1e-4
-        })).cleanOverSpeed(speedLimit)
+            math.abs(lng) > 1e-4 || math.abs(lat) > 1e-4
+        }))
+        validPoints.cleanOverSpeed(speedLimit)
     }
 
     /**

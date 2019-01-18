@@ -2,10 +2,8 @@ package com.github.tsingjyujing.geo.element.immutable
 
 import com.github.tsingjyujing.geo.basic.IGeoPoint
 import com.github.tsingjyujing.geo.basic.operations.{GeoDistanceMeasurable, GeoJSONable, IContains}
-import com.github.tsingjyujing.geo.element.GeoPointTree
+import com.github.tsingjyujing.geo.element.{GeoPointTimeSeries, GeoPointTree}
 import com.github.tsingjyujing.geo.util.GeoUtil
-
-import scala.util.parsing.json.JSONObject
 
 /**
   * Geo point line string which can search/get distance fast
@@ -29,9 +27,18 @@ case class GeoFastLineString[TGeoPoint <: IGeoPoint](points: IndexedSeq[TGeoPoin
                 GeoLine[TGeoPoint](points(0), points(1))
             )
         )
+
         geoPointTree.appendPoints(
-            points.sliding(2).flatMap(
-                lineData => {
+            GeoPointTimeSeries[TGeoPoint](
+                points.zipWithIndex.map(
+                    p => {
+                        TimeElement[TGeoPoint](p._2, p._1)
+                    }
+                )
+            ).isometricallyResample(
+                searchRadius / 2, 1.5
+            ).map(_.getValue.asInstanceOf[TGeoPoint]).sliding(2).flatMap(
+                lineData => try {
                     val line = GeoLine(lineData.head, lineData.last)
                     val dist = lineData.head ~> lineData.last
                     val pointsProcessed = if (dist > (searchRadius / 2)) {
@@ -45,6 +52,8 @@ case class GeoFastLineString[TGeoPoint <: IGeoPoint](points: IndexedSeq[TGeoPoin
                             p, line
                         )
                     })
+                } catch {
+                    case ex: Throwable => Iterable.empty
                 }
             )
         )

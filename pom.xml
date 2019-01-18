@@ -3,10 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <!--Scala version = main.sub -->
-        <scala.version.main>2.11</scala.version.main>
-        <scala.version.sub>12</scala.version.sub>
-        <geoscala.version>2.8.9</geoscala.version>
+        <geoscala.version>2.8.10</geoscala.version>
         <project.build.sourceEncoding>
             UTF-8
         </project.build.sourceEncoding>
@@ -15,6 +12,7 @@
         </project.reporting.outputEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+        <beta>-SNAPSHOT</beta>
     </properties>
 
     <parent>
@@ -25,7 +23,7 @@
 
     <groupId>com.github.tsingjyujing</groupId>
     <artifactId>geo-library</artifactId>
-    <version>${geoscala.version}-${scala.version.main}</version>
+    <version>${geoscala.version}-${scala.version.main}${beta}</version>
     <packaging>jar</packaging>
 
     <developers>
@@ -60,11 +58,6 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>org.scala-lang.modules</groupId>
-            <artifactId>scala-parser-combinators_${scala.version.main}</artifactId>
-            <version>1.0.4</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -79,10 +72,11 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
-            <version>3.6.3</version>
+            <version>3.9.1</version>
             <optional>true</optional>
         </dependency>
 
@@ -255,6 +249,60 @@
         </plugins>
 
     </build>
+
+    <profiles>
+        <profile>
+            <id>scala_2_11</id>
+            <properties>
+                <!--Scala version = main.sub -->
+                <scala.version.main>2.11</scala.version.main>
+                <scala.version.sub>12</scala.version.sub>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.scala-lang.modules</groupId>
+                    <artifactId>scala-parser-combinators_2.11</artifactId>
+                    <version>1.1.1</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>scala_2_10</id>
+            <properties>
+                <!--Scala version = main.sub -->
+                <scala.version.main>2.10</scala.version.main>
+                <scala.version.sub>7</scala.version.sub>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>snapshot</id>
+            <properties>
+                <beta>-SNAPSHOT</beta>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>release</id>
+            <properties>
+                <beta></beta>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>cvnavi-nexus</id>
+            <distributionManagement>
+                <repository>
+                    <id>releases</id>
+                    <url>http://10.10.10.231:18081/nexus/content/repositories/releases</url>
+                </repository>
+                <snapshotRepository>
+                    <id>snapshots</id>
+                    <url>http://10.10.10.231:18081/nexus/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 
 
 </project>
