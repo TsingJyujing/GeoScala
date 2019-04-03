@@ -1,6 +1,8 @@
 ![geo-scala](icon.png)
 # Geo Scala
 
+**Attention: we append 996-ICU licence to standard apache-2.0 licence, please notice that while using this code**
+
 [![CircleCI](https://circleci.com/gh/TsingJyujing/GeoScala.svg?style=svg)](https://circleci.com/gh/TsingJyujing/GeoScala)
 
 A robust geo library written by Java and Scala, contains:
