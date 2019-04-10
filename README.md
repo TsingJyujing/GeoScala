@@ -1,4 +1,4 @@
-![geo-scala](icon.png)
+![geo-scala](geoscala-logo.png)
 # Geo Scala
 
 **Attention: we append 996-ICU licence to standard apache-2.0 licence, please notice that while using this code**

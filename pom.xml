@@ -131,7 +131,6 @@
 
         <finalName>${project.artifactId}</finalName>
         <outputDirectory>target/classes</outputDirectory>
-
         <testOutputDirectory>target/test-classes</testOutputDirectory>
 
         <plugins>
