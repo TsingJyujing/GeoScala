@@ -22,7 +22,7 @@ import scala.io.Source
 object GCJ02 extends GeoTransformable {
 
     val polygonOfChina: IndexedSeq[GeoPolygonWithHoles] = {
-        Source.fromInputStream(GCJ02.getClass.getResourceAsStream("/polygons.json.txt")).getLines().map(
+        Source.fromInputStream(GCJ02.getClass.getResourceAsStream("/china.polygons.json.txt")).getLines().map(
             GeoJSONable.parseGeoPolygonWithHoles
         ).toIndexedSeq
     }

@@ -1,6 +1,5 @@
 name: Build and Test
-on:
-  - push
+on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,8 +10,8 @@ jobs:
         with:
           java-version: 1.8
       - name: Unit Tests and Build (Scala 2.13)
-        run: mvn -B package -Dscala.version.main=2.13 -Dscala.version.sub=3 --file pom.xml
+        run: mvn -B clean test -Dscala.version.main=2.13 -Dscala.version.sub=3 --file pom.xml
       - name: Unit Tests and Build (Scala 2.12)
-        run: mvn -B package -Dscala.version.main=2.12 -Dscala.version.sub=12 --file pom.xml
+        run: mvn -B clean test -Dscala.version.main=2.12 -Dscala.version.sub=12 --file pom.xml
       - name: Unit Tests and Build (Scala 2.11)
-        run: mvn -B package -Dscala.version.main=2.11 -Dscala.version.sub=12 --file pom.xml
+        run: mvn -B clean test -Dscala.version.main=2.11 -Dscala.version.sub=12 --file pom.xml

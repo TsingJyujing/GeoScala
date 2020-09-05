@@ -9,9 +9,9 @@ import com.github.tsingjyujing.geo.element.{GeoHeatMap, GeoNativeIndexPointTree,
 import com.github.tsingjyujing.geo.util.GeoUtil
 import com.github.tsingjyujing.geo.util.convertor.{BD09, GCJ02}
 import com.github.tsingjyujing.geo.util.mathematical.Probability.{gaussian => randn, uniform => rand}
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 
-class GeoAutoTest extends FlatSpec with Matchers {
+class GeoAutoTest extends AnyFlatSpec{
 
 
     "Elements" should "GeoHash" in {

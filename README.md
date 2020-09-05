@@ -1,7 +1,8 @@
-![geo-scala](icon.png)
-# Geo Scala
+![geo-scala](logo.png)
 
 [![CircleCI](https://circleci.com/gh/TsingJyujing/GeoScala.svg?style=svg)](https://circleci.com/gh/TsingJyujing/GeoScala)
+
+[中文](README_ZH.md)
 
 A robust geo library written by Java and Scala, contains:
 - GPS 2d-spherical geometry
@@ -17,19 +18,7 @@ See [Scala Doc](https://tsingjyujing.github.io/geo-scala-doc/) for more details 
 
 ## Maven
 
-<del>Will deploy in Central Maven Server in the future, but now, use `mvn clean install` to install to local.</del>
-
 Now, you can use it on maven directly:
-
-Set the scala version you wanna to use in properties:
-
-```xml
-<properties>
-    <scala.version.main>2.11</scala.version.main>
-</properties>
-```
-
-And set dependency like this:
 
 ```xml
 <dependencies>
@@ -41,11 +30,27 @@ And set dependency like this:
 </dependencies>
 ```
 
-**Notice** 
-Scala 2.10/2.12 or newer version is **NOT** available on maven central, you may compile and install on local by executing `mvn clean install`
+## Build From Source
 
-## TODO
-- Create new algorithm k-means++ & k-means || to initialize points with geo-optimized algorithm
-- parse GeoJSON object from string
-- Now support scala 2.11 only, for other scala version you should download source, modify `pom.xml` and `mvn clean package`
+```shell script
+mvn clean install \
+    -Dscala.version.main=2.13 \
+    -Dscala.version.sub=3
+```
 
+You can set scala version manually like:
+
+Scala 2.12
+
+```shell script
+mvn clean install \
+    -Dscala.version.main=2.12 \
+    -Dscala.version.sub=12
+```
+
+Scala 2.11
+```shell script
+mvn clean install \
+    -Dscala.version.main=2.11 \
+    -Dscala.version.sub=12
+```

@@ -2,33 +2,22 @@
 
 [![CircleCI](https://circleci.com/gh/TsingJyujing/GeoScala.svg?style=svg)](https://circleci.com/gh/TsingJyujing/GeoScala)
 
-A robust geo library written by Java and Scala, contains:
-- GPS 2d-spherical geometry
-- GPS track compression and heat-map.
-- GPS point index
-- Machine learning algorithms implemented on sphere
 
-## Documents
+这是一个用Scala（为主）写成的地理数据计算库，包括：
+- GPS 球面几何
+- GPS 轨迹压缩与热力图
+- GPS 点索引
+- 其它一些基于球面集合重新实现的机器学习算法
 
-See <a href="https://github.com/TsingJyujing/GeoScala/wiki">GeoScala - wiki</a>
+## 文档
 
-See [Scala Doc](https://tsingjyujing.github.io/geo-scala-doc/) for more details about classes.
+可以看 [wiki](https://github.com/TsingJyujing/GeoScala/wiki)。
 
-## Maven
+也可以看 [Scala Doc](https://tsingjyujing.github.io/geo-scala-doc/) 来查看类的细节
 
-<del>Will deploy in Central Maven Server in the future, but now, use `mvn clean install` to install to local.</del>
+## Maven使用
 
-Now, you can use it on maven directly:
-
-Set the scala version you wanna to use in properties:
-
-```xml
-<properties>
-    <scala.version.main>2.11</scala.version.main>
-</properties>
-```
-
-And set dependency like this:
+你可以在Maven上使用它
 
 ```xml
 <dependencies>
@@ -40,11 +29,27 @@ And set dependency like this:
 </dependencies>
 ```
 
-**Notice** 
-Scala 2.10/2.12 or newer version is **NOT** available on maven central, you may compile and install on local by executing `mvn clean install`
+## 从源码安装
 
-## TODO
-- Create new algorithm k-means++ & k-means || to initialize points with geo-optimized algorithm
-- parse GeoJSON object from string
-- Now support scala 2.11 only, for other scala version you should download source, modify `pom.xml` and `mvn clean package`
+```shell script
+mvn clean install \
+    -Dscala.version.main=2.13 \
+    -Dscala.version.sub=3
+```
 
+你可以手动设置Scala版本：
+
+Scala 2.12
+
+```shell script
+mvn clean install \
+    -Dscala.version.main=2.12 \
+    -Dscala.version.sub=12
+```
+
+Scala 2.11
+```shell script
+mvn clean install \
+    -Dscala.version.main=2.11 \
+    -Dscala.version.sub=12
+```
