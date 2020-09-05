@@ -9,8 +9,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - name: Unit Tests and Build (Scala 2.13)
-        run: mvn -B clean test -Dscala.version.main=2.13 -Dscala.version.sub=3 --file pom.xml
       - name: Unit Tests and Build (Scala 2.12)
         run: mvn -B clean test -Dscala.version.main=2.12 -Dscala.version.sub=12 --file pom.xml
       - name: Unit Tests and Build (Scala 2.11)

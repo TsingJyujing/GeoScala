@@ -16,12 +16,6 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
-      - name: Publish package (Scala 2.13)
-        run: mvn -B deploy -Dscala.version.main=2.13 -Dscala.version.sub=3 -Dgeoscala.version=${GITHUB_REF##v}
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USER }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-
       - name: Publish package (Scala 2.12)
         run: mvn -B deploy -Dscala.version.main=2.12 -Dscala.version.sub=12 -Dgeoscala.version=${GITHUB_REF##v}
         env:

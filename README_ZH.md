@@ -33,19 +33,11 @@
 
 ```shell script
 mvn clean install \
-    -Dscala.version.main=2.13 \
-    -Dscala.version.sub=3
-```
-
-你可以手动设置Scala版本：
-
-Scala 2.12
-
-```shell script
-mvn clean install \
     -Dscala.version.main=2.12 \
     -Dscala.version.sub=12
 ```
+
+你可以手动设置Scala版本：
 
 Scala 2.11
 ```shell script

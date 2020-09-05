@@ -34,19 +34,11 @@ Now, you can use it on maven directly:
 
 ```shell script
 mvn clean install \
-    -Dscala.version.main=2.13 \
-    -Dscala.version.sub=3
-```
-
-You can set scala version manually like:
-
-Scala 2.12
-
-```shell script
-mvn clean install \
     -Dscala.version.main=2.12 \
     -Dscala.version.sub=12
 ```
+
+You can set scala version manually like:
 
 Scala 2.11
 ```shell script
