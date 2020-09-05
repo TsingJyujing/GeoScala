@@ -5,9 +5,14 @@
     <distributionManagement>
         <repository>
             <id>ossrh</id>
-            <name>Central Repository OSSRH</name>
+            <name>Maven Repository</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
+        <snapshotRepository>
+            <id>ossrh-snapshot</id>
+            <name>Maven Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <properties>
@@ -15,6 +20,7 @@
         <scala.version.main>2.12</scala.version.main>
         <scala.version.sub>12</scala.version.sub>
         <geoscala.version>2.8.9</geoscala.version>
+        <!--suppress CheckTagEmptyBody -->
         <geoscala.snapshot></geoscala.snapshot>
         <project.build.sourceEncoding>
             UTF-8
@@ -265,6 +271,5 @@
         </plugins>
 
     </build>
-
 
 </project>
