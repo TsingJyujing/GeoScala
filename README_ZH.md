@@ -37,9 +37,8 @@ mvn clean install \
     -Dscala.version.sub=12
 ```
 
-你可以手动设置Scala版本：
+你可以手动设置Scala版本，如使用Scala 2.11:
 
-Scala 2.11
 ```shell script
 mvn clean install \
     -Dscala.version.main=2.11 \

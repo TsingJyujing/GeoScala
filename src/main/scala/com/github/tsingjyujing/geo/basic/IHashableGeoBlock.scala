@@ -128,16 +128,16 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
     def getMaxDistance(x: IHashableGeoBlock): Double = (getCenterPoint geoTo x.getCenterPoint) + (circumradius + x.circumradius)
 
     /**
-      * get min distance from block to point
-      *
-      * if point in block: --> 0
-      * else:
-      * if point out of circumradius --> distanceToCenter - circumradius
-      * else --> calculate for each boundary point
-      *
-      * @param x
-      * @return
-      */
+     * get min distance from block to point
+     *
+     * if point in block: --> 0
+     * else:
+     * if point out of circumradius --> distanceToCenter - circumradius
+     * else --> calculate for each boundary point
+     *
+     * @param x the point
+     * @return
+     */
     def getMinDistance(x: IGeoPoint): Double = {
         val currentPointHash = IHashableGeoBlock.createCodeFromGps(x, getGeoHashAccuracy)
         if (currentPointHash == getIndexCode) {
@@ -163,11 +163,11 @@ trait IHashableGeoBlock extends IGeoPoint with IHashedIndex[Long] {
     }
 
     /**
-      * get max distance from block to point
-      *
-      * @param x
-      * @return
-      */
+     * get max distance from block to point
+     *
+     * @param x the point
+     * @return
+     */
     def getMaxDistance(x: IGeoPoint): Double = (getCenterPoint geoTo x) + circumradius
 
     override def equals(o: Any): Boolean = o match {
@@ -222,21 +222,21 @@ object IHashableGeoBlock {
     val EARTH_RADIUS: Double = 6378.5
 
     /**
-      * Get combined code from point
-      *
-      * @param point
-      * @param accuracy
-      * @return
-      */
+     * Get combined code from point
+     *
+     * @param point    GPS coordinate
+     * @param accuracy how many segments to split for longitude and latitude
+     * @return
+     */
     def createCodeFromGps(point: IGeoPoint, accuracy: Long): Long = createCodeFromCodeTuple(createCodeTupleFromGps(point, accuracy))
 
     /**
-      * Get code tuple from point
-      *
-      * @param point
-      * @param accuracy
-      * @return
-      */
+     * Get code tuple from point
+     *
+     * @param point    GPS coordinate
+     * @param accuracy how many segments to split for longitude and latitude
+     * @return
+     */
     def createCodeTupleFromGps(point: IGeoPoint, accuracy: Long): (Long, Long) = {
         val lngCode = math.round((point.getLongitude + 180.0d) / 180.0d * accuracy)
         val latCode = math.round((point.getLatitude + 90.00d) / 180.0d * accuracy)
@@ -244,19 +244,19 @@ object IHashableGeoBlock {
     }
 
     /**
-      * Convert long tuple into a long value
-      *
-      * @param code
-      * @return
-      */
+     * Convert long tuple into a long value
+     *
+     * @param code 64bit data saving geohash
+     * @return
+     */
     def createCodeFromCodeTuple(code: (Long, Long)): Long = code._1 * IHashableGeoBlock.POW2E31 + code._2
 
     /**
-      * Convert code into tuple
-      *
-      * @param code
-      * @return
-      */
+     * Convert code into tuple
+     *
+     * @param code 64bit data saving geohash
+     * @return
+     */
     def revertCodeTupleFromCode(code: Long): (Long, Long) = {
         val latCode = code & (POW2E31 - 1)
         val lngCode = (code - latCode) / POW2E31
@@ -264,12 +264,12 @@ object IHashableGeoBlock {
     }
 
     /**
-      * Convert code tuple into point
-      *
-      * @param code
-      * @param accuracy
-      * @return
-      */
+     * Convert code tuple into point
+     *
+     * @param code     given block hash
+     * @param accuracy accuracy of hash block
+     * @return
+     */
     def revertGpsFromCodeTuple(code: (Long, Long), accuracy: Long): IGeoPoint = {
         val lng = code._1 * 180.0 / accuracy - 180.0
         val lat = code._2 * 180.0 / accuracy - 90.0
@@ -277,12 +277,12 @@ object IHashableGeoBlock {
     }
 
     /**
-      * Convert code into point
-      *
-      * @param code
-      * @param accuracy
-      * @return
-      */
+     * Convert code into point
+     *
+     * @param code     given block hash
+     * @param accuracy accuracy of hash block
+     * @return
+     */
     def revertGpsFromCode(code: Long, accuracy: Long): IGeoPoint = revertGpsFromCodeTuple(revertCodeTupleFromCode(code), accuracy)
 
 

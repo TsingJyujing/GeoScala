@@ -60,7 +60,7 @@ visualize/*.json
 .idea/
 target/
 experimental/
-.iml
+*.iml
 
 doc/amWiki
 doc/export

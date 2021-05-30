@@ -38,9 +38,8 @@ mvn clean install \
     -Dscala.version.sub=12
 ```
 
-You can set scala version manually like:
+You can set scala version manually, for example, using Scala 2.11.12:
 
-Scala 2.11
 ```shell script
 mvn clean install \
     -Dscala.version.main=2.11 \
